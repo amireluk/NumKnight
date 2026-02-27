@@ -1,6 +1,7 @@
 import { useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence, useAnimation } from 'framer-motion'
 import { makeRound } from '../game/battleLogic'
+import { playCorrect, playWrong, playSwordSwing, playImpact, playVictory, playDefeat } from '../game/sounds'
 import { HPBar } from '../components/HPBar'
 import { KnightCharacter } from '../components/KnightCharacter'
 import { EnemyCharacter } from '../components/EnemyCharacter'
@@ -8,18 +9,67 @@ import { AnswerButton } from '../components/AnswerButton'
 
 const IDLE_BUTTON_STATES = ['idle', 'idle', 'idle', 'idle']
 
+// Impact starburst splash — replaces the red flash
+const SPLASH_ANGLES = [0, 45, 90, 135, 180, 225, 270, 315]
+
+function ImpactSplash({ side }) {
+  const isEnemy = side === 'enemy'
+  const color = isEnemy ? '#fbbf24' : '#f87171'
+
+  return (
+    <motion.div
+      className="absolute pointer-events-none"
+      style={{
+        top: '28%',
+        left: isEnemy ? '64%' : '36%',
+        transform: 'translate(-50%, -50%)',
+        zIndex: 10,
+      }}
+      initial={{ scale: 0.1, opacity: 1 }}
+      animate={{ scale: 1.3, opacity: 0 }}
+      transition={{ duration: 0.3, ease: 'easeOut' }}
+    >
+      <svg width="60" height="60" viewBox="-30 -30 60 60" fill="none">
+        {SPLASH_ANGLES.map((angle) => {
+          const rad = (angle * Math.PI) / 180
+          return (
+            <line
+              key={angle}
+              x1={Math.cos(rad) * 5}
+              y1={Math.sin(rad) * 5}
+              x2={Math.cos(rad) * 22}
+              y2={Math.sin(rad) * 22}
+              stroke={color}
+              strokeWidth="3.5"
+              strokeLinecap="round"
+            />
+          )
+        })}
+        <circle cx="0" cy="0" r="5" fill={color} />
+      </svg>
+    </motion.div>
+  )
+}
+
 export function BattleScreen({ world, onBattleEnd }) {
   const enemy = world.enemies[0]
+  const shakeControls = useAnimation()
 
   const [playerHP, setPlayerHP] = useState(world.playerHP)
   const [enemyHP, setEnemyHP] = useState(world.enemyHP)
   const [round, setRound] = useState(() => makeRound(world.tableRange))
-  const [phase, setPhase] = useState('idle') // 'idle'|'attacking'|'combo'|'hit'|'won'|'lost'
-  const [combo, setCombo] = useState(0)
+  const [phase, setPhase] = useState('idle')
   const [mistakes, setMistakes] = useState(0)
   const [buttonStates, setButtonStates] = useState(IDLE_BUTTON_STATES)
+  const [splash, setSplash] = useState(null) // { id, side }
 
   const { problem, options } = round
+
+  const showSplash = (side) => {
+    const id = Date.now()
+    setSplash({ id, side })
+    setTimeout(() => setSplash(null), 400)
+  }
 
   const loadNextRound = () => {
     setRound(makeRound(world.tableRange))
@@ -41,87 +91,81 @@ export function BattleScreen({ world, onBattleEnd }) {
     )
 
     if (isCorrect) {
-      const newCombo = combo + 1
-      setCombo(newCombo)
-      const isComboStrike = newCombo > 0 && newCombo % 3 === 0
-      const damage = isComboStrike ? 2 : 1
-      setPhase(isComboStrike ? 'combo' : 'attacking')
+      playCorrect()
+      setPhase('attacking')
 
       setTimeout(() => {
-        const newEnemyHP = Math.max(0, enemyHP - damage)
+        playSwordSwing()
+        showSplash('enemy')
+        const newEnemyHP = Math.max(0, enemyHP - 1)
         setEnemyHP(newEnemyHP)
 
         if (newEnemyHP <= 0) {
           setPhase('won')
-          setTimeout(() => onBattleEnd({ won: true, mistakes }), 900)
+          playVictory()
+          setTimeout(() => onBattleEnd({ won: true, mistakes }), 1100)
         } else {
           loadNextRound()
         }
-      }, 750)
+      }, 280)
     } else {
+      playWrong()
       const newMistakes = mistakes + 1
       setMistakes(newMistakes)
-      setCombo(0)
       setPhase('hit')
 
       setTimeout(() => {
+        playImpact()
+        showSplash('player')
+        shakeControls.start({
+          x: [0, -12, 11, -8, 7, -4, 3, 0],
+          transition: { duration: 0.5 },
+        })
         const newPlayerHP = Math.max(0, playerHP - 1)
         setPlayerHP(newPlayerHP)
 
         if (newPlayerHP <= 0) {
           setPhase('lost')
-          setTimeout(() => onBattleEnd({ won: false, mistakes: newMistakes }), 900)
+          playDefeat()
+          setTimeout(() => onBattleEnd({ won: false, mistakes: newMistakes }), 1100)
         } else {
           loadNextRound()
         }
-      }, 750)
+      }, 280)
     }
   }
 
   const isActive = phase !== 'won' && phase !== 'lost'
 
   return (
-    <div className="flex flex-col min-h-dvh max-w-md mx-auto px-4 py-4 gap-3 bg-gradient-to-b from-[#0d0d1e] to-[#1a1040]">
-      {/* World icon header */}
-      <div className="text-center text-2xl">{world.icon}</div>
+    <motion.div
+      animate={shakeControls}
+      className="flex flex-col min-h-dvh max-w-md mx-auto px-3 py-4 gap-4 bg-gradient-to-b from-[#0d0d1e] to-[#1a1040]"
+    >
+      {/* Battle arena: HP cells | characters | HP cells */}
+      <div className="flex flex-1 items-center gap-3 min-h-0">
+        <HPBar current={playerHP} max={world.playerHP} color="green" />
 
-      {/* Enemy HP */}
-      <HPBar current={enemyHP} max={world.enemyHP} color="red" />
+        {/* Characters */}
+        <div className="relative flex flex-1 justify-around items-end py-2">
+          <KnightCharacter phase={phase} />
+          <EnemyCharacter phase={phase} enemy={enemy} />
 
-      {/* Battle arena — characters side by side */}
-      <div className="flex justify-around items-end flex-1 min-h-0 py-2">
-        <KnightCharacter phase={phase} />
-
-        {/* Center — combo badge or crossed swords */}
-        <div className="flex flex-col items-center gap-1">
+          {/* Impact splash */}
           <AnimatePresence>
-            {combo >= 2 && phase === 'idle' && (
-              <motion.div
-                key="combo"
-                initial={{ opacity: 0, scale: 0.5 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.5 }}
-                className="bg-yellow-500 text-black font-black text-xs px-2 py-1 rounded-full shadow-lg"
-              >
-                🔥 {combo}
-              </motion.div>
-            )}
+            {splash && <ImpactSplash key={splash.id} side={splash.side} />}
           </AnimatePresence>
-          <span className="text-gray-600 text-xl">⚔️</span>
         </div>
 
-        <EnemyCharacter phase={phase} enemy={enemy} />
+        <HPBar current={enemyHP} max={world.enemyHP} color="red" />
       </div>
-
-      {/* Player HP */}
-      <HPBar current={playerHP} max={world.playerHP} color="green" />
 
       {/* Problem card */}
       <motion.div
-        key={problem.a + '-' + problem.b}
-        initial={{ opacity: 0, y: 8 }}
+        key={`${problem.a}-${problem.b}`}
+        initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.25 }}
+        transition={{ duration: 0.22 }}
         className="bg-white/10 border border-white/20 rounded-3xl py-5 px-4 text-center shadow-xl"
       >
         <p className="text-5xl font-black text-white tracking-wide">
@@ -129,7 +173,7 @@ export function BattleScreen({ world, onBattleEnd }) {
         </p>
       </motion.div>
 
-      {/* Answer buttons — 2×2 grid */}
+      {/* Answer buttons */}
       <div className="grid grid-cols-2 gap-3 pb-2">
         {options.map((opt, i) => (
           <AnswerButton
@@ -142,6 +186,6 @@ export function BattleScreen({ world, onBattleEnd }) {
           />
         ))}
       </div>
-    </div>
+    </motion.div>
   )
 }

@@ -3,100 +3,125 @@ import { useEffect } from 'react'
 
 function GoblinSVG() {
   return (
-    <svg width="80" height="110" viewBox="0 0 80 110" fill="none">
+    <svg width="84" height="112" viewBox="0 0 90 120" fill="none">
+      <defs>
+        <radialGradient id="gb-skin" cx="35%" cy="28%" r="70%">
+          <stop offset="0%" stopColor="#66bb6a" />
+          <stop offset="100%" stopColor="#2e7d32" />
+        </radialGradient>
+        <radialGradient id="gb-belly" cx="38%" cy="28%" r="65%">
+          <stop offset="0%" stopColor="#a5d6a7" />
+          <stop offset="100%" stopColor="#43a047" />
+        </radialGradient>
+        <radialGradient id="gb-iris" cx="38%" cy="35%" r="58%">
+          <stop offset="0%" stopColor="#ff6659" />
+          <stop offset="55%" stopColor="#d32f2f" />
+          <stop offset="100%" stopColor="#7f0000" />
+        </radialGradient>
+        <radialGradient id="gb-sclera" cx="35%" cy="30%" r="65%">
+          <stop offset="0%" stopColor="#fff9c4" />
+          <stop offset="100%" stopColor="#f9a825" />
+        </radialGradient>
+      </defs>
+
+      {/* Ears */}
+      <path d="M14 35 Q0 18 8 6 Q18 16 24 30Z" fill="#43a047" stroke="#1b5e20" strokeWidth="2" />
+      <path d="M14 33 Q4 19 10 9 Q18 18 22 30Z" fill="#81c784" opacity="0.4" />
+      <path d="M76 35 Q90 18 82 6 Q72 16 66 30Z" fill="#43a047" stroke="#1b5e20" strokeWidth="2" />
+      <path d="M76 33 Q86 19 80 9 Q72 18 68 30Z" fill="#81c784" opacity="0.4" />
+
       {/* Horns */}
-      <polygon points="28,14 22,0 35,12" fill="#15803d" />
-      <polygon points="52,14 58,0 45,12" fill="#15803d" />
-
-      {/* Head */}
-      <ellipse cx="40" cy="34" rx="26" ry="24" fill="#16a34a" />
-
-      {/* Left ear (pointy) */}
-      <polygon points="16,26 6,12 22,22" fill="#16a34a" />
-      {/* Right ear (pointy) */}
-      <polygon points="64,26 74,12 58,22" fill="#16a34a" />
-      {/* Ear shadows */}
-      <polygon points="16,26 9,14 20,23" fill="#15803d" />
-      <polygon points="64,26 71,14 60,23" fill="#15803d" />
-
-      {/* Eyes — yellow sclera, red iris */}
-      <ellipse cx="32" cy="30" rx="7" ry="8" fill="#fef08a" />
-      <ellipse cx="48" cy="30" rx="7" ry="8" fill="#fef08a" />
-      <circle cx="32" cy="31" r="4.5" fill="#dc2626" />
-      <circle cx="48" cy="31" r="4.5" fill="#dc2626" />
-      <circle cx="33" cy="30" r="2.5" fill="#111" />
-      <circle cx="49" cy="30" r="2.5" fill="#111" />
-      {/* Eye glints */}
-      <circle cx="34" cy="29" r="1" fill="white" />
-      <circle cx="50" cy="29" r="1" fill="white" />
-
-      {/* Nose */}
-      <ellipse cx="40" cy="42" rx="5" ry="4" fill="#15803d" />
-      <circle cx="38" cy="43" r="1.5" fill="#166534" />
-      <circle cx="42" cy="43" r="1.5" fill="#166534" />
-
-      {/* Mouth */}
-      <path d="M29 51 Q40 59 51 51" stroke="#166534" strokeWidth="2" fill="none" />
-      {/* Fangs */}
-      <rect x="36" y="51" width="4" height="8" rx="2" fill="white" />
-      <rect x="43" y="51" width="4" height="8" rx="2" fill="white" />
+      <path d="M34 17 Q29 3 37 5 Q38 12 36 18Z" fill="#33691e" stroke="#1b5e20" strokeWidth="1.5" />
+      <path d="M56 17 Q61 3 53 5 Q52 12 54 18Z" fill="#33691e" stroke="#1b5e20" strokeWidth="1.5" />
 
       {/* Body */}
-      <rect x="18" y="56" width="44" height="36" rx="10" fill="#16a34a" />
-      {/* Belly */}
-      <ellipse cx="40" cy="73" rx="16" ry="12" fill="#22c55e" />
+      <ellipse cx="45" cy="97" rx="21" ry="18" fill="url(#gb-skin)" stroke="#1b5e20" strokeWidth="2" />
+      <ellipse cx="45" cy="99" rx="13" ry="11" fill="url(#gb-belly)" stroke="#43a047" strokeWidth="1" />
 
-      {/* Left arm */}
-      <rect x="4" y="58" width="16" height="24" rx="7" fill="#16a34a" />
-      {/* Right arm */}
-      <rect x="60" y="58" width="16" height="24" rx="7" fill="#16a34a" />
-
-      {/* Left claws */}
-      <ellipse cx="7" cy="85" rx="4" ry="5" fill="#15803d" transform="rotate(-25 7 85)" />
-      <ellipse cx="13" cy="87" rx="4" ry="5" fill="#15803d" transform="rotate(-10 13 87)" />
-      {/* Right claws */}
-      <ellipse cx="67" cy="85" rx="4" ry="5" fill="#15803d" transform="rotate(25 67 85)" />
-      <ellipse cx="73" cy="87" rx="4" ry="5" fill="#15803d" transform="rotate(10 73 87)" />
+      {/* Arms */}
+      <path d="M27 84 Q10 92 5 110 Q12 114 16 110 Q19 96 30 88Z"
+        fill="url(#gb-skin)" stroke="#1b5e20" strokeWidth="2" strokeLinejoin="round" />
+      <line x1="5" y1="110" x2="1" y2="117" stroke="#2e7d32" strokeWidth="2.5" strokeLinecap="round" />
+      <line x1="10" y1="113" x2="8" y2="119" stroke="#2e7d32" strokeWidth="2.5" strokeLinecap="round" />
+      <line x1="16" y1="112" x2="16" y2="118" stroke="#2e7d32" strokeWidth="2.5" strokeLinecap="round" />
+      <path d="M63 84 Q80 92 85 110 Q78 114 74 110 Q71 96 60 88Z"
+        fill="url(#gb-skin)" stroke="#1b5e20" strokeWidth="2" strokeLinejoin="round" />
+      <line x1="85" y1="110" x2="89" y2="117" stroke="#2e7d32" strokeWidth="2.5" strokeLinecap="round" />
+      <line x1="80" y1="113" x2="82" y2="119" stroke="#2e7d32" strokeWidth="2.5" strokeLinecap="round" />
+      <line x1="74" y1="112" x2="74" y2="118" stroke="#2e7d32" strokeWidth="2.5" strokeLinecap="round" />
 
       {/* Legs */}
-      <rect x="21" y="88" width="16" height="16" rx="5" fill="#15803d" />
-      <rect x="43" y="88" width="16" height="16" rx="5" fill="#15803d" />
-      {/* Feet */}
-      <ellipse cx="29" cy="105" rx="12" ry="6" fill="#166534" />
-      <ellipse cx="51" cy="105" rx="12" ry="6" fill="#166534" />
+      <path d="M32 111 Q28 119 34 120 Q40 121 39 113Z" fill="#2e7d32" stroke="#1b5e20" strokeWidth="1.5" />
+      <path d="M58 111 Q62 119 56 120 Q50 121 51 113Z" fill="#2e7d32" stroke="#1b5e20" strokeWidth="1.5" />
+
+      {/* Head */}
+      <ellipse cx="45" cy="43" rx="33" ry="31" fill="url(#gb-skin)" stroke="#1b5e20" strokeWidth="2.5" />
+      <ellipse cx="35" cy="29" rx="14" ry="10" fill="white" opacity="0.13" />
+
+      {/* Angry brows */}
+      <path d="M18 37 Q28 29 39 35" stroke="#1b5e20" strokeWidth="4.5" strokeLinecap="round" fill="none" />
+      <path d="M72 37 Q62 29 51 35" stroke="#1b5e20" strokeWidth="4.5" strokeLinecap="round" fill="none" />
+
+      {/* Eyes */}
+      <ellipse cx="30" cy="42" rx="10" ry="11" fill="url(#gb-sclera)" stroke="#1b5e20" strokeWidth="1.5" />
+      <ellipse cx="60" cy="42" rx="10" ry="11" fill="url(#gb-sclera)" stroke="#1b5e20" strokeWidth="1.5" />
+      <circle cx="31" cy="43" r="6.5" fill="url(#gb-iris)" />
+      <circle cx="61" cy="43" r="6.5" fill="url(#gb-iris)" />
+      <ellipse cx="31" cy="44" rx="2.5" ry="4.5" fill="#1a1a1a" />
+      <ellipse cx="61" cy="44" rx="2.5" ry="4.5" fill="#1a1a1a" />
+      <circle cx="33" cy="40" r="1.8" fill="white" />
+      <circle cx="63" cy="40" r="1.8" fill="white" />
+      <ellipse cx="30" cy="42" rx="11" ry="12" fill="#ef5350" opacity="0.1" />
+      <ellipse cx="60" cy="42" rx="11" ry="12" fill="#ef5350" opacity="0.1" />
+
+      {/* Nose */}
+      <ellipse cx="45" cy="57" rx="7" ry="5" fill="#2e7d32" stroke="#1b5e20" strokeWidth="1" />
+      <circle cx="42" cy="58" r="2.2" fill="#1b5e20" />
+      <circle cx="48" cy="58" r="2.2" fill="#1b5e20" />
+
+      {/* Mouth */}
+      <path d="M23 66 Q45 82 67 66 L67 71 Q45 86 23 71Z" fill="#1a1a2e" stroke="#1b5e20" strokeWidth="1.5" />
+      <path d="M23 66 Q45 82 67 66" stroke="#1b5e20" strokeWidth="2" fill="none" />
+      <rect x="30" y="66" width="7" height="9" rx="2" fill="#f5f5f5" stroke="#e0e0e0" strokeWidth="0.5" />
+      <rect x="39" y="66" width="7" height="10" rx="2" fill="#f5f5f5" stroke="#e0e0e0" strokeWidth="0.5" />
+      <rect x="48" y="66" width="7" height="10" rx="2" fill="#f5f5f5" stroke="#e0e0e0" strokeWidth="0.5" />
+      <rect x="57" y="66" width="7" height="9" rx="2" fill="#f5f5f5" stroke="#e0e0e0" strokeWidth="0.5" />
+      <path d="M27 66 L30 79 L34 66Z" fill="#f5f5f5" stroke="#e0e0e0" strokeWidth="0.5" />
+      <path d="M56 66 L60 79 L64 66Z" fill="#f5f5f5" stroke="#e0e0e0" strokeWidth="0.5" />
     </svg>
   )
 }
 
 export function EnemyCharacter({ phase, enemy }) {
-  const controls = useAnimation()
+  const combatControls = useAnimation()
 
   useEffect(() => {
     if (phase === 'hit') {
-      // Enemy attacks — lunges toward knight (left)
-      controls.start({ x: [0, -44, 0], transition: { duration: 0.5, ease: 'easeInOut' } })
-    } else if (phase === 'attacking' || phase === 'combo') {
-      // Enemy gets hurt — flinches right
-      controls.start({ x: [0, 14, -8, 6, 0], transition: { duration: 0.5 } })
+      // Enemy attacks — lunges left toward knight
+      combatControls.start({ x: [0, -80, 0], transition: { duration: 0.45, ease: 'easeInOut' } })
+    } else if (phase === 'attacking') {
+      // Enemy flinches right when knight hits
+      combatControls.start({ x: [0, 18, -12, 8, 0], transition: { duration: 0.4 } })
     }
-  }, [phase, controls])
+  }, [phase, combatControls])
 
   return (
     <div className="relative flex flex-col items-center">
-      <motion.div animate={controls} className="relative" style={{ transform: 'scaleX(-1)' }}>
-        <GoblinSVG />
-
-        {/* Red flash when hit by knight */}
-        {(phase === 'attacking' || phase === 'combo') && (
-          <motion.div
-            className="absolute inset-0 rounded-lg bg-red-500 pointer-events-none"
-            initial={{ opacity: 0.6 }}
-            animate={{ opacity: 0 }}
-            transition={{ duration: 0.5, delay: 0.25 }}
-          />
-        )}
+      <motion.div
+        animate={phase === 'idle' ? { y: [0, -5, 0] } : { y: 0 }}
+        transition={
+          phase === 'idle'
+            ? { duration: 2.8, repeat: Infinity, ease: 'easeInOut', delay: 0.4 }
+            : { duration: 0.2 }
+        }
+      >
+        <motion.div
+          animate={combatControls}
+          style={{ transform: 'scaleX(-1)' }}
+        >
+          <GoblinSVG />
+        </motion.div>
       </motion.div>
-
     </div>
   )
 }

@@ -1,34 +1,37 @@
 import { motion } from 'framer-motion'
 
 export function HPBar({ current, max, color = 'green' }) {
-  const percent = Math.max(0, (current / max) * 100)
-
-  const barColor =
-    color === 'green'
-      ? percent > 50
-        ? 'bg-green-500'
-        : percent > 25
-        ? 'bg-yellow-500'
-        : 'bg-red-500'
-      : 'bg-red-500'
+  const isGreen = color === 'green'
 
   return (
-    <div className="w-full">
-      <div className="flex justify-between text-xs text-gray-400 mb-1">
-        <span className="font-semibold">
-          {'❤️'.repeat(Math.max(0, current))}
-        </span>
-        <span>
-          {current}/{max}
-        </span>
-      </div>
-      <div className="w-full bg-gray-800 rounded-full h-3 overflow-hidden border border-gray-700">
-        <motion.div
-          className={`h-full rounded-full ${barColor}`}
-          animate={{ width: `${percent}%` }}
-          transition={{ duration: 0.4, ease: 'easeOut' }}
-        />
-      </div>
+    <div className="flex flex-col justify-center gap-1.5">
+      {Array.from({ length: max }, (_, i) => {
+        // Drain from top: top cells empty first as HP drops
+        const filled = i >= max - current
+
+        return (
+          <motion.div
+            key={i}
+            animate={{
+              backgroundColor: filled
+                ? isGreen ? '#22c55e' : '#ef4444'
+                : '#1f2937',
+              boxShadow: filled
+                ? isGreen
+                  ? '0 0 6px rgba(34,197,94,0.5)'
+                  : '0 0 6px rgba(239,68,68,0.5)'
+                : 'none',
+            }}
+            transition={{ duration: 0.3 }}
+            style={{ width: 14, height: 22, borderRadius: 4 }}
+            className={`border ${
+              filled
+                ? isGreen ? 'border-green-400' : 'border-red-400'
+                : 'border-gray-700'
+            }`}
+          />
+        )
+      })}
     </div>
   )
 }
