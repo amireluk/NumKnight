@@ -32,7 +32,6 @@ export function BattleScreen({ world, onBattleEnd }) {
 
     const isCorrect = selected === problem.answer
 
-    // Show button feedback — always reveal correct answer
     setButtonStates(
       options.map((opt) => {
         if (opt === problem.answer) return 'correct'
@@ -83,24 +82,17 @@ export function BattleScreen({ world, onBattleEnd }) {
 
   return (
     <div className="flex flex-col min-h-dvh max-w-md mx-auto px-4 py-4 gap-3 bg-gradient-to-b from-[#0d0d1e] to-[#1a1040]">
-      {/* World header */}
-      <div className="text-center">
-        <span className="text-xs uppercase tracking-widest text-purple-400 font-semibold">
-          {world.name}
-        </span>
-      </div>
+      {/* World icon header */}
+      <div className="text-center text-2xl">{world.icon}</div>
 
       {/* Enemy HP */}
-      <div>
-        <p className="text-sm font-bold text-red-300 mb-1">👺 {enemy.name}</p>
-        <HPBar current={enemyHP} max={world.enemyHP} color="red" />
-      </div>
+      <HPBar current={enemyHP} max={world.enemyHP} color="red" />
 
       {/* Battle arena — characters side by side */}
       <div className="flex justify-around items-end flex-1 min-h-0 py-2">
         <KnightCharacter phase={phase} />
 
-        {/* VS + combo in the center */}
+        {/* Center — combo badge or crossed swords */}
         <div className="flex flex-col items-center gap-1">
           <AnimatePresence>
             {combo >= 2 && phase === 'idle' && (
@@ -111,21 +103,18 @@ export function BattleScreen({ world, onBattleEnd }) {
                 exit={{ opacity: 0, scale: 0.5 }}
                 className="bg-yellow-500 text-black font-black text-xs px-2 py-1 rounded-full shadow-lg"
               >
-                🔥 {combo}x
+                🔥 {combo}
               </motion.div>
             )}
           </AnimatePresence>
-          <span className="text-gray-600 font-bold text-lg">VS</span>
+          <span className="text-gray-600 text-xl">⚔️</span>
         </div>
 
         <EnemyCharacter phase={phase} enemy={enemy} />
       </div>
 
       {/* Player HP */}
-      <div>
-        <p className="text-sm font-bold text-blue-300 mb-1">⚔️ NumKnight</p>
-        <HPBar current={playerHP} max={world.playerHP} color="green" />
-      </div>
+      <HPBar current={playerHP} max={world.playerHP} color="green" />
 
       {/* Problem card */}
       <motion.div

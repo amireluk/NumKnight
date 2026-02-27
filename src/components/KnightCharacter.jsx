@@ -25,9 +25,9 @@ export function KnightCharacter({ phase }) {
           initial={{ opacity: 0, y: 0, scale: 0.7 }}
           animate={{ opacity: [0, 1, 1, 0], y: -30, scale: 1 }}
           transition={{ duration: 0.8 }}
-          className="absolute -top-8 whitespace-nowrap text-yellow-300 font-black text-sm drop-shadow-lg"
+          className="absolute -top-8 text-3xl drop-shadow-lg"
         >
-          ⚡ POWER STRIKE!
+          ⚡
         </motion.div>
       )}
 
@@ -103,7 +103,6 @@ export function KnightCharacter({ phase }) {
         )}
       </motion.div>
 
-      <span className="text-xs font-bold text-blue-300 mt-1 tracking-wide">⚔️ Knight</span>
     </div>
   )
 }

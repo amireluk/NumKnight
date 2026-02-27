@@ -1,44 +1,44 @@
 export const WORLDS = {
   forest: {
     id: 'forest',
-    name: 'Enchanted Forest',
+    icon: '🌲',
     tableRange: [1, 3],
     playerHP: 7,
     enemyHP: 5,
     enemies: [
-      { id: 'goblin', name: 'Goblin' },
-      { id: 'slime', name: 'Slime' },
+      { id: 'goblin' },
+      { id: 'slime' },
     ],
   },
   mountains: {
     id: 'mountains',
-    name: 'Rocky Mountains',
+    icon: '⛰️',
     tableRange: [4, 6],
     playerHP: 6,
     enemyHP: 5,
     enemies: [
-      { id: 'orc', name: 'Orc' },
-      { id: 'troll', name: 'Troll' },
+      { id: 'orc' },
+      { id: 'troll' },
     ],
   },
   castle: {
     id: 'castle',
-    name: 'Dark Castle',
+    icon: '🏰',
     tableRange: [7, 9],
     playerHP: 5,
     enemyHP: 5,
     enemies: [
-      { id: 'darkKnight', name: 'Dark Knight' },
-      { id: 'wizard', name: 'Wizard' },
+      { id: 'darkKnight' },
+      { id: 'wizard' },
     ],
   },
   dragonLair: {
     id: 'dragonLair',
-    name: "Dragon's Lair",
+    icon: '🐉',
     tableRange: [1, 10],
     playerHP: 4,
     enemyHP: 5,
-    enemies: [{ id: 'dragon', name: 'Dragon' }],
+    enemies: [{ id: 'dragon' }],
   },
 }
 

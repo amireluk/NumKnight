@@ -48,7 +48,6 @@ export default function App() {
           <ResultScreen
             won={battleResult?.won}
             mistakes={battleResult?.mistakes ?? 0}
-            enemy={DEFAULT_WORLD.enemies[0]}
             onPlayAgain={handlePlayAgain}
           />
         </motion.div>

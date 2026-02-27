@@ -81,8 +81,6 @@ export function EnemyCharacter({ phase, enemy }) {
     }
   }, [phase, controls])
 
-  const enemyName = enemy?.name ?? 'Goblin'
-
   return (
     <div className="relative flex flex-col items-center">
       <motion.div animate={controls} className="relative" style={{ transform: 'scaleX(-1)' }}>
@@ -99,7 +97,6 @@ export function EnemyCharacter({ phase, enemy }) {
         )}
       </motion.div>
 
-      <span className="text-xs font-bold text-green-300 mt-1 tracking-wide">👺 {enemyName}</span>
     </div>
   )
 }
