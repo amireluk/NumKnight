@@ -114,6 +114,19 @@ Easier worlds give the player more HP so beginners can make mistakes and still w
 
 ---
 
+## Language Agnosticism
+
+The app is fully text-free — no words appear anywhere in the UI. All communication is through:
+- **Numbers** (universal — HP counts, math problems, combo counts)
+- **Math symbols** (×, =, ? — universally understood)
+- **Emojis & icons** (🏆 win, 💀 lose, ⭐ stars, ❌ mistakes, 🔄 retry, ▶️ next, ⚔️ battle, 🔥 combo, ⚡ power strike)
+- **World icons** (🌲 Forest, ⛰️ Mountains, 🏰 Castle, 🐉 Dragon's Lair)
+- **Animations** (attack, flinch, flash — communicate outcomes visually)
+
+This makes the app usable by any child regardless of language or reading level.
+
+---
+
 ## Scope & Constraints
 
 - Home project, not intended for public release
