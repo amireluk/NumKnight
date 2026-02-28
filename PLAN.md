@@ -57,6 +57,18 @@ Goal: Multiple enemies and worlds with correct difficulty scaling.
 - [ ] **Enemy attack animations** — unique feel per enemy type (at least 2–3 variants)
 - [ ] **Battle entry screen** — show enemy name and world name before battle starts
 
+### Phase 2 Polish (in progress)
+
+- [x] **Character art redesign** — Knight and Goblin redrawn in cel-shaded cartoon style with reference art
+- [x] **Split SVG weapon animations** — sword/club swing via motion.div overlay (reliable cross-browser)
+- [x] **Impact splash** — starburst on hit character at moment of impact, sequenced with attacker lunge
+- [x] **Combat clarity** — hitKey prop separates attack animation (0ms) from recoil+splash (280ms)
+- [x] **Side HP bars** — vertical discrete cell bars flanking characters
+- [x] **Single-file build** — vite-plugin-singlefile produces one deployable index.html
+- [ ] **Battle background** — rolling hills at midday, low-saturation SVG behind characters
+- [ ] **Battle intro sequence** — fighting-game style: characters slide in, ⚔️ banner, UI reveals with stagger
+- [ ] **Result screen redesign** — win: podium + confetti; lose: gravestone + red vignette
+
 Milestone: Each world feels different, enemies have personality.
 
 ---
