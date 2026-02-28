@@ -137,35 +137,27 @@ export function ResultScreen({ won, mistakes, onPlayAgain }) {
         )}
       </motion.div>
 
-      {/* Stars */}
-      <div className="flex gap-3">
-        {[1, 2, 3].map((n) => (
-          <Star key={n} filled={n <= stars} delay={0.35 + n * 0.15} won={won} />
-        ))}
-      </div>
-
-      {/* Mistake count */}
-      <motion.div
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.8 }}
-        className="bg-white/10 border border-white/20 rounded-2xl px-8 py-4 text-center"
-      >
-        <p className="text-3xl">❌ {mistakes}</p>
-      </motion.div>
+      {/* Stars — win only */}
+      {won && (
+        <div className="flex gap-3">
+          {[1, 2, 3].map((n) => (
+            <Star key={n} filled={n <= stars} delay={0.35 + n * 0.15} won={won} />
+          ))}
+        </div>
+      )}
 
       {/* Play again / retry */}
       <motion.button
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 1 }}
+        transition={{ delay: won ? 1 : 0.7 }}
         whileTap={{ scale: 0.95 }}
         whileHover={{ scale: 1.04 }}
         onClick={onPlayAgain}
-        className={`w-full border-b-4 text-black font-black text-3xl rounded-2xl h-16 shadow-xl cursor-pointer ${
+        className={`w-full border-b-4 font-black text-3xl rounded-2xl h-16 shadow-xl cursor-pointer ${
           won
-            ? 'bg-yellow-400 border-yellow-600'
-            : 'bg-red-400 border-red-700 text-white'
+            ? 'bg-yellow-400 border-yellow-600 text-black'
+            : 'bg-slate-700 border-slate-900 text-white'
         }`}
       >
         {won ? '▶️' : '🔄'}

@@ -3,7 +3,7 @@ export const WORLDS = {
     id: 'forest',
     icon: '🌲',
     tableRange: [1, 3],
-    playerHP: 7,
+    playerHP: 3,
     enemyHP: 5,
     enemies: [
       { id: 'goblin' },
