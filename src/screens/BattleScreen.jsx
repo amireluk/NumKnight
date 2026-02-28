@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, useAnimation } from 'framer-motion'
 import { makeRound } from '../game/battleLogic'
 import { playCorrect, playWrong, playSwordSwing, playImpact, playVictory, playDefeat } from '../game/sounds'
@@ -10,6 +10,22 @@ import { BattleBackground } from '../components/BattleBackground'
 import { BattleIntro } from '../components/BattleIntro'
 
 const IDLE_BUTTON_STATES = ['idle', 'idle', 'idle', 'idle']
+
+function ShadowBlob() {
+  return (
+    <div
+      style={{
+        width: 58,
+        height: 12,
+        borderRadius: '50%',
+        background: 'rgba(0,0,0,0.32)',
+        filter: 'blur(5px)',
+        marginTop: -6,
+        flexShrink: 0,
+      }}
+    />
+  )
+}
 
 export function BattleScreen({ world, onBattleEnd }) {
   const enemy = world.enemies[0]
@@ -24,6 +40,17 @@ export function BattleScreen({ world, onBattleEnd }) {
   const [enemyHitKey, setEnemyHitKey] = useState(0)
   const [playerHitKey, setPlayerHitKey] = useState(0)
   const [introPlaying, setIntroPlaying] = useState(true)
+
+  // Landing shake — fires when characters arrive (500ms after mount)
+  useEffect(() => {
+    const t = setTimeout(() => {
+      shakeControls.start({
+        x: [0, -8, 7, -5, 4, -2, 0],
+        transition: { duration: 0.3 },
+      })
+    }, 500)
+    return () => clearTimeout(t)
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const { problem, options } = round
 
@@ -92,52 +119,74 @@ export function BattleScreen({ world, onBattleEnd }) {
   }
 
   const isActive = phase !== 'won' && phase !== 'lost'
-  // Stagger delays for UI reveal after intro (in seconds)
-  const revealDelay = introPlaying ? 99 : 0
 
   return (
     <motion.div
       animate={shakeControls}
       className="flex flex-col min-h-dvh max-w-md mx-auto px-3 py-4 gap-4"
-      style={{ position: 'relative', overflow: 'hidden' }}
+      style={{ position: 'relative', overflow: 'hidden', background: 'linear-gradient(to bottom, #0d0d1e, #1a1040)' }}
     >
-      <BattleBackground />
-
-      {/* All battle UI sits above the background */}
+      {/* All battle UI */}
       <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', flex: 1, gap: 16 }}>
 
-        {/* Battle arena */}
-        <div className="flex flex-1 items-center gap-3 min-h-0">
+        {/* Battle arena — hills background only in this zone */}
+        <div className="flex flex-1 min-h-0" style={{ position: 'relative', overflow: 'hidden' }}>
+          <BattleBackground />
+          {/* Content above background */}
+          <div className="flex flex-1 items-end gap-3 px-2" style={{ position: 'relative', zIndex: 1 }}>
 
           {/* Left HP bar drops in */}
           <motion.div
             initial={{ y: -60, opacity: 0 }}
             animate={introPlaying ? {} : { y: 0, opacity: 1 }}
-            transition={{ duration: 0.35, delay: revealDelay + 0 }}
+            transition={{ duration: 0.35, delay: 0 }}
+            className="mb-6"
           >
             <HPBar current={playerHP} max={world.playerHP} color="green" />
           </motion.div>
 
-          {/* Characters */}
-          <div className="relative flex flex-1 justify-around items-end py-2">
-            <KnightCharacter phase={phase} hitKey={playerHitKey} />
-            <EnemyCharacter phase={phase} enemy={enemy} hitKey={enemyHitKey} />
+          {/* Characters — slide in from off-screen edges, grounded at bottom with shadow blobs */}
+          <div className="relative flex flex-1 justify-around items-end">
+
+            <div className="flex flex-col items-center">
+              <motion.div
+                initial={{ x: -220 }}
+                animate={{ x: 0 }}
+                transition={{ duration: 0.45, ease: 'easeOut' }}
+              >
+                <KnightCharacter phase={phase} hitKey={playerHitKey} />
+              </motion.div>
+              <ShadowBlob />
+            </div>
+
+            <div className="flex flex-col items-center">
+              <motion.div
+                initial={{ x: 220 }}
+                animate={{ x: 0 }}
+                transition={{ duration: 0.45, ease: 'easeOut' }}
+              >
+                <EnemyCharacter phase={phase} enemy={enemy} hitKey={enemyHitKey} />
+              </motion.div>
+              <ShadowBlob />
+            </div>
           </div>
 
           {/* Right HP bar drops in */}
           <motion.div
             initial={{ y: -60, opacity: 0 }}
             animate={introPlaying ? {} : { y: 0, opacity: 1 }}
-            transition={{ duration: 0.35, delay: revealDelay + 0.1 }}
+            transition={{ duration: 0.35, delay: 0.1 }}
+            className="mb-6"
           >
             <HPBar current={enemyHP} max={world.enemyHP} color="red" />
           </motion.div>
-        </div>
+          </div>{/* end content-above-bg */}
+        </div>{/* end arena */}
 
         {/* Problem card slides up */}
         <motion.div
           key={`${problem.a}-${problem.b}`}
-          initial={{ opacity: 0, y: introPlaying ? 0 : 10 }}
+          initial={{ opacity: 0, y: 10 }}
           animate={introPlaying ? { opacity: 0 } : { opacity: 1, y: 0 }}
           transition={{ duration: 0.22, delay: introPlaying ? 0 : 0.15 }}
           className="bg-white/10 border border-white/20 rounded-3xl py-5 px-4 text-center shadow-xl"
@@ -158,7 +207,7 @@ export function BattleScreen({ world, onBattleEnd }) {
                 type: 'spring',
                 stiffness: 280,
                 damping: 18,
-                delay: revealDelay + 0.22 + i * 0.08,
+                delay: 0.22 + i * 0.08,
               }}
             >
               <AnswerButton
@@ -173,7 +222,7 @@ export function BattleScreen({ world, onBattleEnd }) {
         </div>
       </div>
 
-      {/* Intro overlay — renders on top of everything */}
+      {/* Intro banner overlay */}
       {introPlaying && (
         <BattleIntro onComplete={() => setIntroPlaying(false)} />
       )}

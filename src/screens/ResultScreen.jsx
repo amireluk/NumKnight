@@ -1,13 +1,13 @@
 import { motion } from 'framer-motion'
 import { calculateStars } from '../game/battleLogic'
 
-function Star({ filled, delay, won }) {
+function Star({ filled, delay }) {
   return (
     <motion.span
       initial={{ scale: 0, rotate: -30, opacity: 0 }}
       animate={{ scale: 1, rotate: 0, opacity: 1 }}
       transition={
-        won && filled
+        filled
           ? { delay, type: 'spring', stiffness: 200, damping: 12 }
           : { delay, duration: 0.4, ease: 'easeOut' }
       }
@@ -18,60 +18,11 @@ function Star({ filled, delay, won }) {
   )
 }
 
-// Small confetti particles for the win screen
-const CONFETTI = Array.from({ length: 14 }, (_, i) => ({
-  id: i,
-  angle: (i / 14) * 360,
-  distance: 70 + (i % 3) * 30,
-  size: 6 + (i % 3) * 3,
-  color: ['#fbbf24', '#34d399', '#60a5fa', '#f87171', '#a78bfa'][i % 5],
-  delay: 0.5 + (i % 4) * 0.06,
-}))
-
-function Confetti() {
-  return (
-    <div style={{ position: 'absolute', top: '28%', left: '50%', pointerEvents: 'none' }}>
-      {CONFETTI.map(({ id, angle, distance, size, color, delay }) => {
-        const rad = (angle * Math.PI) / 180
-        const tx = Math.cos(rad) * distance
-        const ty = Math.sin(rad) * distance
-        return (
-          <motion.div
-            key={id}
-            initial={{ x: 0, y: 0, opacity: 1, scale: 0 }}
-            animate={{ x: tx, y: ty, opacity: [1, 1, 0], scale: [0, 1, 1] }}
-            transition={{ duration: 0.9, delay, ease: 'easeOut' }}
-            style={{
-              position: 'absolute',
-              width: size,
-              height: size,
-              borderRadius: id % 2 === 0 ? '50%' : 2,
-              background: color,
-              marginLeft: -size / 2,
-              marginTop: -size / 2,
-            }}
-          />
-        )
-      })}
-    </div>
-  )
-}
-
-function Podium() {
-  return (
-    <svg width="120" height="44" viewBox="0 0 120 44" fill="none">
-      {/* Step 2 left */}
-      <rect x="0" y="16" width="34" height="28" rx="3" fill="#b8860b" stroke="#8b6508" strokeWidth="2" />
-      <rect x="2" y="18" width="30" height="8" rx="2" fill="#d4a017" opacity="0.5" />
-      {/* Step 1 center */}
-      <rect x="36" y="0" width="48" height="44" rx="3" fill="#d4a017" stroke="#b8860b" strokeWidth="2" />
-      <rect x="38" y="2" width="44" height="10" rx="2" fill="#fbbf24" opacity="0.5" />
-      <text x="60" y="30" textAnchor="middle" fontSize="16" fill="#7c5c00" fontWeight="bold">1</text>
-      {/* Step 3 right */}
-      <rect x="86" y="24" width="34" height="20" rx="3" fill="#8b7355" stroke="#6b5a45" strokeWidth="2" />
-      <rect x="88" y="26" width="30" height="6" rx="2" fill="#a0926a" opacity="0.5" />
-    </svg>
-  )
+// Trophy filter per star count: bronze (1), silver (2), gold (3)
+const TROPHY_FILTER = {
+  1: 'sepia(1) saturate(1.4) hue-rotate(-10deg) brightness(0.82)',
+  2: 'grayscale(1) brightness(1.45) contrast(0.88)',
+  3: 'drop-shadow(0 0 22px rgba(251,191,36,0.85))',
 }
 
 function Gravestone() {
@@ -115,35 +66,26 @@ export function ResultScreen({ won, mistakes, onPlayAgain }) {
         overflow: 'hidden',
       }}
     >
-      {won && <Confetti />}
+      {won ? (
+        <>
+          <motion.div
+            initial={{ scale: 0.5, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ type: 'spring', stiffness: 180, damping: 14, delay: 0.05 }}
+          >
+            <span style={{ fontSize: 96, filter: TROPHY_FILTER[stars] ?? TROPHY_FILTER[3] }}>
+              🏆
+            </span>
+          </motion.div>
 
-      {/* Win: knight on podium — Lose: gravestone */}
-      <motion.div
-        initial={{ scale: 0.5, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ type: 'spring', stiffness: 180, damping: 14, delay: 0.05 }}
-        className="flex flex-col items-center gap-2"
-      >
-        {won ? (
-          <>
-            <span style={{ fontSize: 72 }}>🧑‍⚔️</span>
-            <Podium />
-          </>
-        ) : (
-          <>
-            <span style={{ fontSize: 48, marginBottom: -8 }}>💀</span>
-            <Gravestone />
-          </>
-        )}
-      </motion.div>
-
-      {/* Stars — win only */}
-      {won && (
-        <div className="flex gap-3">
-          {[1, 2, 3].map((n) => (
-            <Star key={n} filled={n <= stars} delay={0.35 + n * 0.15} won={won} />
-          ))}
-        </div>
+          <div className="flex gap-3">
+            {[1, 2, 3].map((n) => (
+              <Star key={n} filled={n <= stars} delay={0.35 + n * 0.15} />
+            ))}
+          </div>
+        </>
+      ) : (
+        <Gravestone />
       )}
 
       {/* Play again / retry */}
@@ -160,7 +102,7 @@ export function ResultScreen({ won, mistakes, onPlayAgain }) {
             : 'bg-slate-700 border-slate-900 text-white'
         }`}
       >
-        {won ? '▶️' : '🔄'}
+        {won ? '▶' : '↺'}
       </motion.button>
     </div>
   )

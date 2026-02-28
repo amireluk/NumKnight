@@ -168,8 +168,9 @@ function HitSplash({ color }) {
     <motion.div
       className="absolute pointer-events-none"
       style={{
-        left: 65,
-        top: 50,
+        // Center of goblin torso — left:42 after scaleX(-1) = 84-42=42, stays center
+        left: 42,
+        top: 62,
         transform: 'translate(-50%, -50%)',
         zIndex: 20,
       }}
@@ -237,10 +238,10 @@ export function EnemyCharacter({ phase, enemy, hitKey }) {
   return (
     <div className="relative flex flex-col items-center">
       <motion.div
-        animate={phase === 'idle' ? { y: [0, -5, 0] } : { y: 0 }}
+        animate={phase === 'idle' ? { y: [0, -2, 0] } : { y: 0 }}
         transition={
           phase === 'idle'
-            ? { duration: 2.8, repeat: Infinity, ease: 'easeInOut', delay: 0.4 }
+            ? { duration: 3.4, repeat: Infinity, ease: 'easeInOut', delay: 0.4 }
             : { duration: 0.2 }
         }
       >

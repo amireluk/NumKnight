@@ -1,8 +1,12 @@
+// ViewBox 100×216 ≈ iPhone aspect ratio (9:19.5).
+// With xMidYMid slice the SVG maps almost 1:1 to a portrait phone screen
+// so we can design the ground at the exact y% where characters stand.
+// Characters' feet sit at ~76% of screen height → y ≈ 164 in this viewBox.
 export function BattleBackground() {
   return (
     <svg
       style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', zIndex: 0 }}
-      viewBox="0 0 400 300"
+      viewBox="0 0 100 216"
       preserveAspectRatio="xMidYMid slice"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
@@ -15,26 +19,26 @@ export function BattleBackground() {
       </defs>
 
       {/* Sky */}
-      <rect width="400" height="300" fill="url(#bg-sky)" />
+      <rect width="100" height="216" fill="url(#bg-sky)" />
 
-      {/* Sun — soft, low opacity, top right */}
-      <circle cx="340" cy="55" r="36" fill="#e8d090" opacity="0.35" />
-      <circle cx="340" cy="55" r="26" fill="#edd98a" opacity="0.3" />
+      {/* Sun — upper right, very low opacity */}
+      <circle cx="80" cy="28" r="13" fill="#e8d090" opacity="0.35" />
+      <circle cx="80" cy="28" r="9"  fill="#edd98a" opacity="0.30" />
 
-      {/* Far hill — wide, low, dark muted green */}
-      <path d="M-10 220 Q60 150 130 165 Q200 178 270 155 Q330 138 410 170 L410 300 L-10 300Z"
+      {/* Far hill */}
+      <path d="M-5 140 Q15 112 32 120 Q52 128 68 112 Q82 98 105 112 L105 216 L-5 216Z"
         fill="#4a6340" />
 
       {/* Mid hill */}
-      <path d="M-10 240 Q50 185 120 195 Q190 205 250 182 Q310 162 410 200 L410 300 L-10 300Z"
+      <path d="M-5 152 Q18 128 36 136 Q56 144 72 128 Q86 115 105 130 L105 216 L-5 216Z"
         fill="#567248" />
 
-      {/* Near hill */}
-      <path d="M-10 260 Q70 215 150 225 Q220 232 290 210 Q350 195 410 225 L410 300 L-10 300Z"
+      {/* Near hill — surface crest sits at ~y=164 where characters stand */}
+      <path d="M-5 172 Q22 158 45 164 Q65 170 82 159 Q93 152 105 162 L105 216 L-5 216Z"
         fill="#61804f" />
 
-      {/* Ground strip */}
-      <rect x="-10" y="272" width="420" height="40" fill="#3e5635" />
+      {/* Ground fill below the near hill */}
+      <rect x="-5" y="175" width="115" height="46" fill="#3e5635" />
     </svg>
   )
 }

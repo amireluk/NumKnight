@@ -115,9 +115,9 @@ function HitSplash({ color }) {
     <motion.div
       className="absolute pointer-events-none"
       style={{
-        // Right side of knight (facing the goblin) — torso level
-        left: 65,
-        top: 50,
+        // Center of knight torso — symmetric with goblin splash
+        left: 42,
+        top: 62,
         transform: 'translate(-50%, -50%)',
         zIndex: 20,
       }}
@@ -185,10 +185,10 @@ export function KnightCharacter({ phase, hitKey }) {
   return (
     <div className="relative flex flex-col items-center">
       <motion.div
-        animate={phase === 'idle' ? { y: [0, -5, 0] } : { y: 0 }}
+        animate={phase === 'idle' ? { y: [0, -2, 0] } : { y: 0 }}
         transition={
           phase === 'idle'
-            ? { duration: 2.4, repeat: Infinity, ease: 'easeInOut' }
+            ? { duration: 3.0, repeat: Infinity, ease: 'easeInOut' }
             : { duration: 0.2 }
         }
       >

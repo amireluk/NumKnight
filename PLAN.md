@@ -65,9 +65,9 @@ Goal: Multiple enemies and worlds with correct difficulty scaling.
 - [x] **Combat clarity** — hitKey prop separates attack animation (0ms) from recoil+splash (280ms)
 - [x] **Side HP bars** — vertical discrete cell bars flanking characters
 - [x] **Single-file build** — vite-plugin-singlefile produces one deployable index.html
-- [ ] **Battle background** — rolling hills at midday, low-saturation SVG behind characters
-- [ ] **Battle intro sequence** — fighting-game style: characters slide in, ⚔️ banner, UI reveals with stagger
-- [ ] **Result screen redesign** — win: podium + confetti; lose: gravestone + red vignette
+- [x] **Battle background** — rolling hills at midday, low-saturation SVG behind arena characters only
+- [x] **Battle intro sequence** — fighting-game style: characters slide in, ⚔️ banner, UI reveals with stagger
+- [x] **Result screen redesign** — win: trophy (bronze/silver/gold) + stars; lose: gravestone
 
 Milestone: Each world feels different, enemies have personality.
 
@@ -114,6 +114,22 @@ These are explicitly out of scope for v1 but documented for future reference:
 - [ ] Additional game modes beyond Knight Battle
 - [ ] Parent dashboard / progress tracking
 - [ ] Background music
+
+---
+
+## Design System
+
+### Two-Zone Layout (Battle Screen pattern)
+Battle screens are split into two vertical zones with distinct backgrounds:
+- **Arena zone** (top, `flex: 1`): contains scene background art (hills SVG). `position: relative, overflow: hidden`. Background absolutely fills this zone. Characters and HP bars float above via `position: relative, zIndex: 1` wrapper.
+- **UI zone** (bottom, fixed height): solid dark background (`linear-gradient #0d0d1e → #1a1040`). Contains question card and answer buttons. No scene art — keeps text readable.
+
+Apply this same pattern to all future battle-type screens and enemy encounters.
+
+### Result Screen
+- Win: trophy emoji with CSS filter (1★ bronze, 2★ silver, 3★ gold glow), stars, play button.
+- Lose: gravestone SVG, retry button. No stars.
+- Buttons use plain unicode (▶ / ↺) not colored emoji, so they match button text color.
 
 ---
 

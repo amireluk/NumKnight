@@ -4,7 +4,7 @@ export const WORLDS = {
     icon: '🌲',
     tableRange: [1, 3],
     playerHP: 3,
-    enemyHP: 5,
+    enemyHP: 6,
     enemies: [
       { id: 'goblin' },
       { id: 'slime' },
