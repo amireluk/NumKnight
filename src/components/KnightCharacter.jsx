@@ -1,25 +1,18 @@
-import { motion, useAnimation } from 'framer-motion'
-import { useEffect } from 'react'
+import { motion, useAnimation, AnimatePresence } from 'framer-motion'
+import { useEffect, useState } from 'react'
 
-function KnightSVG() {
+// Static body — everything except the sword arm
+function KnightBodySVG() {
   return (
     <svg width="84" height="112" viewBox="0 0 90 120" fill="none">
       <defs>
-        <linearGradient id="kn-helm" x1="0.2" y1="0" x2="0.8" y2="1">
-          <stop offset="0%" stopColor="#cfd8dc" />
-          <stop offset="100%" stopColor="#607d8b" />
-        </linearGradient>
-        <linearGradient id="kn-body" x1="0.2" y1="0" x2="0.8" y2="1">
-          <stop offset="0%" stopColor="#b0bec5" />
-          <stop offset="100%" stopColor="#546e7a" />
-        </linearGradient>
-        <linearGradient id="kn-chest" x1="0.15" y1="0" x2="0.85" y2="1">
+        <radialGradient id="kn-skin" cx="38%" cy="32%" r="65%">
+          <stop offset="0%" stopColor="#ffe0b2" />
+          <stop offset="100%" stopColor="#ffb74d" />
+        </radialGradient>
+        <linearGradient id="kn-metal" x1="0.15" y1="0" x2="0.85" y2="1">
           <stop offset="0%" stopColor="#eceff1" />
-          <stop offset="100%" stopColor="#90a4ae" />
-        </linearGradient>
-        <linearGradient id="kn-sword" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0%" stopColor="#ffffff" />
-          <stop offset="100%" stopColor="#90a4ae" />
+          <stop offset="100%" stopColor="#78909c" />
         </linearGradient>
         <linearGradient id="kn-shield" x1="0.1" y1="0" x2="0.9" y2="1">
           <stop offset="0%" stopColor="#42a5f5" />
@@ -27,80 +20,167 @@ function KnightSVG() {
         </linearGradient>
       </defs>
 
-      {/* Plume */}
-      <path d="M45 2 C38 8 35 20 40 28 C42 31 48 31 50 28 C55 20 52 8 45 2Z"
-        fill="#ef5350" stroke="#b71c1c" strokeWidth="1.5" />
-      <path d="M45 5 C40 11 39 21 43 26 C44 27 46 26 47 25 C50 20 49 11 45 5Z"
-        fill="#ff8a80" opacity="0.55" />
-
-      {/* Sword (behind body) */}
-      <path d="M77 4 L81 4 L82 58 L76 58Z" fill="url(#kn-sword)" stroke="#90a4ae" strokeWidth="1.5" />
-      <path d="M76 4 L79 0 L82 4Z" fill="url(#kn-sword)" stroke="#90a4ae" strokeWidth="1" />
-      <line x1="78" y1="4" x2="78" y2="55" stroke="white" strokeWidth="1.5" opacity="0.7" strokeLinecap="round" />
-      <rect x="69" y="55" width="22" height="7" rx="3.5" fill="#8d6e63" stroke="#4e342e" strokeWidth="1.5" />
-      <rect x="77" y="62" width="6" height="19" rx="3" fill="#6d4c41" stroke="#3e2723" strokeWidth="1.5" />
-      <circle cx="80" cy="83" r="6" fill="#8d6e63" stroke="#4e342e" strokeWidth="1.5" />
-      <circle cx="78" cy="81" r="2" fill="#a1887f" opacity="0.5" />
-
-      {/* Helmet */}
-      <path d="M20 55 L20 30 Q20 11 45 11 Q70 11 70 30 L70 55Z"
-        fill="url(#kn-helm)" stroke="#263238" strokeWidth="2.5" />
-      <rect x="20" y="45" width="13" height="16" rx="5" fill="url(#kn-helm)" stroke="#263238" strokeWidth="2" />
-      <rect x="57" y="45" width="13" height="16" rx="5" fill="url(#kn-helm)" stroke="#263238" strokeWidth="2" />
-      <path d="M26 15 Q38 11 48 13 Q44 26 32 27 Q24 24 26 15Z" fill="white" opacity="0.18" />
-      <rect x="20" y="36" width="50" height="6" rx="2" fill="#ffb300" stroke="#f57f17" strokeWidth="1" />
-      <rect x="26" y="28" width="38" height="10" rx="4" fill="#1a1a2e" />
-      <rect x="40" y="28" width="10" height="22" rx="4" fill="#1a1a2e" />
-
-      {/* Pauldrons */}
-      <ellipse cx="15" cy="61" rx="12" ry="11" fill="url(#kn-body)" stroke="#263238" strokeWidth="2" />
-      <ellipse cx="75" cy="61" rx="12" ry="11" fill="url(#kn-body)" stroke="#263238" strokeWidth="2" />
-      <ellipse cx="12" cy="57" rx="6" ry="5" fill="white" opacity="0.15" />
-      <ellipse cx="72" cy="57" rx="6" ry="5" fill="white" opacity="0.15" />
-
-      {/* Torso */}
-      <rect x="18" y="54" width="54" height="38" rx="11" fill="url(#kn-body)" stroke="#263238" strokeWidth="2.5" />
-      <rect x="25" y="58" width="40" height="26" rx="8" fill="url(#kn-chest)" stroke="#90a4ae" strokeWidth="1.5" />
-      <line x1="45" y1="60" x2="45" y2="82" stroke="#90a4ae" strokeWidth="3" strokeLinecap="round" />
-      <path d="M27 60 Q36 57 44 61 Q37 70 27 68Z" fill="white" opacity="0.14" />
-      <rect x="18" y="86" width="54" height="6" rx="3" fill="#ffb300" stroke="#f57f17" strokeWidth="1.5" />
-
-      {/* Arms */}
-      <rect x="4" y="60" width="15" height="26" rx="7" fill="url(#kn-body)" stroke="#263238" strokeWidth="2" />
-      <rect x="71" y="60" width="15" height="26" rx="7" fill="url(#kn-body)" stroke="#263238" strokeWidth="2" />
+      {/* Left arm */}
+      <rect x="4" y="60" width="17" height="26" rx="7" fill="url(#kn-metal)" stroke="#424242" strokeWidth="2" />
 
       {/* Shield */}
-      <path d="M1 51 L17 51 L17 76 Q9 87 1 76Z"
-        fill="url(#kn-shield)" stroke="#0d47a1" strokeWidth="2" />
-      <path d="M3 53 L15 53 L15 65 Q9 70 3 65Z" fill="white" opacity="0.15" />
-      <line x1="9" y1="53" x2="9" y2="75" stroke="#ffb300" strokeWidth="2" opacity="0.9" strokeLinecap="round" />
-      <line x1="2" y1="63" x2="16" y2="63" stroke="#ffb300" strokeWidth="2" opacity="0.9" strokeLinecap="round" />
+      <path d="M0 52 L14 52 L14 78 Q7 88 0 78Z" fill="url(#kn-shield)" stroke="#424242" strokeWidth="2.5" />
+      <path d="M2 55 L12 55 L12 68 Q7 74 2 68Z" fill="white" opacity="0.15" />
+      <line x1="7" y1="53" x2="7" y2="76" stroke="#ffd54f" strokeWidth="2.5" opacity="0.9" strokeLinecap="round" />
+      <line x1="0" y1="65" x2="14" y2="65" stroke="#ffd54f" strokeWidth="2.5" opacity="0.9" strokeLinecap="round" />
 
       {/* Legs */}
-      <rect x="22" y="90" width="20" height="20" rx="6" fill="#546e7a" stroke="#263238" strokeWidth="2" />
-      <rect x="48" y="90" width="20" height="20" rx="6" fill="#546e7a" stroke="#263238" strokeWidth="2" />
-      <ellipse cx="32" cy="95" rx="8" ry="6" fill="#607d8b" stroke="#263238" strokeWidth="1.5" />
-      <ellipse cx="58" cy="95" rx="8" ry="6" fill="#607d8b" stroke="#263238" strokeWidth="1.5" />
+      <rect x="25" y="90" width="17" height="20" rx="7" fill="#546e7a" stroke="#424242" strokeWidth="2" />
+      <rect x="48" y="90" width="17" height="20" rx="7" fill="#546e7a" stroke="#424242" strokeWidth="2" />
 
       {/* Boots */}
-      <rect x="18" y="106" width="25" height="13" rx="7" fill="#37474f" stroke="#263238" strokeWidth="2" />
-      <rect x="47" y="106" width="25" height="13" rx="7" fill="#37474f" stroke="#263238" strokeWidth="2" />
-      <rect x="20" y="108" width="10" height="4" rx="2" fill="#546e7a" opacity="0.6" />
-      <rect x="49" y="108" width="10" height="4" rx="2" fill="#546e7a" opacity="0.6" />
+      <rect x="18" y="104" width="26" height="14" rx="7" fill="#3e2723" stroke="#424242" strokeWidth="2" />
+      <rect x="46" y="104" width="26" height="14" rx="7" fill="#3e2723" stroke="#424242" strokeWidth="2" />
+      <ellipse cx="27" cy="108" rx="9" ry="3.5" fill="white" opacity="0.1" />
+      <ellipse cx="55" cy="108" rx="9" ry="3.5" fill="white" opacity="0.1" />
+
+      {/* Body */}
+      <rect x="19" y="58" width="52" height="36" rx="12" fill="url(#kn-metal)" stroke="#424242" strokeWidth="2.5" />
+      <ellipse cx="34" cy="67" rx="12" ry="8" fill="white" opacity="0.2" />
+      <line x1="45" y1="62" x2="45" y2="90" stroke="#78909c" strokeWidth="2" strokeLinecap="round" />
+      <rect x="19" y="88" width="52" height="7" rx="3" fill="#4e342e" stroke="#3e2723" strokeWidth="1.5" />
+      <rect x="40" y="88" width="10" height="7" rx="2" fill="#795548" stroke="#4e342e" strokeWidth="1" />
+
+      {/* Neck */}
+      <rect x="36" y="54" width="18" height="10" rx="4" fill="url(#kn-skin)" stroke="#424242" strokeWidth="2" />
+
+      {/* Head */}
+      <ellipse cx="45" cy="36" rx="27" ry="26" fill="url(#kn-skin)" stroke="#424242" strokeWidth="2.5" />
+      <ellipse cx="34" cy="24" rx="14" ry="9" fill="white" opacity="0.2" />
+
+      {/* Helmet cheek guards */}
+      <rect x="16" y="32" width="13" height="18" rx="6" fill="url(#kn-metal)" stroke="#424242" strokeWidth="2" />
+      <rect x="61" y="32" width="13" height="18" rx="6" fill="url(#kn-metal)" stroke="#424242" strokeWidth="2" />
+
+      {/* Helmet dome */}
+      <path d="M17 37 Q17 10 45 10 Q73 10 73 37 L70 39 Q63 34 56 38 L45 40 L34 38 Q27 34 20 39Z"
+        fill="url(#kn-metal)" stroke="#424242" strokeWidth="2.5" />
+      <ellipse cx="33" cy="21" rx="15" ry="8" fill="white" opacity="0.22" />
+      <path d="M16 37 Q45 31 74 37" stroke="#607d8b" strokeWidth="6" fill="none" strokeLinecap="butt" />
+      <path d="M16 37 Q45 31 74 37" stroke="#cfd8dc" strokeWidth="1.5" fill="none" strokeLinecap="round" opacity="0.6" />
+
+      {/* Face */}
+      <ellipse cx="35" cy="42" rx="5.5" ry="6" fill="white" stroke="#424242" strokeWidth="1.5" />
+      <ellipse cx="55" cy="42" rx="5.5" ry="6" fill="white" stroke="#424242" strokeWidth="1.5" />
+      <circle cx="36.5" cy="43" r="4" fill="#3e2723" />
+      <circle cx="56.5" cy="43" r="4" fill="#3e2723" />
+      <circle cx="38" cy="41.5" r="1.5" fill="white" />
+      <circle cx="58" cy="41.5" r="1.5" fill="white" />
+      <ellipse cx="27" cy="48" rx="7" ry="4.5" fill="#f06292" opacity="0.45" />
+      <ellipse cx="63" cy="48" rx="7" ry="4.5" fill="#f06292" opacity="0.45" />
+      <circle cx="31" cy="51" r="1.3" fill="#d4845a" opacity="0.55" />
+      <circle cx="36" cy="53" r="1.3" fill="#d4845a" opacity="0.55" />
+      <circle cx="54" cy="53" r="1.3" fill="#d4845a" opacity="0.55" />
+      <circle cx="59" cy="51" r="1.3" fill="#d4845a" opacity="0.55" />
+      <path d="M35 51 Q45 58 55 51" stroke="#bf7a60" strokeWidth="2.5" fill="none" strokeLinecap="round" />
     </svg>
   )
 }
 
-export function KnightCharacter({ phase }) {
-  const combatControls = useAnimation()
+// Sword arm only — same viewBox, overlaid on top of body
+function KnightSwordArmSVG() {
+  return (
+    <svg width="84" height="112" viewBox="0 0 90 120" fill="none" overflow="visible">
+      <defs>
+        <linearGradient id="kn-metal2" x1="0.15" y1="0" x2="0.85" y2="1">
+          <stop offset="0%" stopColor="#eceff1" />
+          <stop offset="100%" stopColor="#78909c" />
+        </linearGradient>
+      </defs>
+      {/* Sword blade */}
+      <rect x="73" y="8" width="7" height="44" rx="2" fill="#e0e0e0" stroke="#424242" strokeWidth="1.5" />
+      <polygon points="76.5,4 72,11 81,11" fill="#e0e0e0" stroke="#424242" strokeWidth="1.5" />
+      <line x1="76.5" y1="8" x2="76.5" y2="48" stroke="white" strokeWidth="2" opacity="0.6" strokeLinecap="round" />
+      {/* Crossguard + handle + pommel */}
+      <rect x="65" y="50" width="22" height="6" rx="3" fill="#6d4c41" stroke="#3e2723" strokeWidth="1.5" />
+      <rect x="74" y="56" width="6" height="12" rx="3" fill="#6d4c41" stroke="#3e2723" strokeWidth="1.5" />
+      <circle cx="77" cy="69" r="4.5" fill="#8d6e63" stroke="#4e342e" strokeWidth="1.5" />
+      {/* Right arm */}
+      <rect x="69" y="60" width="17" height="26" rx="7" fill="url(#kn-metal2)" stroke="#424242" strokeWidth="2" />
+    </svg>
+  )
+}
 
+const SPLASH_ANGLES = [0, 45, 90, 135, 180, 225, 270, 315]
+const SPLASH_ANGLES_OFFSET = [22.5, 67.5, 112.5, 157.5, 202.5, 247.5, 292.5, 337.5]
+
+// Hit splash rendered on the character, at the impact point
+function HitSplash({ color }) {
+  return (
+    <motion.div
+      className="absolute pointer-events-none"
+      style={{
+        // Right side of knight (facing the goblin) — torso level
+        left: 65,
+        top: 50,
+        transform: 'translate(-50%, -50%)',
+        zIndex: 20,
+      }}
+      initial={{ scale: 0.05, opacity: 1 }}
+      animate={{ scale: [0.05, 1.4, 1.7], opacity: [1, 1, 0] }}
+      transition={{ duration: 0.5, times: [0, 0.28, 1], ease: 'easeOut' }}
+    >
+      <svg width="90" height="90" viewBox="-45 -45 90 90" fill="none">
+        {SPLASH_ANGLES.map((angle) => {
+          const rad = (angle * Math.PI) / 180
+          return (
+            <line
+              key={angle}
+              x1={Math.cos(rad) * 7} y1={Math.sin(rad) * 7}
+              x2={Math.cos(rad) * 32} y2={Math.sin(rad) * 32}
+              stroke={color} strokeWidth="5" strokeLinecap="round"
+            />
+          )
+        })}
+        {SPLASH_ANGLES_OFFSET.map((angle) => {
+          const rad = (angle * Math.PI) / 180
+          return (
+            <line
+              key={angle}
+              x1={Math.cos(rad) * 9} y1={Math.sin(rad) * 9}
+              x2={Math.cos(rad) * 22} y2={Math.sin(rad) * 22}
+              stroke={color} strokeWidth="3" strokeLinecap="round"
+            />
+          )
+        })}
+        <circle cx="0" cy="0" r="9" fill={color} />
+        <circle cx="0" cy="0" r="4" fill="white" opacity="0.7" />
+      </svg>
+    </motion.div>
+  )
+}
+
+export function KnightCharacter({ phase, hitKey }) {
+  const moveControls = useAnimation()
+  const swordControls = useAnimation()
+  const [splashKey, setSplashKey] = useState(null)
+
+  // Knight attacks — lunge right + sword swing
   useEffect(() => {
     if (phase === 'attacking') {
-      combatControls.start({ x: [0, 80, 0], transition: { duration: 0.45, ease: 'easeInOut' } })
-    } else if (phase === 'hit') {
-      combatControls.start({ x: [0, -18, 12, -8, 0], transition: { duration: 0.4 } })
+      moveControls.start({ x: [0, 80, 0], transition: { duration: 0.45, ease: 'easeInOut' } })
+      swordControls.start({
+        rotate: [0, 62, -12, 0],
+        transition: { duration: 0.45, times: [0, 0.32, 0.62, 1] },
+      })
     }
-  }, [phase, combatControls])
+  }, [phase, moveControls, swordControls])
+
+  // Knight takes a hit — recoil + splash (triggered at moment of impact)
+  useEffect(() => {
+    if (hitKey > 0) {
+      moveControls.start({ x: [0, -12, 5, 0], transition: { duration: 0.35 } })
+      swordControls.start({ rotate: [0, -15, 5, 0], transition: { duration: 0.35 } })
+      setSplashKey(hitKey)
+      const t = setTimeout(() => setSplashKey(null), 550)
+      return () => clearTimeout(t)
+    }
+  }, [hitKey, moveControls, swordControls])
 
   return (
     <div className="relative flex flex-col items-center">
@@ -112,8 +192,35 @@ export function KnightCharacter({ phase }) {
             : { duration: 0.2 }
         }
       >
-        <motion.div animate={combatControls}>
-          <KnightSVG />
+        <motion.div animate={moveControls}>
+          {/* Relative container: body + weapon arm overlaid */}
+          <div style={{ position: 'relative', width: 84, height: 112, overflow: 'visible' }}>
+            <KnightBodySVG />
+            {/*
+              Sword arm rotates around the shoulder (SVG 78,62).
+              SVG viewBox 0 0 90 120 is rendered at 84×112 → scale = 84/90 = 0.9333
+              Shoulder in div-pixels: 78×0.9333 = 72.8 ≈ 73px, 62×0.9333 = 57.9 ≈ 58px
+            */}
+            <motion.div
+              animate={swordControls}
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: 84,
+                height: 112,
+                overflow: 'visible',
+                transformOrigin: '73px 58px',
+              }}
+            >
+              <KnightSwordArmSVG />
+            </motion.div>
+
+            {/* Hit splash — appears at impact point on knight's right (goblin-facing) side */}
+            <AnimatePresence>
+              {splashKey !== null && <HitSplash key={splashKey} color="#f87171" />}
+            </AnimatePresence>
+          </div>
         </motion.div>
       </motion.div>
     </div>

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { motion, AnimatePresence, useAnimation } from 'framer-motion'
+import { motion, useAnimation } from 'framer-motion'
 import { makeRound } from '../game/battleLogic'
 import { playCorrect, playWrong, playSwordSwing, playImpact, playVictory, playDefeat } from '../game/sounds'
 import { HPBar } from '../components/HPBar'
@@ -8,48 +8,6 @@ import { EnemyCharacter } from '../components/EnemyCharacter'
 import { AnswerButton } from '../components/AnswerButton'
 
 const IDLE_BUTTON_STATES = ['idle', 'idle', 'idle', 'idle']
-
-// Impact starburst splash — replaces the red flash
-const SPLASH_ANGLES = [0, 45, 90, 135, 180, 225, 270, 315]
-
-function ImpactSplash({ side }) {
-  const isEnemy = side === 'enemy'
-  const color = isEnemy ? '#fbbf24' : '#f87171'
-
-  return (
-    <motion.div
-      className="absolute pointer-events-none"
-      style={{
-        top: '28%',
-        left: isEnemy ? '64%' : '36%',
-        transform: 'translate(-50%, -50%)',
-        zIndex: 10,
-      }}
-      initial={{ scale: 0.1, opacity: 1 }}
-      animate={{ scale: 1.3, opacity: 0 }}
-      transition={{ duration: 0.3, ease: 'easeOut' }}
-    >
-      <svg width="60" height="60" viewBox="-30 -30 60 60" fill="none">
-        {SPLASH_ANGLES.map((angle) => {
-          const rad = (angle * Math.PI) / 180
-          return (
-            <line
-              key={angle}
-              x1={Math.cos(rad) * 5}
-              y1={Math.sin(rad) * 5}
-              x2={Math.cos(rad) * 22}
-              y2={Math.sin(rad) * 22}
-              stroke={color}
-              strokeWidth="3.5"
-              strokeLinecap="round"
-            />
-          )
-        })}
-        <circle cx="0" cy="0" r="5" fill={color} />
-      </svg>
-    </motion.div>
-  )
-}
 
 export function BattleScreen({ world, onBattleEnd }) {
   const enemy = world.enemies[0]
@@ -61,15 +19,11 @@ export function BattleScreen({ world, onBattleEnd }) {
   const [phase, setPhase] = useState('idle')
   const [mistakes, setMistakes] = useState(0)
   const [buttonStates, setButtonStates] = useState(IDLE_BUTTON_STATES)
-  const [splash, setSplash] = useState(null) // { id, side }
+  // Incrementing keys trigger recoil + splash inside character components
+  const [enemyHitKey, setEnemyHitKey] = useState(0)
+  const [playerHitKey, setPlayerHitKey] = useState(0)
 
   const { problem, options } = round
-
-  const showSplash = (side) => {
-    const id = Date.now()
-    setSplash({ id, side })
-    setTimeout(() => setSplash(null), 400)
-  }
 
   const loadNextRound = () => {
     setRound(makeRound(world.tableRange))
@@ -92,11 +46,11 @@ export function BattleScreen({ world, onBattleEnd }) {
 
     if (isCorrect) {
       playCorrect()
-      setPhase('attacking')
+      setPhase('attacking') // knight lunges immediately
 
       setTimeout(() => {
         playSwordSwing()
-        showSplash('enemy')
+        setEnemyHitKey((k) => k + 1) // goblin recoils + splash at impact
         const newEnemyHP = Math.max(0, enemyHP - 1)
         setEnemyHP(newEnemyHP)
 
@@ -112,11 +66,11 @@ export function BattleScreen({ world, onBattleEnd }) {
       playWrong()
       const newMistakes = mistakes + 1
       setMistakes(newMistakes)
-      setPhase('hit')
+      setPhase('hit') // goblin lunges immediately
 
       setTimeout(() => {
         playImpact()
-        showSplash('player')
+        setPlayerHitKey((k) => k + 1) // knight recoils + splash at impact
         shakeControls.start({
           x: [0, -12, 11, -8, 7, -4, 3, 0],
           transition: { duration: 0.5 },
@@ -148,13 +102,8 @@ export function BattleScreen({ world, onBattleEnd }) {
 
         {/* Characters */}
         <div className="relative flex flex-1 justify-around items-end py-2">
-          <KnightCharacter phase={phase} />
-          <EnemyCharacter phase={phase} enemy={enemy} />
-
-          {/* Impact splash */}
-          <AnimatePresence>
-            {splash && <ImpactSplash key={splash.id} side={splash.side} />}
-          </AnimatePresence>
+          <KnightCharacter phase={phase} hitKey={playerHitKey} />
+          <EnemyCharacter phase={phase} enemy={enemy} hitKey={enemyHitKey} />
         </div>
 
         <HPBar current={enemyHP} max={world.enemyHP} color="red" />
