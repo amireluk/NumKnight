@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { BattleScreen } from './screens/BattleScreen'
 import { ResultScreen } from './screens/ResultScreen'
+import { WorldMapScreen } from './screens/WorldMapScreen'
 import { WORLDS } from './game/worldConfig'
 import { createNewRun, loadRun, saveRun, clearRun } from './game/runState'
 import { getTrophy } from './game/battleLogic'
@@ -9,8 +10,13 @@ import { getTrophy } from './game/battleLogic'
 export default function App() {
   // Restore or create a fresh run
   const [run, setRun] = useState(() => loadRun() ?? createNewRun())
-  // 'battle' | 'result' | 'gameover' | 'victory'
-  const [screen, setScreen] = useState('battle')
+  // 'battle' | 'result' | 'map'
+  const [screen, setScreen] = useState(() => {
+    const existing = loadRun()
+    // Show the map on first load if we're at the start of a non-first world
+    if (existing && existing.worldIndex > 0 && existing.battleIndex === 0) return 'map'
+    return 'battle'
+  })
   const [battleResult, setBattleResult] = useState(null)
   const [battleKey, setBattleKey] = useState(0)
 
@@ -49,14 +55,21 @@ export default function App() {
     const nextBattle = run.battleIndex + 1
 
     if (nextBattle >= world.battles) {
-      // Advance to next world
+      // Last battle of this world — advance to next world and show the map
       const nextWorld = run.worldIndex + 1
       setRun((r) => ({ ...r, worldIndex: nextWorld, battleIndex: 0 }))
+      setBattleResult(null)
+      setScreen('map')
     } else {
+      // Next battle within the same world — go straight to battle
       setRun((r) => ({ ...r, battleIndex: nextBattle }))
+      setBattleResult(null)
+      setBattleKey((k) => k + 1)
+      setScreen('battle')
     }
+  }
 
-    setBattleResult(null)
+  const handleFight = () => {
     setBattleKey((k) => k + 1)
     setScreen('battle')
   }
@@ -74,7 +87,7 @@ export default function App() {
   return (
     <>
     <AnimatePresence mode="wait">
-      {screen === 'battle' ? (
+      {screen === 'battle' && (
         <motion.div
           key={`battle-${battleKey}`}
           initial={{ opacity: 0 }}
@@ -89,7 +102,9 @@ export default function App() {
             onBattleEnd={handleBattleEnd}
           />
         </motion.div>
-      ) : (
+      )}
+
+      {screen === 'result' && (
         <motion.div
           key={`result-${battleKey}`}
           initial={{ opacity: 0 }}
@@ -108,6 +123,24 @@ export default function App() {
             isVictory={battleResult?.isVictory ?? false}
             onContinue={handleContinue}
             onRestart={handleRestart}
+          />
+        </motion.div>
+      )}
+
+      {screen === 'map' && (
+        <motion.div
+          key={`map-${run.worldIndex}`}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.3 }}
+          className="w-full"
+        >
+          <WorldMapScreen
+            worlds={WORLDS}
+            currentWorldIndex={run.worldIndex}
+            trophies={run.trophies}
+            onFight={handleFight}
           />
         </motion.div>
       )}
