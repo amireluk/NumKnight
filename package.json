@@ -1,11 +1,11 @@
 {
   "name": "numknight",
   "private": true,
-  "version": "0.0.1",
+  "version": "1.1.4",
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "node scripts/bump-version.js && vite build",
     "preview": "vite preview"
   },
   "dependencies": {

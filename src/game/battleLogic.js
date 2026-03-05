@@ -1,8 +1,9 @@
-export function generateProblem(tableRange) {
-  const [min, max] = tableRange
-  const a = Math.floor(Math.random() * (max - min + 1)) + min
-  const b = Math.floor(Math.random() * 10) + 1
-  // Randomize order so it's not always "table × other"
+// multipliers: number[] — times-tables active this world (from campaign.config)
+// factorRange: [min, max] — range for the other factor
+export function generateProblem(multipliers, factorRange = [1, 10]) {
+  const [fMin, fMax] = factorRange
+  const a = multipliers[Math.floor(Math.random() * multipliers.length)]
+  const b = Math.floor(Math.random() * (fMax - fMin + 1)) + fMin
   return Math.random() > 0.5
     ? { a, b, answer: a * b }
     : { a: b, b: a, answer: a * b }
@@ -21,7 +22,6 @@ export function generateOptions(answer) {
     }
   }
 
-  // Fallback if not enough distractors (e.g. answer is very small)
   let fallback = 1
   while (distractors.size < 3) {
     if (fallback !== answer && !distractors.has(fallback)) {
@@ -33,16 +33,14 @@ export function generateOptions(answer) {
   return [answer, ...distractors].sort(() => Math.random() - 0.5)
 }
 
-export function calculateStars(mistakes) {
-  if (mistakes === 0) return 3
-  if (mistakes <= 2) return 2
-  return 1
+export function makeRound(multipliers, factorRange = [1, 10]) {
+  const problem = generateProblem(multipliers, factorRange)
+  return { problem, options: generateOptions(problem.answer) }
 }
 
-export function makeRound(tableRange) {
-  const problem = generateProblem(tableRange)
-  return {
-    problem,
-    options: generateOptions(problem.answer),
-  }
+// 0 hits = gold, 1 = silver, 2 = bronze (3 hits = dead, never reaches result)
+export function getTrophy(mistakes) {
+  if (mistakes === 0) return 'gold'
+  if (mistakes === 1) return 'silver'
+  return 'bronze'
 }

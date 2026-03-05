@@ -1,44 +1,53 @@
-// ViewBox 100×216 ≈ iPhone aspect ratio (9:19.5).
-// With xMidYMid slice the SVG maps almost 1:1 to a portrait phone screen
-// so we can design the ground at the exact y% where characters stand.
-// Characters' feet sit at ~76% of screen height → y ≈ 164 in this viewBox.
+// Three independent layers — each anchored so it can never be clipped:
+//   1. Sky     — CSS gradient fills the full arena
+//   2. Sun     — CSS div pinned top-right, always visible
+//   3. Hills   — SVG pinned to bottom:0; overflow="visible" so crests/edges
+//                extend naturally into sky and are clipped only by the wrapper
 export function BattleBackground() {
   return (
-    <svg
-      style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', zIndex: 0 }}
-      viewBox="0 0 100 216"
-      preserveAspectRatio="xMidYMid slice"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <defs>
-        <linearGradient id="bg-sky" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#7aa8c2" />
-          <stop offset="100%" stopColor="#b8d4e4" />
-        </linearGradient>
-      </defs>
+    <div style={{ position: 'absolute', inset: 0, overflow: 'hidden' }}>
 
-      {/* Sky */}
-      <rect width="100" height="216" fill="url(#bg-sky)" />
+      {/* 1. Sky gradient */}
+      <div style={{
+        position: 'absolute', inset: 0,
+        background: 'linear-gradient(to bottom, #7aa8c2, #b8d4e4)',
+      }} />
 
-      {/* Sun — upper right, very low opacity */}
-      <circle cx="80" cy="28" r="13" fill="#e8d090" opacity="0.35" />
-      <circle cx="80" cy="28" r="9"  fill="#edd98a" opacity="0.30" />
+      {/* 2. Sun — two CSS circles for glow + core, pinned top-right */}
+      <div style={{
+        position: 'absolute', top: 18, right: 18,
+        width: 64, height: 64, borderRadius: '50%',
+        background: 'radial-gradient(circle, rgba(255,240,140,0.70) 0%, rgba(232,208,144,0.30) 55%, transparent 75%)',
+        boxShadow: '0 0 48px 24px rgba(232,208,144,0.35)',
+      }} />
+      <div style={{
+        position: 'absolute', top: 30, right: 30,
+        width: 40, height: 40, borderRadius: '50%',
+        background: '#edd98a',
+        opacity: 0.55,
+      }} />
 
-      {/* Far hill */}
-      <path d="M-5 140 Q15 112 32 120 Q52 128 68 112 Q82 98 105 112 L105 216 L-5 216Z"
-        fill="#4a6340" />
+      {/* 3. Hills — anchored to bottom, overflow visible so crests render into sky */}
+      <svg
+        style={{ position: 'absolute', bottom: 0, left: 0, width: '100%', height: '48%' }}
+        viewBox="0 0 100 60"
+        preserveAspectRatio="none"
+        overflow="visible"
+        fill="none"
+      >
+        {/* Far hill */}
+        <path d="M-5 22 Q15 -6 32 2 Q52 10 68 -6 Q82 -20 105 -6 L105 60 L-5 60Z"
+          fill="#4a6340" />
+        {/* Mid hill */}
+        <path d="M-5 32 Q18 8 36 16 Q56 24 72 8 Q86 -5 105 10 L105 60 L-5 60Z"
+          fill="#567248" />
+        {/* Near hill */}
+        <path d="M-5 48 Q22 34 45 40 Q65 46 82 35 Q93 28 105 38 L105 60 L-5 60Z"
+          fill="#61804f" />
+        {/* Ground fill */}
+        <rect x="-5" y="44" width="115" height="20" fill="#3e5635" />
+      </svg>
 
-      {/* Mid hill */}
-      <path d="M-5 152 Q18 128 36 136 Q56 144 72 128 Q86 115 105 130 L105 216 L-5 216Z"
-        fill="#567248" />
-
-      {/* Near hill — surface crest sits at ~y=164 where characters stand */}
-      <path d="M-5 172 Q22 158 45 164 Q65 170 82 159 Q93 152 105 162 L105 216 L-5 216Z"
-        fill="#61804f" />
-
-      {/* Ground fill below the near hill */}
-      <rect x="-5" y="175" width="115" height="46" fill="#3e5635" />
-    </svg>
+    </div>
   )
 }
