@@ -751,6 +751,15 @@ export function EnemyCharacter({ phase, enemy, hitKey }) {
         transition: { duration: 0.45, times: [0, 0.32, 0.62, 1] },
       })
     }
+    // Death — stumble then topple off right side
+    if (phase === 'won') {
+      moveControls.start({
+        x: [0, -18, 160],
+        rotate: [0, -12, -80],
+        opacity: [1, 1, 0],
+        transition: { duration: 0.65, times: [0, 0.25, 1], ease: 'easeIn' },
+      })
+    }
   }, [phase, moveControls, weaponControls])
 
   // Enemy takes a hit — recoil + splash

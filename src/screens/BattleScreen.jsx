@@ -4,7 +4,7 @@ const APP_VERSION = typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : '
 import { useState, useEffect, useRef } from 'react'
 import { DEBUG } from '../game/campaign.config'
 import { motion, useAnimation } from 'framer-motion'
-import { makeRound } from '../game/battleLogic'
+import { makeRound, getTrophy } from '../game/battleLogic'
 import { playCorrect, playWrong, playSwordSwing, playImpact, playVictory, playDefeat } from '../game/sounds'
 import { HPBar } from '../components/HPBar'
 import { KnightCharacter } from '../components/KnightCharacter'
@@ -15,86 +15,125 @@ import { BattleIntro } from '../components/BattleIntro'
 
 const IDLE_BUTTON_STATES = ['idle', 'idle', 'idle', 'idle']
 
+const TROPHY_FILTER = {
+  gold:   'drop-shadow(0 0 22px rgba(251,191,36,0.9))',
+  silver: 'grayscale(1) brightness(1.5) contrast(0.85)',
+  bronze: 'sepia(1) saturate(1.4) hue-rotate(-10deg) brightness(0.82)',
+}
+const TROPHY_LABEL = { gold: 'PERFECT!', silver: 'GREAT!', bronze: 'SURVIVED!' }
+const TROPHY_COLOR = { gold: '#fbbf24', silver: '#cbd5e1', bronze: '#b45309' }
+
 function ShadowBlob() {
   return (
-    <div
-      style={{
-        width: 58,
-        height: 12,
-        borderRadius: '50%',
-        background: 'rgba(0,0,0,0.32)',
-        filter: 'blur(5px)',
-        marginTop: -6,
-        flexShrink: 0,
-      }}
-    />
+    <div style={{
+      width: 58, height: 12, borderRadius: '50%',
+      background: 'rgba(0,0,0,0.32)', filter: 'blur(5px)',
+      marginTop: -6, flexShrink: 0,
+    }} />
   )
 }
 
-// Draining countdown bar shown for timed worlds
 function TimerBar({ timeLeft, maxTime }) {
   const pct = Math.max(0, timeLeft / maxTime)
   const color = timeLeft <= 2 ? '#ef4444' : timeLeft <= Math.ceil(maxTime / 2) ? '#f59e0b' : '#4ade80'
   return (
-    <div
+    <div style={{ height: 6, borderRadius: 4, background: 'rgba(255,255,255,0.15)', overflow: 'hidden', marginTop: -4 }}>
+      <div style={{
+        height: '100%', width: `${pct * 100}%`, background: color,
+        transition: 'width 0.85s linear, background 0.3s', borderRadius: 4,
+      }} />
+    </div>
+  )
+}
+
+// In-scene overlay shown when the enemy is defeated
+function TrophyOverlay({ trophy, onContinue }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.18 }}
+      onClick={onContinue}
       style={{
-        height: 6,
-        borderRadius: 4,
-        background: 'rgba(255,255,255,0.15)',
-        overflow: 'hidden',
-        marginTop: -4,
+        position: 'absolute', inset: 0, zIndex: 20,
+        display: 'flex', flexDirection: 'column',
+        alignItems: 'center', justifyContent: 'center',
+        background: 'rgba(0,0,0,0.52)',
+        cursor: 'pointer', gap: 14,
       }}
     >
-      <div
+      {/* Trophy drops in from above */}
+      <motion.div
+        initial={{ y: -180, scale: 0.4, rotate: -8 }}
+        animate={{ y: 0,    scale: 1,   rotate: 0 }}
+        transition={{ type: 'spring', stiffness: 170, damping: 13, delay: 0.05 }}
+      >
+        <span style={{ fontSize: 92, filter: TROPHY_FILTER[trophy] }}>🏆</span>
+      </motion.div>
+
+      {/* Quality label */}
+      <motion.p
+        initial={{ opacity: 0, y: 14 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.35 }}
         style={{
-          height: '100%',
-          width: `${pct * 100}%`,
-          background: color,
-          transition: 'width 0.85s linear, background 0.3s',
-          borderRadius: 4,
+          fontSize: 30, fontWeight: 900, letterSpacing: '0.18em',
+          color: TROPHY_COLOR[trophy],
+          filter: `drop-shadow(0 0 12px ${TROPHY_COLOR[trophy]})`,
         }}
-      />
-    </div>
+      >
+        {TROPHY_LABEL[trophy]}
+      </motion.p>
+
+      {/* Tap hint */}
+      <motion.p
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.75 }}
+        style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)', letterSpacing: '0.12em' }}
+      >
+        TAP TO CONTINUE
+      </motion.p>
+    </motion.div>
   )
 }
 
 export function BattleScreen({ world, battleIndex, onBattleEnd }) {
   const shakeControls = useAnimation()
 
-  const [playerHP, setPlayerHP] = useState(world.playerHP)
-  const [enemyHP, setEnemyHP] = useState(world.enemy.hp)
-  const [round, setRound] = useState(() => makeRound(world.multipliers, world.factorRange))
-  const [phase, setPhase] = useState('idle')
-  const [mistakes, setMistakes] = useState(0)
+  const [playerHP,  setPlayerHP]  = useState(world.playerHP)
+  const [enemyHP,   setEnemyHP]   = useState(world.enemy.hp)
+  const [round,     setRound]     = useState(() => makeRound(world.multipliers, world.factorRange))
+  const [phase,     setPhase]     = useState('idle')
+  const [mistakes,  setMistakes]  = useState(0)
   const [buttonStates, setButtonStates] = useState(IDLE_BUTTON_STATES)
-  const [enemyHitKey, setEnemyHitKey] = useState(0)
+  const [enemyHitKey,  setEnemyHitKey]  = useState(0)
   const [playerHitKey, setPlayerHitKey] = useState(0)
   const [introPlaying, setIntroPlaying] = useState(true)
 
-  // Timer state
-  const [timeLeft, setTimeLeft] = useState(world.timer ?? null)
-  const [timedOut, setTimedOut] = useState(false)
+  // Trophy overlay — shown after enemy dies, before onBattleEnd fires
+  const [showTrophy,  setShowTrophy]  = useState(false)
+  const wonMistakesRef = useRef(0)
 
-  // Refs so timer callbacks always see fresh state
-  const phaseRef = useRef(phase)
-  phaseRef.current = phase
-  const mistakesRef = useRef(mistakes)
-  mistakesRef.current = mistakes
-  const playerHPRef = useRef(playerHP)
-  playerHPRef.current = playerHP
+  // Timer
+  const [timeLeft,  setTimeLeft]  = useState(world.timer ?? null)
+  const [timedOut,  setTimedOut]  = useState(false)
 
-  // Landing shake
+  // Refs for timer callbacks
+  const phaseRef     = useRef(phase);     phaseRef.current     = phase
+  const mistakesRef  = useRef(mistakes);  mistakesRef.current  = mistakes
+  const playerHPRef  = useRef(playerHP);  playerHPRef.current  = playerHP
+
+  // Landing shake — only on the very first encounter of a world
   useEffect(() => {
+    if (battleIndex !== 0) return
     const t = setTimeout(() => {
-      shakeControls.start({
-        x: [0, -8, 7, -5, 4, -2, 0],
-        transition: { duration: 0.3 },
-      })
+      shakeControls.start({ x: [0, -8, 7, -5, 4, -2, 0], transition: { duration: 0.3 } })
     }, 500)
     return () => clearTimeout(t)
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Countdown timer — starts fresh on each new round (once intro is done)
+  // Countdown timer — resets each round once intro is done
   useEffect(() => {
     if (!world.timer || introPlaying) return
     setTimeLeft(world.timer)
@@ -102,11 +141,7 @@ export function BattleScreen({ world, battleIndex, onBattleEnd }) {
 
     const id = setInterval(() => {
       setTimeLeft((t) => {
-        if (t <= 1) {
-          setTimedOut(true)
-          clearInterval(id)
-          return 0
-        }
+        if (t <= 1) { setTimedOut(true); clearInterval(id); return 0 }
         return t - 1
       })
     }, 1000)
@@ -114,14 +149,11 @@ export function BattleScreen({ world, battleIndex, onBattleEnd }) {
     return () => clearInterval(id)
   }, [round, introPlaying]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // React to timer expiry — treat as wrong answer
+  // Timer expiry → wrong answer
   useEffect(() => {
     if (!timedOut || phaseRef.current !== 'idle') return
     setTimedOut(false)
-
-    // Highlight correct answer, grey out rest
     setButtonStates(round.options.map((opt) => (opt === round.problem.answer ? 'correct' : 'idle')))
-
     playWrong()
     const newMistakes = mistakesRef.current + 1
     setMistakes(newMistakes)
@@ -130,10 +162,7 @@ export function BattleScreen({ world, battleIndex, onBattleEnd }) {
     setTimeout(() => {
       playImpact()
       setPlayerHitKey((k) => k + 1)
-      shakeControls.start({
-        x: [0, -12, 11, -8, 7, -4, 3, 0],
-        transition: { duration: 0.5 },
-      })
+      shakeControls.start({ x: [0, -12, 11, -8, 7, -4, 3, 0], transition: { duration: 0.5 } })
       const newPlayerHP = Math.max(0, playerHPRef.current - 1)
       setPlayerHP(newPlayerHP)
 
@@ -159,14 +188,11 @@ export function BattleScreen({ world, battleIndex, onBattleEnd }) {
     if (phase !== 'idle') return
 
     const isCorrect = selected === problem.answer
-
-    setButtonStates(
-      options.map((opt) => {
-        if (opt === problem.answer) return 'correct'
-        if (opt === selected) return 'wrong'
-        return 'idle'
-      })
-    )
+    setButtonStates(options.map((opt) => {
+      if (opt === problem.answer) return 'correct'
+      if (opt === selected)       return 'wrong'
+      return 'idle'
+    }))
 
     if (isCorrect) {
       playCorrect()
@@ -181,11 +207,15 @@ export function BattleScreen({ world, battleIndex, onBattleEnd }) {
         if (newEnemyHP <= 0) {
           setPhase('won')
           playVictory()
-          setTimeout(() => onBattleEnd({ won: true, mistakes }), 1100)
+          // Capture mistakes now (state won't change after this point)
+          wonMistakesRef.current = mistakes
+          // Enemy death-anim plays (~650ms), then trophy overlay appears
+          setTimeout(() => setShowTrophy(true), 700)
         } else {
           loadNextRound()
         }
       }, 280)
+
     } else {
       playWrong()
       const newMistakes = mistakes + 1
@@ -195,10 +225,7 @@ export function BattleScreen({ world, battleIndex, onBattleEnd }) {
       setTimeout(() => {
         playImpact()
         setPlayerHitKey((k) => k + 1)
-        shakeControls.start({
-          x: [0, -12, 11, -8, 7, -4, 3, 0],
-          transition: { duration: 0.5 },
-        })
+        shakeControls.start({ x: [0, -12, 11, -8, 7, -4, 3, 0], transition: { duration: 0.5 } })
         const newPlayerHP = Math.max(0, playerHP - 1)
         setPlayerHP(newPlayerHP)
 
@@ -223,10 +250,11 @@ export function BattleScreen({ world, battleIndex, onBattleEnd }) {
     >
       <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', flex: 1, gap: 16 }}>
 
-        {/* Battle arena — no overflow:hidden so character sprites (wings, weapons) aren't clipped */}
+        {/* Battle arena */}
         <div className="flex flex-1 min-h-0" style={{ position: 'relative' }}>
           <BattleBackground />
-          {/* Version + config mode label — top-left of the arena */}
+
+          {/* Version label */}
           <div style={{
             position: 'absolute', top: 8, left: 10, zIndex: 2,
             display: 'flex', flexDirection: 'column', gap: 1,
@@ -235,17 +263,20 @@ export function BattleScreen({ world, battleIndex, onBattleEnd }) {
             <span style={{ fontSize: 11, fontFamily: 'monospace', color: 'rgba(255,255,255,0.28)' }}>
               v{APP_VERSION}
             </span>
-            <span style={{ fontSize: 10, fontFamily: 'monospace', color: DEBUG ? 'rgba(251,191,36,0.45)' : 'rgba(255,255,255,0.18)', letterSpacing: '0.06em' }}>
+            <span style={{
+              fontSize: 10, fontFamily: 'monospace', letterSpacing: '0.06em',
+              color: DEBUG ? 'rgba(251,191,36,0.45)' : 'rgba(255,255,255,0.18)',
+            }}>
               {DEBUG ? 'debug' : 'prod'}
             </span>
           </div>
-          <div className="flex flex-1 items-end gap-3 px-2" style={{ position: 'relative', zIndex: 1 }}>
 
-            {/* Left HP bar */}
+          <div className="flex flex-1 items-end gap-3 px-2" style={{ position: 'relative', zIndex: 1 }}>
+            {/* Player HP */}
             <motion.div
               initial={{ y: -60, opacity: 0 }}
               animate={introPlaying ? {} : { y: 0, opacity: 1 }}
-              transition={{ duration: 0.35, delay: 0 }}
+              transition={{ duration: 0.35 }}
               className="mb-6"
             >
               <HPBar current={playerHP} max={world.playerHP} color="green" />
@@ -253,30 +284,49 @@ export function BattleScreen({ world, battleIndex, onBattleEnd }) {
 
             {/* Characters */}
             <div className="relative flex flex-1 justify-around items-end">
+              {/* Knight — slides in from left only on first encounter; stays put on subsequent ones */}
               <div className="flex flex-col items-center">
                 <motion.div
-                  initial={{ x: -220 }}
+                  initial={{ x: battleIndex === 0 ? -220 : 0 }}
                   animate={{ x: 0 }}
                   transition={{ duration: 0.45, ease: 'easeOut' }}
                 >
                   <KnightCharacter phase={phase} hitKey={playerHitKey} />
                 </motion.div>
-                <ShadowBlob />
+                {/* Shadow: instant on round 2+, fades in on first encounter */}
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: battleIndex === 0 ? 0.4 : 0, duration: 0.2 }}
+                >
+                  <ShadowBlob />
+                </motion.div>
               </div>
 
+              {/* Enemy — slides in from right alongside knight */}
               <div className="flex flex-col items-center">
                 <motion.div
-                  initial={{ x: 220 }}
-                  animate={{ x: 0 }}
-                  transition={{ duration: 0.45, ease: 'easeOut' }}
+                  initial={{ x: 120, opacity: 0 }}
+                  animate={{ x: 0, opacity: showTrophy ? 0 : 1 }}
+                  transition={showTrophy
+                    ? { opacity: { duration: 0.35, ease: 'easeOut' } }
+                    : { duration: 0.45, ease: 'easeOut' }
+                  }
                 >
                   <EnemyCharacter phase={phase} enemy={world.enemy} hitKey={enemyHitKey} />
                 </motion.div>
-                <ShadowBlob />
+                {/* Shadow fades in as enemy lands */}
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: showTrophy ? 0 : 1 }}
+                  transition={{ delay: showTrophy ? 0 : 0.4, duration: 0.2 }}
+                >
+                  <ShadowBlob />
+                </motion.div>
               </div>
             </div>
 
-            {/* Right HP bar */}
+            {/* Enemy HP */}
             <motion.div
               initial={{ y: -60, opacity: 0 }}
               animate={introPlaying ? {} : { y: 0, opacity: 1 }}
@@ -304,17 +354,10 @@ export function BattleScreen({ world, battleIndex, onBattleEnd }) {
                 <circle
                   cx="5.5" cy="5.5" r="4.5"
                   fill={i < battleIndex ? '#fbbf24' : 'none'}
-                  stroke={
-                    i < battleIndex ? '#fbbf24'
-                    : i === battleIndex ? 'rgba(255,255,255,0.9)'
-                    : 'rgba(255,255,255,0.28)'
-                  }
+                  stroke={i < battleIndex ? '#fbbf24' : i === battleIndex ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.28)'}
                   strokeWidth="1.5"
                 />
-                {/* Active battle: small centre dot */}
-                {i === battleIndex && (
-                  <circle cx="5.5" cy="5.5" r="2" fill="rgba(255,255,255,0.9)" />
-                )}
+                {i === battleIndex && <circle cx="5.5" cy="5.5" r="2" fill="rgba(255,255,255,0.9)" />}
               </svg>
             ))}
           </div>
@@ -331,7 +374,6 @@ export function BattleScreen({ world, battleIndex, onBattleEnd }) {
           <p className="text-5xl font-black text-white tracking-wide">
             {problem.a} × {problem.b} = ?
           </p>
-          {/* Timer bar — only for timed worlds */}
           {world.timer && !introPlaying && timeLeft !== null && (
             <div className="mt-4 px-2">
               <TimerBar timeLeft={timeLeft} maxTime={world.timer} />
@@ -347,17 +389,10 @@ export function BattleScreen({ world, battleIndex, onBattleEnd }) {
               key={i}
               initial={{ scale: 0, opacity: 0 }}
               animate={introPlaying ? {} : { scale: 1, opacity: 1 }}
-              transition={{
-                type: 'spring',
-                stiffness: 280,
-                damping: 18,
-                delay: 0.22 + i * 0.08,
-              }}
+              transition={{ type: 'spring', stiffness: 280, damping: 18, delay: 0.22 + i * 0.08 }}
             >
               <AnswerButton
-                value={opt}
-                index={i}
-                onClick={handleAnswer}
+                value={opt} index={i} onClick={handleAnswer}
                 disabled={!isActive || phase !== 'idle' || introPlaying}
                 state={buttonStates[i]}
               />
@@ -366,8 +401,15 @@ export function BattleScreen({ world, battleIndex, onBattleEnd }) {
         </div>
       </div>
 
-      {introPlaying && (
-        <BattleIntro onComplete={() => setIntroPlaying(false)} />
+      {/* Intro overlay */}
+      {introPlaying && <BattleIntro onComplete={() => setIntroPlaying(false)} battleIndex={battleIndex} />}
+
+      {/* In-scene trophy overlay — dims arena and shows trophy drop */}
+      {showTrophy && (
+        <TrophyOverlay
+          trophy={getTrophy(wonMistakesRef.current)}
+          onContinue={() => onBattleEnd({ won: true, mistakes: wonMistakesRef.current })}
+        />
       )}
     </motion.div>
   )

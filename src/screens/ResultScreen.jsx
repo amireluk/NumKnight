@@ -1,18 +1,5 @@
 import { motion } from 'framer-motion'
 
-// Trophy CSS filters: bronze, silver, gold
-const TROPHY_FILTER = {
-  gold:   'drop-shadow(0 0 22px rgba(251,191,36,0.9))',
-  silver: 'grayscale(1) brightness(1.5) contrast(0.85)',
-  bronze: 'sepia(1) saturate(1.4) hue-rotate(-10deg) brightness(0.82)',
-}
-
-const TROPHY_LABEL = {
-  gold:   'PERFECT!',
-  silver: 'GREAT!',
-  bronze: 'SURVIVED!',
-}
-
 function Gravestone() {
   return (
     <motion.div
@@ -34,30 +21,7 @@ function Gravestone() {
   )
 }
 
-function VictoryBurst() {
-  return (
-    <motion.div
-      initial={{ scale: 0, opacity: 0 }}
-      animate={{ scale: 1, opacity: 1 }}
-      transition={{ type: 'spring', stiffness: 160, damping: 12, delay: 0.05 }}
-      style={{ fontSize: 96, textAlign: 'center', lineHeight: 1 }}
-    >
-      🏆
-    </motion.div>
-  )
-}
-
-export function ResultScreen({
-  won,
-  trophy,        // 'gold' | 'silver' | 'bronze' — only when won
-  worldName,
-  worldNum,      // 1–5
-  battleNum,     // 1-based index of the battle just completed
-  totalBattles,  // world.battles — total encounters in this world
-  isVictory,     // true when all battles in the whole campaign are done
-  onContinue,    // advance to next battle
-  onRestart,     // restart from world 1
-}) {
+export function ResultScreen({ won, isVictory, onRestart }) {
   if (isVictory) {
     return (
       <div
@@ -66,7 +30,14 @@ export function ResultScreen({
           background: 'radial-gradient(ellipse at 50% 40%, rgba(251,191,36,0.18) 0%, transparent 70%), linear-gradient(to bottom, #0d0d1e, #1a1040)',
         }}
       >
-        <VictoryBurst />
+        <motion.div
+          initial={{ scale: 0, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ type: 'spring', stiffness: 160, damping: 12, delay: 0.05 }}
+          style={{ fontSize: 96, textAlign: 'center', lineHeight: 1 }}
+        >
+          🏆
+        </motion.div>
 
         <motion.div
           initial={{ opacity: 0, y: 16 }}
@@ -93,84 +64,7 @@ export function ResultScreen({
     )
   }
 
-  if (won) {
-    return (
-      <div
-        className="flex flex-col items-center justify-center min-h-dvh max-w-md mx-auto px-6 gap-6"
-        style={{
-          background: 'radial-gradient(ellipse at 50% 40%, rgba(251,191,36,0.12) 0%, transparent 70%), linear-gradient(to bottom, #0d0d1e, #1a1040)',
-        }}
-      >
-        {/* World label — no battle counter (dots below already show position) */}
-        <motion.p
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="text-white/50 text-base font-semibold tracking-widest uppercase"
-        >
-          {worldName}
-        </motion.p>
-
-        {/* Trophy */}
-        <motion.div
-          initial={{ scale: 0.5, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ type: 'spring', stiffness: 180, damping: 14, delay: 0.15 }}
-        >
-          <span style={{ fontSize: 96, filter: TROPHY_FILTER[trophy] ?? TROPHY_FILTER.gold }}>
-            🏆
-          </span>
-        </motion.div>
-
-        {/* Trophy label */}
-        <motion.p
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ type: 'spring', stiffness: 220, damping: 14, delay: 0.45 }}
-          className="text-2xl font-black tracking-widest"
-          style={{
-            color: trophy === 'gold' ? '#fbbf24' : trophy === 'silver' ? '#cbd5e1' : '#b45309',
-          }}
-        >
-          {TROPHY_LABEL[trophy]}
-        </motion.p>
-
-        {/* World progress dots — filled = completed, outlined = upcoming */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.6 }}
-          style={{ display: 'flex', gap: 8, alignItems: 'center' }}
-        >
-          {Array.from({ length: totalBattles }).map((_, i) => (
-            <svg key={i} width="13" height="13" viewBox="0 0 13 13">
-              <circle
-                cx="6.5" cy="6.5" r="5.5"
-                fill={i < battleNum ? '#fbbf24' : 'none'}
-                stroke={i < battleNum ? '#fbbf24' : 'rgba(255,255,255,0.25)'}
-                strokeWidth="1.5"
-              />
-            </svg>
-          ))}
-        </motion.div>
-
-        {/* Continue button */}
-        <motion.button
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.8 }}
-          whileTap={{ scale: 0.95 }}
-          whileHover={{ scale: 1.04 }}
-          onClick={onContinue}
-          className="w-full bg-yellow-400 border-b-4 border-yellow-600 text-black font-black text-xl rounded-2xl h-16 shadow-xl cursor-pointer tracking-widest"
-        >
-          CONTINUE →
-        </motion.button>
-      </div>
-    )
-  }
-
-  // Game over
+  // Game over (won === false)
   return (
     <div
       className="flex flex-col items-center justify-center min-h-dvh max-w-md mx-auto px-6 gap-6"
@@ -187,7 +81,6 @@ export function ResultScreen({
         className="text-center"
       >
         <p className="text-3xl font-black text-white/80 tracking-widest">GAME OVER</p>
-        <p className="text-white/40 mt-1">Fell in {worldName}</p>
       </motion.div>
 
       <motion.button
