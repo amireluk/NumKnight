@@ -338,7 +338,7 @@ export function BattleScreen({ world, battleIndex, onBattleEnd }) {
           style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingInline: 4 }}
         >
           <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.55)', fontWeight: 700, letterSpacing: '0.04em' }}>
-            {world.icon}&nbsp;&nbsp;{world.name}
+            {world.name}
           </span>
           <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.55)', fontWeight: 700, letterSpacing: '0.06em' }}>
             Round {battleIndex + 1} / {world.battles}

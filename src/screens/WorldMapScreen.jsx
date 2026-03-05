@@ -51,15 +51,15 @@ function KnightHelmet() {
   )
 }
 
-// Red × drawn in SVG — overlaid on a conquered node
+// Red × — fills the node circle exactly (56×56)
 function ConqueredX() {
   return (
     <svg
-      width="44" height="44" viewBox="0 0 44 44"
+      width="56" height="56" viewBox="0 0 56 56"
       style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}
     >
-      <line x1="10" y1="10" x2="34" y2="34" stroke="rgba(239,68,68,0.70)" strokeWidth="4" strokeLinecap="round" />
-      <line x1="34" y1="10" x2="10" y2="34" stroke="rgba(239,68,68,0.70)" strokeWidth="4" strokeLinecap="round" />
+      <line x1="11" y1="11" x2="45" y2="45" stroke="rgba(239,68,68,0.88)" strokeWidth="6.5" strokeLinecap="round" />
+      <line x1="45" y1="11" x2="11" y2="45" stroke="rgba(239,68,68,0.88)" strokeWidth="6.5" strokeLinecap="round" />
     </svg>
   )
 }
@@ -79,7 +79,6 @@ function WorldNode({ world, index, status, trophy, delay, isSelected, onClick })
     flexShrink: 0,
     cursor: 'pointer',
     transition: 'box-shadow 0.18s, border-color 0.18s',
-    overflow: 'hidden',   // keeps X overlay clipped to the circle
     ...(isComplete && {
       background: '#1a1040',
       border: isSelected ? '2.5px solid #a78bfa' : '2.5px solid rgba(251,191,36,0.75)',
@@ -168,9 +167,9 @@ function WorldNode({ world, index, status, trophy, delay, isSelected, onClick })
         {/* Trophy badge — top-right, only on completed nodes */}
         {trophy && (
           <span style={{
-            position: 'absolute', top: -7, right: -9,
-            fontSize: 16, lineHeight: 1,
-            filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.7))',
+            position: 'absolute', top: -12, right: -13,
+            fontSize: 24, lineHeight: 1,
+            filter: 'drop-shadow(0 1px 4px rgba(0,0,0,0.8))',
             zIndex: 2,
           }}>
             {TROPHY_EMOJI[trophy]}
@@ -222,7 +221,7 @@ export function WorldMapScreen({
       knightPosRef.current = next
       setKnightPos(next)
       if (next !== target) scheduleStep()
-    }, 230)
+    }, 150)
   }
 
   const handleNodeClick = (i) => {
@@ -246,21 +245,71 @@ export function WorldMapScreen({
   return (
     <div
       className="flex flex-col min-h-dvh max-w-md mx-auto select-none"
-      style={{ background: 'linear-gradient(160deg, #0d0d1e 0%, #110830 55%, #1a1040 100%)', position: 'relative', overflow: 'hidden' }}
+      style={{ background: 'linear-gradient(to bottom, #0a1208, #0e1a0a, #0c1608)', position: 'relative', overflow: 'hidden' }}
     >
-      {/* Star field */}
+      {/* Kingdom landscape background */}
       <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: 0 }}
-        viewBox="0 0 360 700" preserveAspectRatio="xMidYMid slice">
-        {[
-          [18,22],[45,8],[72,35],[100,14],[130,28],[158,6],[185,40],[210,18],[238,32],[264,10],[290,24],[318,38],[344,12],
-          [30,68],[60,52],[88,72],[115,58],[142,80],[170,62],[196,75],[222,55],[250,70],[276,50],[302,66],[332,58],
-          [12,110],[40,96],[70,118],[98,102],[128,122],[155,95],[182,115],[208,98],[236,120],[262,105],[288,118],[315,92],[342,110],
-          [25,155],[55,140],[82,162],[108,148],[136,168],[163,142],[190,158],[216,144],[244,166],[270,152],[296,160],[325,138],
-          [8,200],[38,188],[66,205],[94,192],[122,210],[150,195],[178,208],[204,185],[232,202],[258,190],[284,204],[312,188],[340,200],
-        ].map(([cx, cy], i) => (
-          <circle key={i} cx={cx} cy={cy} r={i % 5 === 0 ? 1.1 : 0.65} fill="white"
-            opacity={0.12 + (i % 6) * 0.06} />
+        viewBox="0 0 360 760" preserveAspectRatio="xMidYMid slice">
+        {/* Distant mountain silhouette */}
+        <path d="M0 228 L32 155 L65 198 L98 128 L135 172 L168 115 L204 158 L238 125 L272 162 L306 135 L338 155 L360 140 L360 252 L0 252Z"
+          fill="#0c1c0a" />
+        <path d="M0 248 L45 185 L82 218 L118 168 L155 202 L192 148 L228 184 L265 152 L300 178 L335 155 L360 165 L360 268 L0 268Z"
+          fill="#091408" opacity="0.9" />
+        {/* Castle (upper-right, behind Dragon Lair node area) */}
+        <rect x="256" y="132" width="32" height="96" fill="#070e06" />
+        <rect x="244" y="112" width="18" height="116" fill="#070e06" />
+        {/* Left tower battlements */}
+        <path d="M242 112 L244 112 L244 105 L249 105 L249 112 L254 112 L254 105 L259 105 L259 112 L262 112 L262 118 L242 118Z" fill="#070e06" />
+        <rect x="270" y="120" width="18" height="108" fill="#070e06" />
+        {/* Right tower battlements */}
+        <path d="M268 120 L270 120 L270 113 L275 113 L275 120 L280 120 L280 113 L285 113 L285 120 L288 120 L288 126 L268 126Z" fill="#070e06" />
+        {/* Keep battlements */}
+        <path d="M254 132 L256 132 L256 126 L261 126 L261 132 L266 132 L266 126 L271 126 L271 132 L276 132 L276 126 L281 126 L281 132 L288 132 L288 138 L254 138Z" fill="#070e06" />
+        {/* Castle windows — warm amber glow */}
+        <rect x="263" y="158" width="9"  height="14" rx="4.5" fill="#6b4a06" />
+        <rect x="264" y="159" width="7"  height="12" rx="3.5" fill="#f59e0b" opacity="0.38" />
+        <rect x="248" y="142" width="7"  height="11" rx="3.5" fill="#6b4a06" />
+        <rect x="249" y="143" width="5"  height="9"  rx="2.5" fill="#f59e0b" opacity="0.32" />
+        {/* Castle walls */}
+        <path d="M232 224 L232 210 L238 210 L238 203 L243 203 L243 210 L250 210 L250 203 L255 203 L255 210 L262 210 L262 224Z" fill="#070e06" />
+        <path d="M280 224 L280 212 L286 212 L286 205 L291 205 L291 212 L298 212 L298 205 L303 205 L303 212 L310 212 L310 224Z" fill="#070e06" />
+        {/* Tree clusters — upper middle */}
+        {[[12,308],[28,316],[48,308],[68,314],[4,320],[86,310],[104,318]].map(([x,y],i) => (
+          <path key={i} d={`M${x} ${y} L${x+12} ${y-36} L${x+24} ${y}Z`} fill={i%2===0 ? '#091508' : '#0b1c0a'} />
         ))}
+        {[[274,302],[290,310],[308,304],[325,312],[342,308]].map(([x,y],i) => (
+          <path key={i} d={`M${x} ${y} L${x+12} ${y-34} L${x+24} ${y}Z`} fill={i%2===0 ? '#091508' : '#0b1c0a'} />
+        ))}
+        {/* River */}
+        <path d="M18 448 Q72 408 138 432 Q202 456 268 415 Q312 388 355 402"
+          stroke="#0d2218" strokeWidth="20" fill="none" strokeLinecap="round" />
+        <path d="M18 448 Q72 408 138 432 Q202 456 268 415 Q312 388 355 402"
+          stroke="#112a20" strokeWidth="11" fill="none" strokeLinecap="round" />
+        <path d="M18 448 Q72 408 138 432 Q202 456 268 415 Q312 388 355 402"
+          stroke="#183228" strokeWidth="4"  fill="none" strokeLinecap="round" opacity="0.55" />
+        {/* Rolling hills */}
+        <path d="M0 495 Q48 460 95 478 Q142 496 188 462 Q234 428 280 455 Q318 474 360 452 L360 760 L0 760Z"
+          fill="#0c1a0a" />
+        <path d="M0 540 Q58 510 115 528 Q172 546 228 514 Q272 490 315 510 Q342 522 360 508 L360 760 L0 760Z"
+          fill="#0e1e0c" />
+        {/* Pasture patches */}
+        <ellipse cx="78"  cy="520" rx="58" ry="24" fill="#122214" opacity="0.65" />
+        <ellipse cx="238" cy="508" rx="52" ry="22" fill="#122214" opacity="0.65" />
+        <ellipse cx="335" cy="525" rx="38" ry="18" fill="#122214" opacity="0.60" />
+        {/* Small farmhouse left pasture */}
+        <rect x="55" y="508" width="14" height="10" fill="#0a1608" />
+        <path d="M53 508 L62 500 L71 508Z" fill="#0a1608" />
+        {/* Small farmhouse right pasture */}
+        <rect x="220" y="497" width="12" height="9" fill="#0a1608" />
+        <path d="M218 497 L226 490 L234 497Z" fill="#0a1608" />
+        {/* Dense near-forest trees */}
+        {Array.from({ length: 12 }, (_, i) => {
+          const x = i * 32
+          const y = 622 + (i % 3) * 6
+          return <path key={i} d={`M${x} ${y} L${x+16} ${y-50} L${x+32} ${y}Z`} fill={i%2===0 ? '#091508' : '#0b1c0a'} />
+        })}
+        {/* Ground */}
+        <rect x="0" y="628" width="360" height="132" fill="#080e06" />
       </svg>
       {/* Header */}
       <motion.div
@@ -301,7 +350,7 @@ export function WorldMapScreen({
             style={{ position: 'absolute', zIndex: 10, pointerEvents: 'none' }}
             initial={{ left: initLeft, top: initTop }}
             animate={{ left: knightLeft, top: knightTop }}
-            transition={{ type: 'spring', stiffness: 340, damping: 28 }}
+            transition={{ type: 'tween', duration: 0.14, ease: 'linear' }}
           >
             <div style={{ transform: 'translate(-50%, -62px)' }}>
               <KnightHelmet />
