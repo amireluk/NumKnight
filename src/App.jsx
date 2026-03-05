@@ -3,28 +3,34 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { BattleScreen } from './screens/BattleScreen'
 import { ResultScreen } from './screens/ResultScreen'
 import { WorldMapScreen } from './screens/WorldMapScreen'
-import { WORLDS } from './game/worldConfig'
+import { getConfig } from './game/campaign.config'
 import { createNewRun, loadRun, saveRun, clearRun } from './game/runState'
 import { getTrophy } from './game/battleLogic'
 
+const DIFF_KEY = 'numknight_difficulty'
+function loadDifficulty() {
+  try { return localStorage.getItem(DIFF_KEY) || 'medium' } catch { return 'medium' }
+}
+function saveDifficulty(d) {
+  try { localStorage.setItem(DIFF_KEY, d) } catch { /* ignore */ }
+}
+
 export default function App() {
-  // Restore or create a fresh run
+  const [difficulty, setDifficulty] = useState(loadDifficulty)
   const [run, setRun] = useState(() => loadRun() ?? createNewRun())
-  // 'battle' | 'result' | 'map' — always start on map
+  // always start on map
   const [screen, setScreen] = useState('map')
   const [battleResult, setBattleResult] = useState(null)
   const [battleKey, setBattleKey] = useState(0)
-  // True when we just cleared a world and are transitioning to the next —
-  // tells WorldMapScreen to park the knight at the old world so the player
-  // must explicitly move it to the new one before FIGHT activates.
+  // true when we just cleared a world — knight stays at cleared world
+  // until the player manually moves it to the new one
   const [mapIsTransition, setMapIsTransition] = useState(false)
 
-  // Persist run state on every change
-  useEffect(() => {
-    saveRun(run)
-  }, [run])
+  // Derive world list from current difficulty
+  const worlds = getConfig(difficulty)
+  const world  = worlds[run.worldIndex]
 
-  const world = WORLDS[run.worldIndex]
+  useEffect(() => { saveRun(run) }, [run])
 
   const handleBattleEnd = ({ won, mistakes }) => {
     if (won) {
@@ -34,17 +40,14 @@ export default function App() {
       setRun(newRun)
       saveRun(newRun)
 
-      // Check for full campaign victory
-      const totalBattles = WORLDS.reduce((sum, w) => sum + w.battles, 0)
-      const completedBattles = newTrophies.length
-      if (completedBattles >= totalBattles) {
+      const totalBattles = worlds.reduce((sum, w) => sum + w.battles, 0)
+      if (newTrophies.length >= totalBattles) {
         setBattleResult({ won: true, trophy, isVictory: true })
       } else {
         setBattleResult({ won: true, trophy, isVictory: false })
       }
       setScreen('result')
     } else {
-      // Died — game over
       setBattleResult({ won: false })
       setScreen('result')
     }
@@ -52,18 +55,13 @@ export default function App() {
 
   const handleContinue = () => {
     const nextBattle = run.battleIndex + 1
-
     if (nextBattle >= world.battles) {
-      // Last battle of this world — advance to next world and show the map.
-      // isTransition=true so the knight stays at the cleared world until
-      // the player manually moves it to the new one.
-      const nextWorld = run.worldIndex + 1
-      setRun((r) => ({ ...r, worldIndex: nextWorld, battleIndex: 0 }))
+      // Cleared this world — show map, knight parks at cleared world
+      setRun((r) => ({ ...r, worldIndex: run.worldIndex + 1, battleIndex: 0 }))
       setBattleResult(null)
       setMapIsTransition(true)
       setScreen('map')
     } else {
-      // Next battle within the same world — go straight to battle
       setRun((r) => ({ ...r, battleIndex: nextBattle }))
       setBattleResult(null)
       setBattleKey((k) => k + 1)
@@ -88,34 +86,39 @@ export default function App() {
     setScreen('map')
   }
 
+  const handleDifficultyChange = (newDiff) => {
+    if (newDiff === difficulty) return
+    saveDifficulty(newDiff)
+    setDifficulty(newDiff)
+    // Difficulty change always resets progress
+    clearRun()
+    const fresh = createNewRun()
+    setRun(fresh)
+    saveRun(fresh)
+    setBattleResult(null)
+    setMapIsTransition(false)
+    setBattleKey((k) => k + 1)
+    setScreen('map')
+  }
+
   return (
     <>
     <AnimatePresence mode="wait">
       {screen === 'battle' && (
         <motion.div
           key={`battle-${battleKey}`}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.25 }}
-          className="w-full"
+          initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+          transition={{ duration: 0.25 }} className="w-full"
         >
-          <BattleScreen
-            world={world}
-            battleIndex={run.battleIndex}
-            onBattleEnd={handleBattleEnd}
-          />
+          <BattleScreen world={world} battleIndex={run.battleIndex} onBattleEnd={handleBattleEnd} />
         </motion.div>
       )}
 
       {screen === 'result' && (
         <motion.div
           key={`result-${battleKey}`}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.25 }}
-          className="w-full"
+          initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+          transition={{ duration: 0.25 }} className="w-full"
         >
           <ResultScreen
             won={battleResult?.won ?? false}
@@ -134,18 +137,18 @@ export default function App() {
       {screen === 'map' && (
         <motion.div
           key={`map-${run.worldIndex}`}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.3 }}
-          className="w-full"
+          initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+          transition={{ duration: 0.3 }} className="w-full"
         >
           <WorldMapScreen
-            worlds={WORLDS}
+            worlds={worlds}
             currentWorldIndex={run.worldIndex}
             trophies={run.trophies}
             isTransition={mapIsTransition}
+            difficulty={difficulty}
+            onDifficultyChange={handleDifficultyChange}
             onFight={handleFight}
+            onRestart={handleRestart}
           />
         </motion.div>
       )}
