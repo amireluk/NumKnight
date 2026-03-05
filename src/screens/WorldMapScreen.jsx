@@ -222,8 +222,13 @@ function WorldNode({ world, index, status, trophy, delay, isSelected, onClick })
   )
 }
 
-export function WorldMapScreen({ worlds, currentWorldIndex, trophies, onFight }) {
-  const [selectedIndex, setSelectedIndex] = useState(currentWorldIndex)
+export function WorldMapScreen({ worlds, currentWorldIndex, trophies, isTransition, onFight }) {
+  // On a world transition the knight parks at the just-cleared world so the
+  // player must explicitly tap the next world to move it there.
+  // On a fresh load or resume the knight starts at the current world.
+  const [selectedIndex, setSelectedIndex] = useState(
+    isTransition ? Math.max(0, currentWorldIndex - 1) : currentWorldIndex
+  )
 
   const currentWorld  = worlds[currentWorldIndex]
   const selectedWorld = worlds[selectedIndex]

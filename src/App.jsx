@@ -10,16 +10,14 @@ import { getTrophy } from './game/battleLogic'
 export default function App() {
   // Restore or create a fresh run
   const [run, setRun] = useState(() => loadRun() ?? createNewRun())
-  // 'battle' | 'result' | 'map'
-  const [screen, setScreen] = useState(() => {
-    const existing = loadRun()
-    // Show map whenever we're at the start of a world (battleIndex === 0),
-    // including the very first world. Skip map only if resuming mid-world.
-    if (existing && existing.battleIndex > 0) return 'battle'
-    return 'map'
-  })
+  // 'battle' | 'result' | 'map' — always start on map
+  const [screen, setScreen] = useState('map')
   const [battleResult, setBattleResult] = useState(null)
   const [battleKey, setBattleKey] = useState(0)
+  // True when we just cleared a world and are transitioning to the next —
+  // tells WorldMapScreen to park the knight at the old world so the player
+  // must explicitly move it to the new one before FIGHT activates.
+  const [mapIsTransition, setMapIsTransition] = useState(false)
 
   // Persist run state on every change
   useEffect(() => {
@@ -56,10 +54,13 @@ export default function App() {
     const nextBattle = run.battleIndex + 1
 
     if (nextBattle >= world.battles) {
-      // Last battle of this world — advance to next world and show the map
+      // Last battle of this world — advance to next world and show the map.
+      // isTransition=true so the knight stays at the cleared world until
+      // the player manually moves it to the new one.
       const nextWorld = run.worldIndex + 1
       setRun((r) => ({ ...r, worldIndex: nextWorld, battleIndex: 0 }))
       setBattleResult(null)
+      setMapIsTransition(true)
       setScreen('map')
     } else {
       // Next battle within the same world — go straight to battle
@@ -71,6 +72,7 @@ export default function App() {
   }
 
   const handleFight = () => {
+    setMapIsTransition(false)
     setBattleKey((k) => k + 1)
     setScreen('battle')
   }
@@ -81,8 +83,9 @@ export default function App() {
     setRun(fresh)
     saveRun(fresh)
     setBattleResult(null)
+    setMapIsTransition(false)
     setBattleKey((k) => k + 1)
-    setScreen('battle')
+    setScreen('map')
   }
 
   return (
@@ -141,6 +144,7 @@ export default function App() {
             worlds={WORLDS}
             currentWorldIndex={run.worldIndex}
             trophies={run.trophies}
+            isTransition={mapIsTransition}
             onFight={handleFight}
           />
         </motion.div>
