@@ -143,3 +143,189 @@ The arena div has **no** `overflow:hidden` so weapon/wing sprites aren't clipped
 - Background clipping fixes (sun always visible, hills always at bottom)
 - DEBUG/prod config flag
 - Version auto-bump on build
+
+---
+
+---
+
+# ROADMAP
+
+## Phase 1 — World Map Screen
+**Goal:** Show the player where they are in the campaign between battles.
+
+### What it looks like
+- A vertical or winding path with 5 world nodes (icon + name)
+- Completed nodes show the best trophy earned across their battles
+- Current world node pulses / is highlighted
+- Future nodes are locked/dimmed
+- Shown after the result screen when advancing to a new world (not between battles in the same world)
+- A "FIGHT" button at the current node launches the next battle
+
+### Technical approach
+- New screen: `src/screens/WorldMapScreen.jsx`
+- New App screen state: `'map'` — inserted between `result` (last battle of a world) and `battle` (first of next world)
+- Props needed: `worlds` (WORLDS array), `worldIndex` (current), `trophies[]` (all earned so far)
+- Trophy per world = best trophy across that world's completed battles (gold > silver > bronze)
+- Framer Motion: staggered node entrance, path draw animation (`pathLength` 0→1)
+
+### Data shape addition to runState (no breaking change)
+- Trophies array is already stored; derive per-world best at render time
+
+---
+
+## Phase 2 — Per-World Backgrounds
+**Goal:** Each region feels visually distinct.
+
+### Palette plan
+| World | Sky | Ground/terrain | Special elements |
+|-------|-----|----------------|-----------------|
+| Forest | Blue→light blue (current) | Green hills (current) | Sun |
+| Swamp | Murky purple-green→grey-green | Dark boggy ground, dead trees | Dim moon |
+| Mountains | Cold grey-blue→pale | Rocky grey ground, snow patches | Snow-capped peaks |
+| Castle | Dark navy→charcoal | Stone floor, battlements silhouette | Storm clouds |
+| Dragon Lair | Deep red-orange→dark | Volcanic rock, lava cracks | Glowing lava glow at bottom |
+
+### Technical approach
+- `BattleBackground` accepts a `worldId` prop
+- Internal switch/map returns the right layer config (sky gradient stops, ground colour, extra SVG elements)
+- Sun becomes a world-specific light source (sun for forest/mountains, moon for swamp, no sun for castle/lair)
+- Add `background` field to `campaign.config.js` world entries (or derive from `id` — simpler)
+- No new files needed; all within `BattleBackground.jsx`
+
+---
+
+## Phase 3 — Scoring System
+**Goal:** Give players a numeric score to chase, rewarding speed and accuracy.
+
+### Score formula (per battle)
+```
+battleScore = basePoints × trophyMultiplier + timeBonus
+
+basePoints       = enemy.hp × 100          (harder enemies = more base points)
+trophyMultiplier = gold:3  silver:2  bronze:1
+timeBonus        = only for timed worlds (timer !== null)
+                 = sum over all questions of: floor((timeLeft / world.timer) × 50)
+                   (answered with 8s left on an 8s timer = 50 bonus pts)
+```
+
+### Run score
+`totalScore = sum of all battleScores`
+
+### What needs tracking
+- `questionTimeLeft` at moment of correct answer — already available in BattleScreen state
+- Pass `score` out of `onBattleEnd({ won, mistakes, score })`
+- Store per-battle scores in `runState.trophies` → extend to `runState.battles[]`:
+  ```js
+  battles: [{ trophy, score, worldIndex, battleIndex }]
+  ```
+- Show battle score on the result screen (animates up like a counter)
+- Show cumulative run score on the victory screen
+
+### Changes needed
+- `battleLogic.js`: add `calcBattleScore(enemyHp, trophy, timeBonuses)`
+- `BattleScreen.jsx`: track `timeBonuses[]`, pass score to `onBattleEnd`
+- `ResultScreen.jsx`: display battle score + running total
+- `runState.js`: extend battles array shape
+
+---
+
+## Phase 4 — Local Leaderboard
+**Goal:** Top runs stored in the browser, shown after each completed run.
+
+### Data (localStorage key: `numknight_scores`)
+```js
+[
+  { name, totalScore, worldsCleared, date, trophySummary },
+  // kept sorted, capped at top 10
+]
+```
+
+### Flow
+1. Victory screen: show final score + prompt for player name (simple text input)
+2. Save entry to `numknight_scores`
+3. Transition to leaderboard screen showing top 10
+4. "PLAY AGAIN" from leaderboard restarts
+
+### New files
+- `src/game/scoreState.js` — `saveScore(entry)`, `loadScores()`, `clearScores()`
+- `src/screens/LeaderboardScreen.jsx` — ranked table with trophy icons, score, name, date
+- `src/screens/NameEntryScreen.jsx` — simple input + confirm (or inline on victory screen)
+
+### UI
+- Gold/silver/bronze row tinting based on avg trophy
+- Animated rank numbers counting in
+- Player's just-submitted run highlighted
+
+---
+
+## Phase 5 — Visual Polish
+**Goal:** Juice up the moments that matter most.
+
+### Priority list
+1. **Enemy death animation** — when enemy HP hits 0: rotate + fall off-screen (translateY +200, rotate 90deg, fade out). Currently enemy just disappears when `won` phase starts.
+2. **Player death animation** — knight topples/falls when HP hits 0 (similar fall + fade)
+3. **Screen flash on hit** — brief red overlay (opacity 0→0.3→0) when player takes damage
+4. **Victory particle burst** — confetti/star particles explode on gold trophy
+5. **World transition** — cinematic wipe or flash between worlds on the map
+6. **Answer button shake** — wrong answer: button shakes left-right
+7. **HP bar animate** — smooth lerp instead of instant drop; flash red on damage
+8. **Idle enemy variety** — enemies do occasional random actions (scratch head, look around) during long idle
+
+### Technical notes
+- Enemy fall: add `'dying'` phase to EnemyCharacter, triggered when `phase === 'won'` and `enemyHP === 0`; use Framer Motion exit animation
+- Player fall: same in KnightCharacter
+- Screen flash: absolute overlay div in BattleScreen, `AnimatePresence` + opacity keyframe
+- Particles: can use a simple hand-rolled CSS/SVG burst (no library needed) similar to the existing `HitSplash`
+
+---
+
+## Phase 6 — Cross-Device Backend Leaderboard
+**Goal:** Global high scores visible across all devices/players.
+
+### Recommended stack
+**Supabase** (free tier, no self-hosting needed)
+- PostgreSQL database
+- Auto-generated REST API
+- No auth required for a public leaderboard (anon key is fine)
+- Works with `vite-plugin-singlefile` (pure HTTP calls, no SSR needed)
+
+### Schema
+```sql
+CREATE TABLE scores (
+  id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  name        text NOT NULL,
+  total_score integer NOT NULL,
+  worlds_cleared integer NOT NULL,
+  trophy_summary  text,   -- e.g. "GGSBS" (G=gold S=silver B=bronze)
+  created_at  timestamptz DEFAULT now()
+);
+CREATE INDEX ON scores(total_score DESC);
+```
+
+### App changes
+- `src/game/api.js` — `submitScore(entry)`, `fetchLeaderboard(limit=20)`
+- Leaderboard screen fetches global scores on mount; falls back to local if offline
+- Player name persisted locally (`numknight_player_name`) so they don't re-enter it each run
+- Submit score at end of run (fire-and-forget, non-blocking)
+
+### Anti-cheat (lightweight)
+- Score is recomputed server-side from the submitted `battles[]` array (validate formula)
+- Rate-limit submissions per IP (Supabase Edge Functions or just rely on their built-in rate limits)
+- Names: client-side length cap (16 chars), no validation for content (keep it simple)
+
+### Considerations
+- The app is currently a single HTML file — Supabase JS client adds ~40KB gzipped. Acceptable.
+- Offline-first: always save locally, submit globally when possible
+- No login/accounts — name is the identity. Same name from different devices = separate entries (by design, keeps it simple)
+
+---
+
+## Suggested implementation order
+```
+Phase 1 (World Map)      ← highest gameplay impact, sets up the visual journey
+Phase 2 (Backgrounds)   ← pairs naturally with map work, same context
+Phase 3 (Scoring)       ← adds replayability, needed before leaderboard
+Phase 4 (Local LB)      ← can ship without backend, validates the loop
+Phase 5 (Polish)        ← do incrementally alongside other phases
+Phase 6 (Backend LB)    ← last, biggest lift, needs Phase 3+4 done first
+```
