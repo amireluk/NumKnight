@@ -240,7 +240,7 @@ const WORLD_SCENES = {
 
 // ── Screen ────────────────────────────────────────────────────────────────────
 
-export function AreaClearedScreen({ world, worldTrophies, onContinue }) {
+export function AreaClearedScreen({ world, worldTrophies, worldScore, onContinue }) {
   const Scene = WORLD_SCENES[world.id] ?? ForestScene
 
   return (
@@ -252,22 +252,22 @@ export function AreaClearedScreen({ world, worldTrophies, onContinue }) {
           'linear-gradient(to bottom, #0d0d1e, #1a1040)',
       }}
     >
-      {/* Region name — on top */}
+      {/* 1. Region name */}
       <motion.div
         className="text-center"
         initial={{ opacity: 0, y: -14 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.32 }}
       >
-        <p className="text-white/40 text-xs font-black tracking-[0.35em] uppercase mb-1">
-          Area Cleared
-        </p>
         <p className="text-white font-black text-3xl tracking-wide">
           {world.name}
         </p>
+        <p className="text-white/40 text-xs font-black tracking-[0.35em] uppercase mt-1">
+          Area Cleared
+        </p>
       </motion.div>
 
-      {/* Region illustration */}
+      {/* 2. Region illustration */}
       <motion.div
         initial={{ scale: 0.7, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
@@ -281,25 +281,47 @@ export function AreaClearedScreen({ world, worldTrophies, onContinue }) {
         <Scene />
       </motion.div>
 
-      {/* Trophy row */}
+      {/* 3. Trophy row (per-battle) */}
       <div style={{ display: 'flex', gap: 24, alignItems: 'center', justifyContent: 'center' }}>
         {worldTrophies.map((trophy, i) => (
           <motion.div
             key={i}
             initial={{ scale: 0, opacity: 0, y: 20 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 + i * 0.15, type: 'spring', stiffness: 260, damping: 16 }}
+            transition={{ delay: 0.4 + i * 0.15, type: 'spring', stiffness: 260, damping: 16 }}
           >
             <span style={{ fontSize: 48, filter: TROPHY_FILTER[trophy] }}>🏆</span>
           </motion.div>
         ))}
       </div>
 
-      {/* Continue button */}
+      {/* 4. World score total */}
+      {worldScore > 0 && (
+        <motion.div
+          initial={{ opacity: 0, scale: 0.85 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.75, type: 'spring', stiffness: 220, damping: 15 }}
+          style={{
+            background: 'rgba(251,191,36,0.12)',
+            border: '1px solid rgba(251,191,36,0.28)',
+            borderRadius: 14, padding: '8px 32px',
+            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2,
+          }}
+        >
+          <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)', fontWeight: 700, letterSpacing: '0.15em' }}>
+            WORLD SCORE
+          </span>
+          <span style={{ fontSize: 28, fontWeight: 900, color: '#fbbf24' }}>
+            {worldScore}
+          </span>
+        </motion.div>
+      )}
+
+      {/* 5. Continue */}
       <motion.button
         initial={{ opacity: 0, y: 22 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 1.0, type: 'spring', stiffness: 210, damping: 18 }}
+        transition={{ delay: 1.05, type: 'spring', stiffness: 210, damping: 18 }}
         whileTap={{ scale: 0.95 }}
         whileHover={{ scale: 1.04 }}
         onClick={onContinue}

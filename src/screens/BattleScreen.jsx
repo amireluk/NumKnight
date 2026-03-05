@@ -3,7 +3,7 @@ const APP_VERSION = typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : '
 
 import { useState, useEffect, useRef } from 'react'
 import { motion, useAnimation } from 'framer-motion'
-import { makeRound, getTrophy } from '../game/battleLogic'
+import { makeRound, getTrophy, calcBattleScore } from '../game/battleLogic'
 import { playCorrect, playWrong, playSwordSwing, playImpact, playVictory, playDefeat } from '../game/sounds'
 import { HPBar } from '../components/HPBar'
 import { KnightCharacter } from '../components/KnightCharacter'
@@ -46,7 +46,7 @@ function TimerBar({ timeLeft, maxTime }) {
 }
 
 // In-scene overlay shown when the enemy is defeated
-function TrophyOverlay({ trophy, onContinue }) {
+function TrophyOverlay({ trophy, score, onContinue }) {
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -84,11 +84,21 @@ function TrophyOverlay({ trophy, onContinue }) {
         {TROPHY_LABEL[trophy]}
       </motion.p>
 
+      {/* Battle score */}
+      <motion.p
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.55 }}
+        style={{ fontSize: 22, fontWeight: 900, color: 'white', letterSpacing: '0.06em' }}
+      >
+        +{score} pts
+      </motion.p>
+
       {/* Tap hint */}
       <motion.p
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 0.75 }}
+        transition={{ delay: 0.85 }}
         style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)', letterSpacing: '0.12em' }}
       >
         TAP TO CONTINUE
@@ -112,7 +122,9 @@ export function BattleScreen({ world, battleIndex, onBattleEnd }) {
 
   // Trophy overlay — shown after enemy dies, before onBattleEnd fires
   const [showTrophy,  setShowTrophy]  = useState(false)
-  const wonMistakesRef = useRef(0)
+  const wonMistakesRef  = useRef(0)
+  const wonTimeBonusRef = useRef(0)
+  const timeBonusAccRef = useRef(0) // accumulated per correct answer this battle
 
   // Timer
   const [timeLeft,  setTimeLeft]  = useState(world.timer ?? null)
@@ -194,6 +206,10 @@ export function BattleScreen({ world, battleIndex, onBattleEnd }) {
     }))
 
     if (isCorrect) {
+      // Accumulate time bonus for timed worlds
+      if (world.timer && timeLeft !== null) {
+        timeBonusAccRef.current += Math.floor(timeLeft * 10)
+      }
       playCorrect()
       setPhase('attacking')
 
@@ -206,8 +222,9 @@ export function BattleScreen({ world, battleIndex, onBattleEnd }) {
         if (newEnemyHP <= 0) {
           setPhase('won')
           playVictory()
-          // Capture mistakes now (state won't change after this point)
+          // Capture mistakes and timeBonus (state won't change after this point)
           wonMistakesRef.current = mistakes
+          wonTimeBonusRef.current = timeBonusAccRef.current
           // Enemy death-anim plays (~650ms), then trophy overlay appears
           setTimeout(() => setShowTrophy(true), 700)
         } else {
@@ -390,7 +407,8 @@ export function BattleScreen({ world, battleIndex, onBattleEnd }) {
       {showTrophy && (
         <TrophyOverlay
           trophy={getTrophy(wonMistakesRef.current)}
-          onContinue={() => onBattleEnd({ won: true, mistakes: wonMistakesRef.current })}
+          score={calcBattleScore(getTrophy(wonMistakesRef.current), wonTimeBonusRef.current)}
+          onContinue={() => onBattleEnd({ won: true, mistakes: wonMistakesRef.current, timeBonus: wonTimeBonusRef.current })}
         />
       )}
     </motion.div>

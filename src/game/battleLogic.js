@@ -44,3 +44,9 @@ export function getTrophy(mistakes) {
   if (mistakes === 1) return 'silver'
   return 'bronze'
 }
+
+// base: gold=100, silver=50, bronze=25 + timeBonus (seconds × 10, accumulated per correct answer)
+export function calcBattleScore(trophy, timeBonus = 0) {
+  const base = { gold: 100, silver: 50, bronze: 25 }[trophy] ?? 0
+  return base + timeBonus
+}

@@ -5,24 +5,6 @@ import { useState, useRef, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { DIFFICULTY } from '../game/campaign.config'
 
-const VW = 360
-const VH = 500
-
-const NODE_POS = [
-  [ 72, 428],  // 0 Forest
-  [285, 350],  // 1 Swamp
-  [ 75, 258],  // 2 Mountains
-  [275, 158],  // 3 Castle
-  [180,  55],  // 4 Dragon Lair
-]
-
-const PATH =
-  'M 72 428' +
-  ' C 72 385 285 385 285 350' +
-  ' C 285 315 75 296 75 258' +
-  ' C 75 218 275 196 275 158' +
-  ' C 275 110 180 88 180 55'
-
 const TROPHY_EMOJI = { gold: '🥇', silver: '🥈', bronze: '🥉' }
 
 function getBestTrophy(trophies, worlds, worldIndex) {
@@ -34,10 +16,238 @@ function getBestTrophy(trophies, worlds, worldIndex) {
   return null
 }
 
+// ── Region panoramic strips (360×100, xMidYMid slice) ───────────────────────
+
+function ForestStrip() {
+  return (
+    <svg width="100%" height="100%" viewBox="0 0 360 100"
+      preserveAspectRatio="xMidYMid slice" style={{ position: 'absolute', inset: 0 }}>
+      <defs>
+        <linearGradient id="wm-fs-sky" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%"   stopColor="#4a9ed8" />
+          <stop offset="100%" stopColor="#89cef0" />
+        </linearGradient>
+      </defs>
+      <rect width="360" height="100" fill="url(#wm-fs-sky)" />
+      {/* Sun */}
+      <circle cx="316" cy="20" r="18" fill="#f0d070" opacity="0.35" />
+      <circle cx="316" cy="20" r="11" fill="#f0d070" opacity="0.85" />
+      {/* Birds */}
+      <path d="M90 28 Q93 25 96 28" stroke="#2e6080" strokeWidth="1.2" fill="none" strokeLinecap="round" />
+      <path d="M104 23 Q107 20 110 23" stroke="#2e6080" strokeWidth="1.2" fill="none" strokeLinecap="round" />
+      {/* Far hill */}
+      <path d="M0 58 Q60 36 120 52 Q180 66 240 44 Q300 24 360 42 L360 100 L0 100Z" fill="#3e6830" />
+      {/* Near hill */}
+      <path d="M0 72 Q70 54 140 68 Q210 80 280 62 Q330 50 360 60 L360 100 L0 100Z" fill="#4e8040" />
+      {/* Ground */}
+      <rect x="0" y="85" width="360" height="15" fill="#3a5828" />
+      {/* Trees */}
+      {[[30,72],[52,66],[76,72],[152,58],[174,52],[196,60],[262,64],[282,58],[304,66]].map(([x,y],i) => (
+        <path key={i} d={`M${x-10} ${y} L${x} ${y-26} L${x+10} ${y}Z`}
+          fill={i % 2 === 0 ? '#1e3e14' : '#264c1a'} />
+      ))}
+      {/* Flowers */}
+      <circle cx="110" cy="87" r="2.2" fill="#f9d84a" opacity="0.8" />
+      <circle cx="200" cy="88" r="1.8" fill="#f87171" opacity="0.75" />
+      <circle cx="240" cy="87" r="2"   fill="#f9d84a" opacity="0.7" />
+    </svg>
+  )
+}
+
+function SwampStrip() {
+  return (
+    <svg width="100%" height="100%" viewBox="0 0 360 100"
+      preserveAspectRatio="xMidYMid slice" style={{ position: 'absolute', inset: 0 }}>
+      <defs>
+        <linearGradient id="wm-sw-sky" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%"   stopColor="#182218" />
+          <stop offset="100%" stopColor="#2e4230" />
+        </linearGradient>
+      </defs>
+      <rect width="360" height="100" fill="url(#wm-sw-sky)" />
+      {/* Moon */}
+      <circle cx="48" cy="20" r="14" fill="#c3d294" opacity="0.28" />
+      <circle cx="48" cy="20" r="9"  fill="#c3d294" opacity="0.42" />
+      {/* Ground */}
+      <rect x="0" y="60" width="360" height="40" fill="#111a10" />
+      {/* Water */}
+      <ellipse cx="80"  cy="74" rx="50" ry="8"  fill="#0e2018" />
+      <ellipse cx="220" cy="76" rx="44" ry="7"  fill="#0e2018" />
+      <ellipse cx="320" cy="71" rx="32" ry="6"  fill="#0e2018" />
+      {/* Ripples */}
+      <path d="M48 72 Q62 69 76 72"  stroke="#1a3028" strokeWidth="1" fill="none" opacity="0.7" />
+      <path d="M192 73 Q208 70 224 73" stroke="#1a3028" strokeWidth="1" fill="none" opacity="0.7" />
+      {/* Dead trees */}
+      <line x1="28"  y1="60" x2="28"  y2="14" stroke="#0a140a" strokeWidth="4"   strokeLinecap="round" />
+      <line x1="28"  y1="28" x2="14"  y2="18" stroke="#0a140a" strokeWidth="2.2" strokeLinecap="round" />
+      <line x1="28"  y1="28" x2="44"  y2="20" stroke="#0a140a" strokeWidth="2.2" strokeLinecap="round" />
+      <line x1="28"  y1="44" x2="16"  y2="36" stroke="#0a140a" strokeWidth="1.5" strokeLinecap="round" />
+      <line x1="148" y1="60" x2="148" y2="16" stroke="#0a140a" strokeWidth="3.5" strokeLinecap="round" />
+      <line x1="148" y1="30" x2="132" y2="20" stroke="#0a140a" strokeWidth="2"   strokeLinecap="round" />
+      <line x1="148" y1="30" x2="164" y2="22" stroke="#0a140a" strokeWidth="2"   strokeLinecap="round" />
+      <line x1="310" y1="60" x2="310" y2="18" stroke="#0a140a" strokeWidth="3.5" strokeLinecap="round" />
+      <line x1="310" y1="32" x2="295" y2="22" stroke="#0a140a" strokeWidth="2"   strokeLinecap="round" />
+      <line x1="310" y1="32" x2="326" y2="24" stroke="#0a140a" strokeWidth="2"   strokeLinecap="round" />
+      {/* Reeds */}
+      {[175, 188, 200, 338, 350].map((x, i) => (
+        <g key={i}>
+          <line x1={x} y1="62" x2={x} y2="42" stroke="#223820" strokeWidth="2" strokeLinecap="round" />
+          <ellipse cx={x} cy="40" rx="2.5" ry="6" fill="#223820" />
+        </g>
+      ))}
+      {/* Mist */}
+      <path d="M0 57 Q90 51 180 57 Q270 63 360 55 L360 67 L0 67Z"
+        fill="white" opacity="0.022" />
+    </svg>
+  )
+}
+
+function MountainsStrip() {
+  return (
+    <svg width="100%" height="100%" viewBox="0 0 360 100"
+      preserveAspectRatio="xMidYMid slice" style={{ position: 'absolute', inset: 0 }}>
+      <defs>
+        <linearGradient id="wm-mt-sky" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%"   stopColor="#223848" />
+          <stop offset="100%" stopColor="#72a8be" />
+        </linearGradient>
+      </defs>
+      <rect width="360" height="100" fill="url(#wm-mt-sky)" />
+      {/* Pale sun */}
+      <circle cx="316" cy="18" r="14" fill="#d8eaf4" opacity="0.35" />
+      <circle cx="316" cy="18" r="9"  fill="#d8eaf4" opacity="0.65" />
+      {/* Far peaks */}
+      <path d="M0 72 L24 34 L46 56 L72 18 L100 48 L128 26 L156 50 L186 30 L216 54 L244 26 L272 50 L300 20 L330 46 L360 28 L360 82 L0 82Z"
+        fill="#324a58" />
+      {/* Far snow */}
+      {[[24,34],[72,18],[128,26],[186,30],[244,26],[300,20]].map(([x,y],i) => (
+        <path key={i} d={`M${x} ${y} L${x-8} ${y+14} L${x+8} ${y+14}Z`}
+          fill="#ddeef8" opacity="0.75" />
+      ))}
+      {/* Near peaks */}
+      <path d="M0 90 L20 54 L40 74 L64 38 L90 64 L114 44 L140 68 L166 46 L194 70 L220 48 L248 72 L274 50 L302 74 L328 52 L360 68 L360 100 L0 100Z"
+        fill="#263848" />
+      {/* Near snow */}
+      {[[20,54],[64,38],[114,44],[166,46],[220,48],[274,50],[328,52]].map(([x,y],i) => (
+        <path key={i} d={`M${x} ${y} L${x-6} ${y+12} L${x+6} ${y+12}Z`}
+          fill="#e0eef6" opacity="0.88" />
+      ))}
+      {/* Rocky ground */}
+      <path d="M0 92 Q40 86 80 90 Q120 94 160 88 Q200 82 240 88 Q290 94 360 86 L360 100 L0 100Z"
+        fill="#1c2c36" />
+      {/* Snow patches on ground */}
+      <ellipse cx="50"  cy="94" rx="18" ry="3.5" fill="#ddeef8" opacity="0.4" />
+      <ellipse cx="210" cy="92" rx="14" ry="3"   fill="#ddeef8" opacity="0.35" />
+    </svg>
+  )
+}
+
+function CastleStrip() {
+  return (
+    <svg width="100%" height="100%" viewBox="0 0 360 100"
+      preserveAspectRatio="xMidYMid slice" style={{ position: 'absolute', inset: 0 }}>
+      <defs>
+        <linearGradient id="wm-cs-sky" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%"   stopColor="#040710" />
+          <stop offset="100%" stopColor="#0c1628" />
+        </linearGradient>
+      </defs>
+      <rect width="360" height="100" fill="url(#wm-cs-sky)" />
+      {/* Stars */}
+      {[[22,10],[58,7],[94,16],[136,9],[176,14],[218,7],[256,12],[296,8],[334,16],[42,24],[156,22],[282,20]].map(([x,y],i) => (
+        <circle key={i} cx={x} cy={y} r="0.9" fill="white" opacity={0.2 + (i % 3) * 0.1} />
+      ))}
+      {/* Moon */}
+      <circle cx="44" cy="20" r="14" fill="#c4d0de" opacity="0.28" />
+      <circle cx="44" cy="20" r="9"  fill="#c4d0de" opacity="0.52" />
+      {/* Storm cloud */}
+      <path d="M140 14 Q152 8 166 12 Q172 6 176 14 Q182 10 184 18 Q182 24 172 22 Q162 26 150 22 Q140 24 136 18 Q134 12 140 14Z"
+        fill="#121e30" opacity="0.9" />
+      {/* Left battlements */}
+      <path d="M0 68 L0 58 L8 58 L8 52 L14 52 L14 58 L22 58 L22 52 L28 52 L28 58 L36 58 L36 52 L42 52 L42 58 L52 58 L52 68Z"
+        fill="#040b14" />
+      {/* Central tower */}
+      <rect x="148" y="8" width="64" height="92" fill="#050c16" />
+      <path d="M146 8 L148 8 L148 2 L156 2 L156 8 L164 8 L164 2 L172 2 L172 8 L180 8 L180 2 L188 2 L188 8 L196 8 L196 2 L204 2 L204 8 L212 8 L212 14 L146 14Z"
+        fill="#050c16" />
+      {/* Glowing window */}
+      <rect x="172" y="32" width="16" height="22" rx="8" fill="#6b4a08" />
+      <rect x="174" y="34" width="12" height="18" rx="6" fill="#f59e0b" opacity="0.45" />
+      {/* Right battlements */}
+      <path d="M212 68 L212 58 L220 58 L220 52 L226 52 L226 58 L234 58 L234 52 L240 52 L240 58 L248 58 L248 52 L254 52 L254 58 L262 58 L262 52 L268 52 L268 58 L276 58 L276 52 L282 52 L282 58 L290 58 L290 52 L296 52 L296 58 L304 58 L304 52 L310 52 L310 58 L318 58 L318 52 L324 52 L324 58 L332 58 L332 52 L338 52 L338 58 L346 58 L346 52 L352 52 L352 58 L360 58 L360 68Z"
+        fill="#040b14" />
+      {/* Stone floor */}
+      <rect x="0" y="68" width="360" height="32" fill="#03080e" />
+      {[40,80,120,200,240,280,320].map((x, i) => (
+        <line key={i} x1={x} y1="68" x2={x} y2="100" stroke="#070f1a" strokeWidth="0.8" />
+      ))}
+      <line x1="0" y1="82" x2="360" y2="82" stroke="#070f1a" strokeWidth="0.8" />
+    </svg>
+  )
+}
+
+function DragonLairStrip() {
+  return (
+    <svg width="100%" height="100%" viewBox="0 0 360 100"
+      preserveAspectRatio="xMidYMid slice" style={{ position: 'absolute', inset: 0 }}>
+      <defs>
+        <linearGradient id="wm-dl-sky" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%"   stopColor="#050100" />
+          <stop offset="100%" stopColor="#2a0600" />
+        </linearGradient>
+        <radialGradient id="wm-dl-glow" cx="50%" cy="100%" r="65%">
+          <stop offset="0%"   stopColor="rgba(220,60,0,0.55)" />
+          <stop offset="100%" stopColor="transparent" />
+        </radialGradient>
+      </defs>
+      <rect width="360" height="100" fill="url(#wm-dl-sky)" />
+      <rect width="360" height="100" fill="url(#wm-dl-glow)" />
+      {/* Stalactites */}
+      {[[0,20],[22,30],[44,20],[68,34],[90,22],[114,28],[138,20],[162,32],[186,22],[210,26],[234,20],[258,30],[282,18],[306,26],[330,22],[354,30]].map(([x,h],i) => (
+        <path key={i} d={`M${x} 0 L${x + h * 0.45} 0 L${x + h * 0.22} ${h}Z`}
+          fill={i % 2 === 0 ? '#120400' : '#1a0500'} />
+      ))}
+      {/* Tip glows */}
+      {[[11,20],[33,30],[79,34],[125,28],[173,32],[221,26],[269,30],[317,26],[365,30]].map(([x,h],i) => (
+        <circle key={i} cx={x} cy={h} r="1.8" fill="#ff4500" opacity="0.5" />
+      ))}
+      {/* Rock back wall */}
+      <path d="M0 58 Q30 48 60 54 Q90 40 120 50 Q150 38 180 48 Q210 36 240 46 Q270 34 300 44 Q330 32 360 42 L360 100 L0 100Z"
+        fill="#160400" />
+      {/* Ground */}
+      <path d="M0 74 Q45 64 90 70 Q135 76 180 64 Q225 54 270 64 Q315 72 360 60 L360 100 L0 100Z"
+        fill="#0e0200" />
+      {/* Lava cracks */}
+      <path d="M20 80 Q38 74 48 82 Q56 78 68 84" stroke="#ff4500" strokeWidth="2.2" fill="none" strokeLinecap="round" opacity="0.9" />
+      <path d="M20 80 Q38 74 48 82 Q56 78 68 84" stroke="#ffaa00" strokeWidth="0.8" fill="none" strokeLinecap="round" opacity="0.7" />
+      <path d="M142 76 Q160 70 170 78 Q178 74 190 80" stroke="#ff4500" strokeWidth="2.2" fill="none" strokeLinecap="round" opacity="0.9" />
+      <path d="M142 76 Q160 70 170 78 Q178 74 190 80" stroke="#ffaa00" strokeWidth="0.8" fill="none" strokeLinecap="round" opacity="0.7" />
+      <path d="M272 74 Q286 68 296 76 Q304 72 316 78" stroke="#ff4500" strokeWidth="2" fill="none" strokeLinecap="round" opacity="0.85" />
+      {/* Lava pools */}
+      <ellipse cx="52"  cy="90" rx="24" ry="7" fill="#6b1200" opacity="0.8" />
+      <ellipse cx="52"  cy="90" rx="14" ry="4" fill="#ff5500" opacity="0.55" />
+      <ellipse cx="220" cy="92" rx="22" ry="7" fill="#6b1200" opacity="0.8" />
+      <ellipse cx="220" cy="92" rx="12" ry="4" fill="#ff5500" opacity="0.55" />
+      <ellipse cx="330" cy="88" rx="18" ry="5" fill="#6b1200" opacity="0.7" />
+      <ellipse cx="330" cy="88" rx="10" ry="3" fill="#ff5500" opacity="0.5" />
+    </svg>
+  )
+}
+
+const REGION_STRIPS = {
+  forest:     ForestStrip,
+  swamp:      SwampStrip,
+  mountains:  MountainsStrip,
+  castle:     CastleStrip,
+  dragonLair: DragonLairStrip,
+}
+
+// ── Knight helmet marker ─────────────────────────────────────────────────────
+
 function KnightHelmet() {
   return (
     <div style={{ filter: 'drop-shadow(0 0 7px rgba(251,191,36,0.9))' }}>
-      <svg width="24" height="30" viewBox="0 0 24 30" fill="none">
+      <svg width="22" height="28" viewBox="0 0 24 30" fill="none">
         <path d="M 8 6 Q 12 0 16 6" stroke="#ef4444" strokeWidth="2.5" fill="none" strokeLinecap="round" />
         <path d="M 3.5 17 Q 3.5 6 12 6 Q 20.5 6 20.5 17 L 20.5 21 L 3.5 21 Z" fill="#e2e8f0" />
         <rect x="5"    y="14"   width="14" height="4.5" rx="1.5" fill="#1e293b" />
@@ -51,138 +261,114 @@ function KnightHelmet() {
   )
 }
 
-function ConqueredX() {
-  return (
-    <svg
-      width="56" height="56" viewBox="0 0 56 56"
-      style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}
-    >
-      <line x1="11" y1="11" x2="45" y2="45" stroke="rgba(239,68,68,0.88)" strokeWidth="6.5" strokeLinecap="round" />
-      <line x1="45" y1="11" x2="11" y2="45" stroke="rgba(239,68,68,0.88)" strokeWidth="6.5" strokeLinecap="round" />
-    </svg>
-  )
-}
+// ── Region band ──────────────────────────────────────────────────────────────
 
-function WorldNode({ world, index, status, trophy, delay, isSelected, onClick }) {
-  const isCurrent  = status === 'current'
-  const isLocked   = status === 'locked'
-  const isComplete = status === 'completed'
-  const [cx, cy]   = NODE_POS[index]
-
-  const circleStyle = {
-    width: 56, height: 56,
-    borderRadius: '50%',
-    display: 'flex', alignItems: 'center', justifyContent: 'center',
-    fontSize: 26,
-    position: 'relative',
-    flexShrink: 0,
-    cursor: 'pointer',
-    transition: 'box-shadow 0.18s, border-color 0.18s',
-    ...(isComplete && {
-      background: '#1a1040',
-      border: isSelected ? '2.5px solid #a78bfa' : '2.5px solid rgba(251,191,36,0.75)',
-      boxShadow: isSelected ? '0 0 16px rgba(167,139,250,0.45)' : '0 0 10px rgba(251,191,36,0.28)',
-    }),
-    ...(isCurrent && {
-      background: '#2d1060',
-      border: '2.5px solid #fbbf24',
-      boxShadow: '0 0 22px rgba(251,191,36,0.75)',
-    }),
-    ...(isLocked && {
-      background: '#090916',
-      border: isSelected ? '2px solid rgba(167,139,250,0.4)' : '2px solid rgba(255,255,255,0.09)',
-      boxShadow: isSelected ? '0 0 10px rgba(167,139,250,0.18)' : 'none',
-    }),
-  }
-
-  const nameColor = isLocked
-    ? 'rgba(255,255,255,0.22)'
-    : isCurrent
-      ? '#fbbf24'
-      : isSelected ? '#c4b5fd' : 'rgba(255,255,255,0.62)'
+function RegionBand({ world, status, trophy, isSelected, isKnight, onClick, delay }) {
+  const Strip    = REGION_STRIPS[world.id] ?? ForestStrip
+  const isLocked  = status === 'locked'
+  const isCurrent = status === 'current'
 
   return (
     <motion.div
+      initial={{ opacity: 0, x: -28 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ delay, duration: 0.28 }}
+      onClick={onClick}
       style={{
-        position: 'absolute',
-        left: `${(cx / VW) * 100}%`,
-        top:  `${(cy / VH) * 100}%`,
-        transform: 'translate(-50%, -50%)',
-        display: 'flex', flexDirection: 'column', alignItems: 'center',
-        gap: 4, zIndex: isSelected ? 5 : 3,
+        position: 'relative',
+        flex: 1,
+        overflow: 'hidden',
+        cursor: 'pointer',
+        borderRadius: 10,
+        border: isSelected
+          ? isCurrent
+            ? '2px solid rgba(251,191,36,0.9)'
+            : '2px solid rgba(167,139,250,0.65)'
+          : '2px solid rgba(255,255,255,0.06)',
+        boxShadow: isSelected
+          ? isCurrent
+            ? '0 0 20px rgba(251,191,36,0.4), inset 0 0 14px rgba(251,191,36,0.07)'
+            : '0 0 14px rgba(167,139,250,0.25)'
+          : 'none',
+        transition: 'border-color 0.18s, box-shadow 0.18s',
       }}
-      initial={{ scale: 0, opacity: 0 }}
-      animate={{ scale: 1, opacity: isLocked ? 0.5 : 1 }}
-      transition={{ delay, type: 'spring', stiffness: 240, damping: 18 }}
     >
-      <div style={{ position: 'relative' }}>
-        {isCurrent && (
-          <motion.div
-            style={{
-              position: 'absolute', inset: -9, borderRadius: '50%',
-              border: '2px solid rgba(251,191,36,0.6)', pointerEvents: 'none',
-            }}
-            animate={{ scale: [1, 1.6, 1], opacity: [0.7, 0, 0.7] }}
-            transition={{ repeat: Infinity, duration: 2.1, ease: 'easeInOut' }}
-          />
-        )}
-        {isSelected && !isCurrent && (
-          <motion.div
-            style={{
-              position: 'absolute', inset: -6, borderRadius: '50%',
-              border: '1.5px solid rgba(167,139,250,0.5)', pointerEvents: 'none',
-            }}
-            initial={{ scale: 0.7, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-          />
-        )}
+      {/* Scene background */}
+      <Strip />
 
-        <div style={circleStyle} onClick={onClick}>
-          <span style={{ filter: isLocked ? 'grayscale(1) brightness(0.35)' : undefined }}>
-            {world.icon}
+      {/* Left gradient for text legibility */}
+      <div style={{
+        position: 'absolute', inset: 0, pointerEvents: 'none',
+        background: 'linear-gradient(to right, rgba(0,0,0,0.70) 0%, rgba(0,0,0,0.20) 55%, rgba(0,0,0,0) 100%)',
+      }} />
+
+      {/* Locked overlay */}
+      {isLocked && (
+        <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.52)', pointerEvents: 'none' }} />
+      )}
+
+      {/* Current pulsing border */}
+      {isCurrent && (
+        <motion.div
+          style={{ position: 'absolute', inset: 0, pointerEvents: 'none', borderRadius: 8, border: '2px solid rgba(251,191,36,0.55)' }}
+          animate={{ opacity: [0.4, 1, 0.4] }}
+          transition={{ repeat: Infinity, duration: 2.2, ease: 'easeInOut' }}
+        />
+      )}
+
+      {/* Left: icon + name */}
+      <div style={{
+        position: 'absolute', inset: 0, display: 'flex', alignItems: 'center',
+        paddingInline: 14, gap: 10, pointerEvents: 'none',
+      }}>
+        <span style={{ fontSize: 22, flexShrink: 0, filter: isLocked ? 'grayscale(1) brightness(0.35)' : undefined }}>
+          {world.icon}
+        </span>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+          <span style={{
+            fontSize: 13, fontWeight: 900, letterSpacing: '0.07em',
+            color: isLocked ? 'rgba(255,255,255,0.25)' : isCurrent ? '#fbbf24' : 'rgba(255,255,255,0.88)',
+            textShadow: '0 1px 5px rgba(0,0,0,0.95)',
+            lineHeight: 1,
+          }}>
+            {world.name}
           </span>
-          {isComplete && <ConqueredX />}
-          {isLocked && (
-            <div style={{
-              position: 'absolute', inset: 0,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: 22,
-            }}>
-              🔒
-            </div>
+          {world.timer !== null && !isLocked && (
+            <span style={{ fontSize: 9, color: '#fbbf24', fontWeight: 700, opacity: 0.82, letterSpacing: '0.04em' }}>
+              {world.timer}s / question
+            </span>
           )}
         </div>
+      </div>
 
+      {/* Right: knight / trophy / lock */}
+      <div style={{
+        position: 'absolute', right: 14, top: '50%', transform: 'translateY(-50%)',
+        display: 'flex', alignItems: 'center', gap: 8,
+      }}>
+        {isKnight && (
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ type: 'spring', stiffness: 320, damping: 18 }}
+          >
+            <KnightHelmet />
+          </motion.div>
+        )}
         {trophy && (
-          <span style={{
-            position: 'absolute', top: -12, right: -13,
-            fontSize: 24, lineHeight: 1,
-            filter: 'drop-shadow(0 1px 4px rgba(0,0,0,0.8))',
-            zIndex: 2,
-          }}>
+          <span style={{ fontSize: 22, filter: 'drop-shadow(0 1px 4px rgba(0,0,0,0.8))', lineHeight: 1 }}>
             {TROPHY_EMOJI[trophy]}
           </span>
         )}
+        {isLocked && (
+          <span style={{ fontSize: 18, opacity: 0.45 }}>🔒</span>
+        )}
       </div>
-
-      <span style={{
-        fontSize: 9.5, fontWeight: 800, letterSpacing: '0.12em',
-        textTransform: 'uppercase', color: nameColor,
-        whiteSpace: 'nowrap', lineHeight: 1,
-        textShadow: '0 1px 4px rgba(0,0,0,0.9)',
-      }}>
-        {world.name}
-      </span>
-
-      {world.timer !== null && (
-        <span style={{ fontSize: 8, color: '#fbbf24', fontWeight: 700, opacity: isLocked ? 0.45 : 0.85 }}>
-          ⏱{world.timer}s
-        </span>
-      )}
     </motion.div>
   )
 }
+
+// ── Screen ───────────────────────────────────────────────────────────────────
 
 export function WorldMapScreen({
   worlds, currentWorldIndex, trophies,
@@ -191,10 +377,10 @@ export function WorldMapScreen({
   const initPos = isTransition ? Math.max(0, currentWorldIndex - 1) : currentWorldIndex
 
   const [selectedIndex, setSelectedIndex] = useState(initPos)
-  const [knightPos,    setKnightPos]    = useState(initPos)
-  const knightPosRef  = useRef(initPos)
-  const targetRef     = useRef(initPos)
-  const stepTimerRef  = useRef(null)
+  const [knightPos,     setKnightPos]     = useState(initPos)
+  const knightPosRef = useRef(initPos)
+  const targetRef    = useRef(initPos)
+  const stepTimerRef = useRef(null)
 
   useEffect(() => () => {
     if (stepTimerRef.current) clearTimeout(stepTimerRef.current)
@@ -212,7 +398,7 @@ export function WorldMapScreen({
     }, 150)
   }
 
-  const handleNodeClick = (i) => {
+  const handleBandClick = (i) => {
     setSelectedIndex(i)
     if (stepTimerRef.current) clearTimeout(stepTimerRef.current)
     targetRef.current = i
@@ -220,299 +406,77 @@ export function WorldMapScreen({
   }
 
   const canFight = selectedIndex === currentWorldIndex
-
   const selectedStatus =
     selectedIndex < currentWorldIndex ? 'completed' :
     selectedIndex === currentWorldIndex ? 'current' : 'locked'
 
-  const knightLeft = `${(NODE_POS[knightPos][0] / VW) * 100}%`
-  const knightTop  = `${(NODE_POS[knightPos][1] / VH) * 100}%`
-  const initLeft   = `${(NODE_POS[initPos][0]   / VW) * 100}%`
-  const initTop    = `${(NODE_POS[initPos][1]   / VH) * 100}%`
-
   return (
-    // h-dvh + overflow-hidden keeps footer always in view
     <div
       className="flex flex-col h-dvh max-w-md mx-auto select-none"
-      style={{ position: 'relative', overflow: 'hidden' }}
+      style={{ position: 'relative', background: '#04060c' }}
     >
-      {/* ── Kingdomino-style kingdom background ────────────────────────── */}
-      <svg
-        style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: 0 }}
-        viewBox="0 0 360 760" preserveAspectRatio="xMidYMid slice"
-      >
-        {/* Sky */}
-        <defs>
-          <linearGradient id="km-sky" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%"   stopColor="#4a9ed8" />
-            <stop offset="100%" stopColor="#89cef0" />
-          </linearGradient>
-          <linearGradient id="km-hill1" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#6abf50" />
-            <stop offset="100%" stopColor="#4e9a38" />
-          </linearGradient>
-          <linearGradient id="km-ground" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#52a83a" />
-            <stop offset="100%" stopColor="#3e8228" />
-          </linearGradient>
-          <radialGradient id="km-sun" cx="50%" cy="50%" r="50%">
-            <stop offset="0%"   stopColor="#ffe066" />
-            <stop offset="70%"  stopColor="#f0c030" />
-            <stop offset="100%" stopColor="rgba(240,192,48,0)" />
-          </radialGradient>
-        </defs>
-
-        <rect width="360" height="760" fill="url(#km-sky)" />
-
-        {/* Sun */}
-        <circle cx="316" cy="58" r="44" fill="url(#km-sun)" opacity="0.55" />
-        <circle cx="316" cy="58" r="26" fill="#ffe066" opacity="0.95" />
-        {/* Sun rays */}
-        {[0,45,90,135,180,225,270,315].map((a, i) => {
-          const r = (a * Math.PI) / 180
-          return <line key={i}
-            x1={316 + Math.cos(r)*30} y1={58 + Math.sin(r)*30}
-            x2={316 + Math.cos(r)*46} y2={58 + Math.sin(r)*46}
-            stroke="#ffe066" strokeWidth="3.5" strokeLinecap="round" opacity="0.75" />
-        })}
-
-        {/* Clouds */}
-        <g opacity="0.92">
-          <ellipse cx="60"  cy="72" rx="36" ry="18" fill="white" />
-          <ellipse cx="44"  cy="80" rx="22" ry="14" fill="white" />
-          <ellipse cx="82"  cy="78" rx="26" ry="16" fill="white" />
-          <ellipse cx="60"  cy="84" rx="34" ry="12" fill="white" />
-        </g>
-        <g opacity="0.85">
-          <ellipse cx="198" cy="50" rx="28" ry="14" fill="white" />
-          <ellipse cx="184" cy="58" rx="18" ry="11" fill="white" />
-          <ellipse cx="216" cy="56" rx="20" ry="12" fill="white" />
-          <ellipse cx="198" cy="62" rx="26" ry="10" fill="white" />
-        </g>
-
-        {/* ── Cheerful castle (upper centre-right) ── */}
-        {/* Castle base / keep */}
-        <rect x="232" y="148" width="88" height="110" rx="4" fill="#d4b870" />
-        <rect x="232" y="148" width="88" height="110" rx="4" fill="#c8a858" opacity="0.6" />
-        {/* Stone lines */}
-        {[160,172,184,196,208,220,232].map((y,i)=>(
-          <line key={i} x1="232" y1={y} x2="320" y2={y} stroke="#b09040" strokeWidth="1" opacity="0.5"/>
-        ))}
-        {[248,264,280,296,312].map((x,i)=>(
-          <line key={i} x1={x} y1="148" x2={x} y2="258" stroke="#b09040" strokeWidth="1" opacity="0.4"/>
-        ))}
-        {/* Left tower */}
-        <rect x="222" y="128" width="28" height="130" rx="3" fill="#c8a858" />
-        <rect x="222" y="128" width="28" height="130" rx="3" fill="#d4b870" opacity="0.5" />
-        {/* Right tower */}
-        <rect x="302" y="136" width="28" height="122" rx="3" fill="#c8a858" />
-        {/* Left battlements */}
-        <path d="M220 128 L222 128 L222 120 L228 120 L228 128 L234 128 L234 120 L240 120 L240 128 L246 128 L246 120 L250 120 L250 128 L252 128 L252 134 L220 134Z" fill="#d4b870" />
-        {/* Right battlements */}
-        <path d="M300 136 L302 136 L302 128 L308 128 L308 136 L314 136 L314 128 L320 128 L320 136 L326 136 L326 128 L330 128 L330 136 L332 136 L332 142 L300 142Z" fill="#c8a858" />
-        {/* Keep battlements */}
-        <path d="M230 148 L232 148 L232 140 L238 140 L238 148 L246 148 L246 140 L252 140 L252 148 L260 148 L260 140 L266 140 L266 148 L274 148 L274 140 L280 140 L280 148 L288 148 L288 140 L294 140 L294 148 L302 148 L302 140 L308 140 L308 148 L320 148 L320 154 L230 154Z" fill="#d4b870" />
-        {/* Gate arch */}
-        <rect x="265" y="220" width="22" height="38" rx="11" fill="#6b4a18" />
-        <rect x="267" y="222" width="18" height="34" rx="9"  fill="#4a3010" />
-        {/* Windows */}
-        <rect x="230" y="162" width="12" height="16" rx="6" fill="#5a8ab0" />
-        <rect x="231" y="163" width="10" height="14" rx="5" fill="#7ab4d8" opacity="0.7" />
-        <rect x="306" y="168" width="12" height="16" rx="6" fill="#5a8ab0" />
-        <rect x="307" y="169" width="10" height="14" rx="5" fill="#7ab4d8" opacity="0.7" />
-        <rect x="258" y="165" width="11" height="15" rx="5.5" fill="#5a8ab0" />
-        <rect x="293" y="165" width="11" height="15" rx="5.5" fill="#5a8ab0" />
-        {/* Pennants / flags */}
-        <line x1="236" y1="120" x2="236" y2="96"  stroke="#8b6020" strokeWidth="2" />
-        <path d="M236 96 L252 103 L236 110Z" fill="#e84040" />
-        <line x1="316" y1="128" x2="316" y2="104" stroke="#8b6020" strokeWidth="2" />
-        <path d="M316 104 L332 111 L316 118Z" fill="#4040e8" />
-
-        {/* ── Far rolling hills ── */}
-        <path d="M0 310 Q40 272 80 290 Q120 308 160 278 Q200 248 240 272 Q280 295 320 268 Q345 252 360 260 L360 380 L0 380Z"
-          fill="#6abf50" />
-        <path d="M0 330 Q50 298 95 315 Q140 332 185 305 Q225 280 265 302 Q305 322 360 295 L360 400 L0 400Z"
-          fill="#5aad42" />
-
-        {/* ── Forest tree clusters ── */}
-        {/* Left cluster */}
-        {[[6,312],[22,320],[38,312],[54,320],[70,312],[4,328],[20,332]].map(([x,y],i) => (
-          <g key={i}>
-            <ellipse cx={x+14} cy={y-18} rx={13} ry={16} fill={i%2===0?'#2e7e28':'#3a9230'} />
-            <ellipse cx={x+14} cy={y-22} rx={10} ry={12} fill={i%2===0?'#3a9230':'#4aaa3a'} />
-            <rect x={x+11} y={y-4} width={6} height={12} rx={2} fill="#7a4820" />
-          </g>
-        ))}
-        {/* Right cluster */}
-        {[[276,298],[292,308],[308,298],[324,306],[340,298],[284,316],[300,320]].map(([x,y],i) => (
-          <g key={i}>
-            <ellipse cx={x+10} cy={y-16} rx={12} ry={15} fill={i%2===0?'#2e7e28':'#3a9230'} />
-            <ellipse cx={x+10} cy={y-20} rx={9}  ry={11} fill={i%2===0?'#3a9230':'#4aaa3a'} />
-            <rect x={x+7} y={y-4} width={6} height={10} rx={2} fill="#7a4820" />
-          </g>
-        ))}
-
-        {/* ── River ── */}
-        <path d="M10 455 Q68 418 135 440 Q200 462 266 422 Q312 396 355 410"
-          stroke="#3a8ed8" strokeWidth="22" fill="none" strokeLinecap="round" />
-        <path d="M10 455 Q68 418 135 440 Q200 462 266 422 Q312 396 355 410"
-          stroke="#5aaae8" strokeWidth="14" fill="none" strokeLinecap="round" />
-        <path d="M10 455 Q68 418 135 440 Q200 462 266 422 Q312 396 355 410"
-          stroke="#7ac0f0" strokeWidth="5"  fill="none" strokeLinecap="round" opacity="0.6" />
-        {/* River shimmer */}
-        <path d="M50 438 Q80 428 110 436" stroke="white" strokeWidth="1.5" fill="none" strokeLinecap="round" opacity="0.35" />
-        <path d="M180 450 Q210 440 240 446" stroke="white" strokeWidth="1.5" fill="none" strokeLinecap="round" opacity="0.35" />
-
-        {/* ── Wheat / grain fields ── */}
-        <path d="M0 480 Q35 465 70 475 L70 540 Q35 550 0 540Z" fill="#e8b830" />
-        <path d="M0 480 Q35 465 70 475 L70 540 Q35 550 0 540Z" fill="#d4a020" opacity="0.4" />
-        {/* Wheat lines */}
-        {[10,20,30,40,50,60].map((x,i)=>(
-          <line key={i} x1={x} y1="478" x2={x} y2="538" stroke="#c09018" strokeWidth="1" opacity="0.5"/>
-        ))}
-
-        <path d="M290 470 Q322 455 360 465 L360 535 Q328 548 290 538Z" fill="#e8b830" />
-        {[302,314,326,338,350].map((x,i)=>(
-          <line key={i} x1={x} y1="468" x2={x} y2="534" stroke="#c09018" strokeWidth="1" opacity="0.5"/>
-        ))}
-
-        {/* ── Pasture / green fields ── */}
-        <path d="M70 475 Q130 458 185 470 L185 545 Q130 558 70 540Z" fill="#5cb84a" />
-        <path d="M185 468 Q240 452 290 462 L290 532 Q240 548 185 538Z" fill="#64c452" />
-
-        {/* Windmill (left pasture) */}
-        <rect x="108" y="482" width="8" height="40" rx="2" fill="#c8a050" />
-        <circle cx="112" cy="482" r="5" fill="#b08840" />
-        {[0,90,180,270].map((a,i) => {
-          const r = (a * Math.PI)/180
-          return <line key={i} x1="112" y1="482"
-            x2={112+Math.cos(r)*18} y2={482+Math.sin(r)*18}
-            stroke="#d4a858" strokeWidth="3" strokeLinecap="round" />
-        })}
-
-        {/* Farmhouse (right pasture) */}
-        <rect x="218" y="492" width="22" height="16" rx="2" fill="#e8c880" />
-        <path d="M215 492 L229 480 L243 492Z" fill="#d44030" />
-        <rect x="225" y="498" width="7" height="10" rx="1" fill="#7ab4d8" />
-
-        {/* ── Rolling near hills ── */}
-        <path d="M0 548 Q55 518 110 535 Q165 552 220 520 Q268 492 315 514 Q342 526 360 510 L360 760 L0 760Z"
-          fill="#52a83a" />
-        <path d="M0 590 Q60 565 120 582 Q178 598 235 568 Q278 546 325 566 Q348 576 360 562 L360 760 L0 760Z"
-          fill="#4a9832" />
-
-        {/* Near trees */}
-        {Array.from({ length: 10 }, (_, i) => {
-          const x = i * 38 + 4
-          const y = 600 + (i % 3) * 8
-          return (
-            <g key={i}>
-              <ellipse cx={x+14} cy={y-22} rx={14} ry={18} fill={i%2===0?'#2e7e28':'#3a9230'} />
-              <ellipse cx={x+14} cy={y-28} rx={10} ry={13} fill={i%2===0?'#3a9230':'#4aaa3a'} />
-              <rect x={x+11} y={y-6} width={6} height={14} rx={2} fill="#7a4820" />
-            </g>
-          )
-        })}
-
-        {/* Ground base */}
-        <rect x="0" y="618" width="360" height="142" fill="#3e8228" />
-      </svg>
-
-      {/* ── Restart button — top-left corner, unobtrusive ── */}
+      {/* Restart button */}
       <motion.button
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 1.2 }}
+        transition={{ delay: 1.0 }}
         onClick={onRestart}
         style={{
-          position: 'absolute', top: 14, left: 14, zIndex: 20,
+          position: 'absolute', top: 14, left: 14, zIndex: 30,
           width: 34, height: 34, borderRadius: '50%',
-          background: 'rgba(0,0,0,0.28)', border: '1px solid rgba(255,255,255,0.14)',
+          background: 'rgba(0,0,0,0.35)', border: '1px solid rgba(255,255,255,0.14)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           cursor: 'pointer', color: 'rgba(255,255,255,0.45)', fontSize: 16,
           backdropFilter: 'blur(4px)',
         }}
         whileTap={{ scale: 0.9 }}
-        whileHover={{ background: 'rgba(0,0,0,0.45)', color: 'rgba(255,255,255,0.75)' }}
+        whileHover={{ background: 'rgba(0,0,0,0.55)', color: 'rgba(255,255,255,0.75)' }}
         title="New Game"
       >
         ↺
       </motion.button>
 
-      {/* ── Header ── */}
+      {/* Header */}
       <motion.div
-        className="text-center pt-8 pb-2 px-6"
-        style={{ position: 'relative', zIndex: 10 }}
+        className="text-center pt-8 pb-3 px-6"
+        style={{ flexShrink: 0 }}
         initial={{ opacity: 0, y: -12 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
+        transition={{ duration: 0.35 }}
       >
         <p className="font-black text-3xl tracking-widest text-white"
           style={{ textShadow: '0 2px 8px rgba(0,0,0,0.6)' }}>
           NumKnight
         </p>
-        <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)', fontFamily: 'monospace', marginTop: 4, letterSpacing: '0.08em',
-          textShadow: '0 1px 4px rgba(0,0,0,0.8)' }}>
+        <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.32)', fontFamily: 'monospace', marginTop: 2, letterSpacing: '0.08em' }}>
           v{APP_VERSION} · {DIFFICULTY}
         </p>
       </motion.div>
 
-      {/* ── Map ── */}
-      <div className="flex-1 min-h-0 px-4 pb-1" style={{ position: 'relative', zIndex: 10, overflow: 'visible' }}>
-        <div style={{ position: 'relative', width: '100%', overflow: 'visible' }}>
-          <svg
-            viewBox={`0 0 ${VW} ${VH}`}
-            style={{ width: '100%', display: 'block', overflow: 'visible' }}
-          >
-            {/* Guide trail */}
-            <path d={PATH} fill="none" stroke="rgba(0,0,0,0.18)"
-              strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" />
-            {/* Animated gold path */}
-            <motion.path
-              d={PATH} fill="none" stroke="#fbbf24" strokeWidth="3.5"
-              strokeLinecap="round" strokeLinejoin="round"
-              initial={{ pathLength: 0, opacity: 0 }}
-              animate={{ pathLength: 1, opacity: 0.9 }}
-              transition={{ duration: 1.5, ease: 'easeOut', delay: 0.15 }}
-              style={{ filter: 'drop-shadow(0 0 6px rgba(251,191,36,0.6))' }}
+      {/* Region bands */}
+      <div className="flex-1 min-h-0 flex flex-col px-4" style={{ gap: 4 }}>
+        {worlds.map((world, i) => {
+          const status =
+            i < currentWorldIndex  ? 'completed' :
+            i === currentWorldIndex ? 'current'   : 'locked'
+          const trophy = i < currentWorldIndex ? getBestTrophy(trophies, worlds, i) : null
+          return (
+            <RegionBand
+              key={world.id}
+              world={world}
+              status={status}
+              trophy={trophy}
+              isSelected={selectedIndex === i}
+              isKnight={knightPos === i}
+              onClick={() => handleBandClick(i)}
+              delay={0.08 + i * 0.06}
             />
-          </svg>
-
-          {/* Knight marker */}
-          <motion.div
-            style={{ position: 'absolute', zIndex: 10, pointerEvents: 'none' }}
-            initial={{ left: initLeft, top: initTop }}
-            animate={{ left: knightLeft, top: knightTop }}
-            transition={{ type: 'tween', duration: 0.14, ease: 'linear' }}
-          >
-            <div style={{ transform: 'translate(-50%, -62px)' }}>
-              <KnightHelmet />
-            </div>
-          </motion.div>
-
-          {/* World nodes */}
-          {worlds.map((world, i) => {
-            const status =
-              i < currentWorldIndex  ? 'completed' :
-              i === currentWorldIndex ? 'current'   : 'locked'
-            const trophy = i < currentWorldIndex
-              ? getBestTrophy(trophies, worlds, i)
-              : null
-            return (
-              <WorldNode
-                key={world.id}
-                world={world} index={i} status={status} trophy={trophy}
-                delay={0.2 + i * 0.1}
-                isSelected={selectedIndex === i}
-                onClick={() => handleNodeClick(i)}
-              />
-            )
-          })}
-        </div>
+          )
+        })}
       </div>
 
-      {/* ── Info strip ── */}
-      <div className="px-6" style={{ minHeight: 22, position: 'relative', zIndex: 10 }}>
+      {/* Info strip */}
+      <div className="px-6 pt-2" style={{ minHeight: 22, flexShrink: 0 }}>
         {!canFight && (
           <motion.p
             key={selectedIndex}
@@ -523,7 +487,6 @@ export function WorldMapScreen({
               color: selectedStatus === 'locked'
                 ? 'rgba(167,139,250,0.75)'
                 : 'rgba(251,191,36,0.75)',
-              textShadow: '0 1px 4px rgba(0,0,0,0.8)',
             }}
           >
             {selectedStatus === 'locked' ? 'PATH NOT UNLOCKED' : 'WORLD CLEARED'}
@@ -531,16 +494,16 @@ export function WorldMapScreen({
         )}
       </div>
 
-      {/* ── Footer — FIGHT button only ── */}
-      <div className="px-6 pb-6 pt-2" style={{ position: 'relative', zIndex: 10 }}>
+      {/* Footer */}
+      <div className="px-6 pb-6 pt-2" style={{ flexShrink: 0 }}>
         <motion.button
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.9, type: 'spring', stiffness: 210, damping: 18 }}
+          transition={{ delay: 0.65, type: 'spring', stiffness: 210, damping: 18 }}
           whileTap={canFight ? { scale: 0.95 } : undefined}
           whileHover={canFight ? { scale: 1.03 } : undefined}
           onClick={canFight ? onFight : undefined}
-          className={`w-full font-black text-2xl rounded-2xl h-16 shadow-xl tracking-widest transition-colors duration-200 ${
+          className={`w-full font-black text-2xl rounded-2xl h-14 shadow-xl tracking-widest transition-colors duration-200 ${
             canFight
               ? 'bg-yellow-400 border-b-4 border-yellow-600 text-black cursor-pointer'
               : 'bg-slate-800/80 border-b-4 border-slate-900 text-white/20 cursor-default'

@@ -14,56 +14,14 @@ function Gravestone() {
         <rect x="46" y="44" width="8" height="28" rx="3" fill="#5a5a6a" />
         <rect x="36" y="52" width="28" height="8" rx="3" fill="#5a5a6a" />
         <rect x="8" y="104" width="84" height="12" rx="4" fill="#2a2a3a" stroke="#1a1a2a" strokeWidth="2" />
-        <path d="M8 112 Q14 106 20 112" stroke="#3e5635" strokeWidth="2.5" fill="none" strokeLinecap="round" />
+        <path d="M8 112 Q14 106 20 112"  stroke="#3e5635" strokeWidth="2.5" fill="none" strokeLinecap="round" />
         <path d="M76 112 Q82 106 88 112" stroke="#3e5635" strokeWidth="2.5" fill="none" strokeLinecap="round" />
       </svg>
     </motion.div>
   )
 }
 
-export function ResultScreen({ won, isVictory, onRestart }) {
-  if (isVictory) {
-    return (
-      <div
-        className="flex flex-col items-center justify-center min-h-dvh max-w-md mx-auto px-6 gap-6"
-        style={{
-          background: 'radial-gradient(ellipse at 50% 40%, rgba(251,191,36,0.18) 0%, transparent 70%), linear-gradient(to bottom, #0d0d1e, #1a1040)',
-        }}
-      >
-        <motion.div
-          initial={{ scale: 0, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ type: 'spring', stiffness: 160, damping: 12, delay: 0.05 }}
-          style={{ fontSize: 96, textAlign: 'center', lineHeight: 1 }}
-        >
-          🏆
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-          className="text-center"
-        >
-          <p className="text-4xl font-black text-yellow-400 tracking-widest">VICTORY!</p>
-          <p className="text-white/60 mt-2 text-lg">All worlds conquered</p>
-        </motion.div>
-
-        <motion.button
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.9 }}
-          whileTap={{ scale: 0.95 }}
-          whileHover={{ scale: 1.04 }}
-          onClick={onRestart}
-          className="w-full bg-yellow-400 border-b-4 border-yellow-600 text-black font-black text-2xl rounded-2xl h-16 shadow-xl cursor-pointer"
-        >
-          Play Again
-        </motion.button>
-      </div>
-    )
-  }
-
+export function ResultScreen({ won, worldName, onRestart }) {
   // Game over (won === false)
   return (
     <div
@@ -81,6 +39,11 @@ export function ResultScreen({ won, isVictory, onRestart }) {
         className="text-center"
       >
         <p className="text-3xl font-black text-white/80 tracking-widest">GAME OVER</p>
+        {worldName && (
+          <p className="text-white/45 mt-2 text-base tracking-wide">
+            Fell at {worldName}
+          </p>
+        )}
       </motion.div>
 
       <motion.button
