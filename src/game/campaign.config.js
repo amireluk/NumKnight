@@ -107,14 +107,16 @@ export const HARD = [
   },
 ]
 
-// ── Runtime lookup ────────────────────────────────────────────────────
+// ── Active difficulty ─────────────────────────────────────────────────
+//  Change this to 'easy' | 'medium' | 'hard' to switch configs.
+export const DIFFICULTY = 'medium'
+
 const ALL = { easy: EASY, medium: MEDIUM, hard: HARD }
 
-export function getConfig(difficulty) {
-  const base = ALL[difficulty] ?? MEDIUM
+export function getConfig(d) {
+  const base = ALL[d] ?? MEDIUM
   if (!DEBUG) return base
   return base.map(w => ({ ...w, battles: 1, enemy: { ...w.enemy, hp: 1 } }))
 }
 
-// Kept for BattleScreen's DEBUG import (display label only)
-export const CAMPAIGN = getConfig('medium')
+export const CAMPAIGN = getConfig(DIFFICULTY)

@@ -101,14 +101,14 @@ export function ResultScreen({
           background: 'radial-gradient(ellipse at 50% 40%, rgba(251,191,36,0.12) 0%, transparent 70%), linear-gradient(to bottom, #0d0d1e, #1a1040)',
         }}
       >
-        {/* World / battle label */}
+        {/* World label — no battle counter (dots below already show position) */}
         <motion.p
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
           className="text-white/50 text-base font-semibold tracking-widest uppercase"
         >
-          {worldName} · {battleNum}/{totalBattles}
+          {worldName}
         </motion.p>
 
         {/* Trophy */}
