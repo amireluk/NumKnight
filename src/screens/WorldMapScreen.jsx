@@ -51,7 +51,6 @@ function KnightHelmet() {
   )
 }
 
-// Red × — fills the node circle exactly (56×56)
 function ConqueredX() {
   return (
     <svg
@@ -117,7 +116,6 @@ function WorldNode({ world, index, status, trophy, delay, isSelected, onClick })
       transition={{ delay, type: 'spring', stiffness: 240, damping: 18 }}
     >
       <div style={{ position: 'relative' }}>
-        {/* Pulse ring */}
         {isCurrent && (
           <motion.div
             style={{
@@ -128,8 +126,6 @@ function WorldNode({ world, index, status, trophy, delay, isSelected, onClick })
             transition={{ repeat: Infinity, duration: 2.1, ease: 'easeInOut' }}
           />
         )}
-
-        {/* Selection ring */}
         {isSelected && !isCurrent && (
           <motion.div
             style={{
@@ -142,17 +138,11 @@ function WorldNode({ world, index, status, trophy, delay, isSelected, onClick })
           />
         )}
 
-        {/* Node circle */}
         <div style={circleStyle} onClick={onClick}>
-          {/* World icon — dimmed for locked */}
           <span style={{ filter: isLocked ? 'grayscale(1) brightness(0.35)' : undefined }}>
             {world.icon}
           </span>
-
-          {/* Conquered: red × stamped over the icon */}
           {isComplete && <ConqueredX />}
-
-          {/* Locked: lock emoji centered over the icon */}
           {isLocked && (
             <div style={{
               position: 'absolute', inset: 0,
@@ -164,7 +154,6 @@ function WorldNode({ world, index, status, trophy, delay, isSelected, onClick })
           )}
         </div>
 
-        {/* Trophy badge — top-right, only on completed nodes */}
         {trophy && (
           <span style={{
             position: 'absolute', top: -12, right: -13,
@@ -177,16 +166,15 @@ function WorldNode({ world, index, status, trophy, delay, isSelected, onClick })
         )}
       </div>
 
-      {/* Name */}
       <span style={{
         fontSize: 9.5, fontWeight: 800, letterSpacing: '0.12em',
         textTransform: 'uppercase', color: nameColor,
         whiteSpace: 'nowrap', lineHeight: 1,
+        textShadow: '0 1px 4px rgba(0,0,0,0.9)',
       }}>
         {world.name}
       </span>
 
-      {/* Timer indicator (only shown for timed worlds) */}
       {world.timer !== null && (
         <span style={{ fontSize: 8, color: '#fbbf24', fontWeight: 700, opacity: isLocked ? 0.45 : 0.85 }}>
           ⏱{world.timer}s
@@ -243,105 +231,250 @@ export function WorldMapScreen({
   const initTop    = `${(NODE_POS[initPos][1]   / VH) * 100}%`
 
   return (
+    // h-dvh + overflow-hidden keeps footer always in view
     <div
-      className="flex flex-col min-h-dvh max-w-md mx-auto select-none"
-      style={{ background: 'linear-gradient(to bottom, #0a1208, #0e1a0a, #0c1608)', position: 'relative', overflow: 'hidden' }}
+      className="flex flex-col h-dvh max-w-md mx-auto select-none"
+      style={{ position: 'relative', overflow: 'hidden' }}
     >
-      {/* Kingdom landscape background */}
-      <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: 0 }}
-        viewBox="0 0 360 760" preserveAspectRatio="xMidYMid slice">
-        {/* Distant mountain silhouette */}
-        <path d="M0 228 L32 155 L65 198 L98 128 L135 172 L168 115 L204 158 L238 125 L272 162 L306 135 L338 155 L360 140 L360 252 L0 252Z"
-          fill="#0c1c0a" />
-        <path d="M0 248 L45 185 L82 218 L118 168 L155 202 L192 148 L228 184 L265 152 L300 178 L335 155 L360 165 L360 268 L0 268Z"
-          fill="#091408" opacity="0.9" />
-        {/* Castle (upper-right, behind Dragon Lair node area) */}
-        <rect x="256" y="132" width="32" height="96" fill="#070e06" />
-        <rect x="244" y="112" width="18" height="116" fill="#070e06" />
-        {/* Left tower battlements */}
-        <path d="M242 112 L244 112 L244 105 L249 105 L249 112 L254 112 L254 105 L259 105 L259 112 L262 112 L262 118 L242 118Z" fill="#070e06" />
-        <rect x="270" y="120" width="18" height="108" fill="#070e06" />
-        {/* Right tower battlements */}
-        <path d="M268 120 L270 120 L270 113 L275 113 L275 120 L280 120 L280 113 L285 113 L285 120 L288 120 L288 126 L268 126Z" fill="#070e06" />
-        {/* Keep battlements */}
-        <path d="M254 132 L256 132 L256 126 L261 126 L261 132 L266 132 L266 126 L271 126 L271 132 L276 132 L276 126 L281 126 L281 132 L288 132 L288 138 L254 138Z" fill="#070e06" />
-        {/* Castle windows — warm amber glow */}
-        <rect x="263" y="158" width="9"  height="14" rx="4.5" fill="#6b4a06" />
-        <rect x="264" y="159" width="7"  height="12" rx="3.5" fill="#f59e0b" opacity="0.38" />
-        <rect x="248" y="142" width="7"  height="11" rx="3.5" fill="#6b4a06" />
-        <rect x="249" y="143" width="5"  height="9"  rx="2.5" fill="#f59e0b" opacity="0.32" />
-        {/* Castle walls */}
-        <path d="M232 224 L232 210 L238 210 L238 203 L243 203 L243 210 L250 210 L250 203 L255 203 L255 210 L262 210 L262 224Z" fill="#070e06" />
-        <path d="M280 224 L280 212 L286 212 L286 205 L291 205 L291 212 L298 212 L298 205 L303 205 L303 212 L310 212 L310 224Z" fill="#070e06" />
-        {/* Tree clusters — upper middle */}
-        {[[12,308],[28,316],[48,308],[68,314],[4,320],[86,310],[104,318]].map(([x,y],i) => (
-          <path key={i} d={`M${x} ${y} L${x+12} ${y-36} L${x+24} ${y}Z`} fill={i%2===0 ? '#091508' : '#0b1c0a'} />
-        ))}
-        {[[274,302],[290,310],[308,304],[325,312],[342,308]].map(([x,y],i) => (
-          <path key={i} d={`M${x} ${y} L${x+12} ${y-34} L${x+24} ${y}Z`} fill={i%2===0 ? '#091508' : '#0b1c0a'} />
-        ))}
-        {/* River */}
-        <path d="M18 448 Q72 408 138 432 Q202 456 268 415 Q312 388 355 402"
-          stroke="#0d2218" strokeWidth="20" fill="none" strokeLinecap="round" />
-        <path d="M18 448 Q72 408 138 432 Q202 456 268 415 Q312 388 355 402"
-          stroke="#112a20" strokeWidth="11" fill="none" strokeLinecap="round" />
-        <path d="M18 448 Q72 408 138 432 Q202 456 268 415 Q312 388 355 402"
-          stroke="#183228" strokeWidth="4"  fill="none" strokeLinecap="round" opacity="0.55" />
-        {/* Rolling hills */}
-        <path d="M0 495 Q48 460 95 478 Q142 496 188 462 Q234 428 280 455 Q318 474 360 452 L360 760 L0 760Z"
-          fill="#0c1a0a" />
-        <path d="M0 540 Q58 510 115 528 Q172 546 228 514 Q272 490 315 510 Q342 522 360 508 L360 760 L0 760Z"
-          fill="#0e1e0c" />
-        {/* Pasture patches */}
-        <ellipse cx="78"  cy="520" rx="58" ry="24" fill="#122214" opacity="0.65" />
-        <ellipse cx="238" cy="508" rx="52" ry="22" fill="#122214" opacity="0.65" />
-        <ellipse cx="335" cy="525" rx="38" ry="18" fill="#122214" opacity="0.60" />
-        {/* Small farmhouse left pasture */}
-        <rect x="55" y="508" width="14" height="10" fill="#0a1608" />
-        <path d="M53 508 L62 500 L71 508Z" fill="#0a1608" />
-        {/* Small farmhouse right pasture */}
-        <rect x="220" y="497" width="12" height="9" fill="#0a1608" />
-        <path d="M218 497 L226 490 L234 497Z" fill="#0a1608" />
-        {/* Dense near-forest trees */}
-        {Array.from({ length: 12 }, (_, i) => {
-          const x = i * 32
-          const y = 622 + (i % 3) * 6
-          return <path key={i} d={`M${x} ${y} L${x+16} ${y-50} L${x+32} ${y}Z`} fill={i%2===0 ? '#091508' : '#0b1c0a'} />
+      {/* ── Kingdomino-style kingdom background ────────────────────────── */}
+      <svg
+        style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: 0 }}
+        viewBox="0 0 360 760" preserveAspectRatio="xMidYMid slice"
+      >
+        {/* Sky */}
+        <defs>
+          <linearGradient id="km-sky" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%"   stopColor="#4a9ed8" />
+            <stop offset="100%" stopColor="#89cef0" />
+          </linearGradient>
+          <linearGradient id="km-hill1" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#6abf50" />
+            <stop offset="100%" stopColor="#4e9a38" />
+          </linearGradient>
+          <linearGradient id="km-ground" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#52a83a" />
+            <stop offset="100%" stopColor="#3e8228" />
+          </linearGradient>
+          <radialGradient id="km-sun" cx="50%" cy="50%" r="50%">
+            <stop offset="0%"   stopColor="#ffe066" />
+            <stop offset="70%"  stopColor="#f0c030" />
+            <stop offset="100%" stopColor="rgba(240,192,48,0)" />
+          </radialGradient>
+        </defs>
+
+        <rect width="360" height="760" fill="url(#km-sky)" />
+
+        {/* Sun */}
+        <circle cx="316" cy="58" r="44" fill="url(#km-sun)" opacity="0.55" />
+        <circle cx="316" cy="58" r="26" fill="#ffe066" opacity="0.95" />
+        {/* Sun rays */}
+        {[0,45,90,135,180,225,270,315].map((a, i) => {
+          const r = (a * Math.PI) / 180
+          return <line key={i}
+            x1={316 + Math.cos(r)*30} y1={58 + Math.sin(r)*30}
+            x2={316 + Math.cos(r)*46} y2={58 + Math.sin(r)*46}
+            stroke="#ffe066" strokeWidth="3.5" strokeLinecap="round" opacity="0.75" />
         })}
-        {/* Ground */}
-        <rect x="0" y="628" width="360" height="132" fill="#080e06" />
+
+        {/* Clouds */}
+        <g opacity="0.92">
+          <ellipse cx="60"  cy="72" rx="36" ry="18" fill="white" />
+          <ellipse cx="44"  cy="80" rx="22" ry="14" fill="white" />
+          <ellipse cx="82"  cy="78" rx="26" ry="16" fill="white" />
+          <ellipse cx="60"  cy="84" rx="34" ry="12" fill="white" />
+        </g>
+        <g opacity="0.85">
+          <ellipse cx="198" cy="50" rx="28" ry="14" fill="white" />
+          <ellipse cx="184" cy="58" rx="18" ry="11" fill="white" />
+          <ellipse cx="216" cy="56" rx="20" ry="12" fill="white" />
+          <ellipse cx="198" cy="62" rx="26" ry="10" fill="white" />
+        </g>
+
+        {/* ── Cheerful castle (upper centre-right) ── */}
+        {/* Castle base / keep */}
+        <rect x="232" y="148" width="88" height="110" rx="4" fill="#d4b870" />
+        <rect x="232" y="148" width="88" height="110" rx="4" fill="#c8a858" opacity="0.6" />
+        {/* Stone lines */}
+        {[160,172,184,196,208,220,232].map((y,i)=>(
+          <line key={i} x1="232" y1={y} x2="320" y2={y} stroke="#b09040" strokeWidth="1" opacity="0.5"/>
+        ))}
+        {[248,264,280,296,312].map((x,i)=>(
+          <line key={i} x1={x} y1="148" x2={x} y2="258" stroke="#b09040" strokeWidth="1" opacity="0.4"/>
+        ))}
+        {/* Left tower */}
+        <rect x="222" y="128" width="28" height="130" rx="3" fill="#c8a858" />
+        <rect x="222" y="128" width="28" height="130" rx="3" fill="#d4b870" opacity="0.5" />
+        {/* Right tower */}
+        <rect x="302" y="136" width="28" height="122" rx="3" fill="#c8a858" />
+        {/* Left battlements */}
+        <path d="M220 128 L222 128 L222 120 L228 120 L228 128 L234 128 L234 120 L240 120 L240 128 L246 128 L246 120 L250 120 L250 128 L252 128 L252 134 L220 134Z" fill="#d4b870" />
+        {/* Right battlements */}
+        <path d="M300 136 L302 136 L302 128 L308 128 L308 136 L314 136 L314 128 L320 128 L320 136 L326 136 L326 128 L330 128 L330 136 L332 136 L332 142 L300 142Z" fill="#c8a858" />
+        {/* Keep battlements */}
+        <path d="M230 148 L232 148 L232 140 L238 140 L238 148 L246 148 L246 140 L252 140 L252 148 L260 148 L260 140 L266 140 L266 148 L274 148 L274 140 L280 140 L280 148 L288 148 L288 140 L294 140 L294 148 L302 148 L302 140 L308 140 L308 148 L320 148 L320 154 L230 154Z" fill="#d4b870" />
+        {/* Gate arch */}
+        <rect x="265" y="220" width="22" height="38" rx="11" fill="#6b4a18" />
+        <rect x="267" y="222" width="18" height="34" rx="9"  fill="#4a3010" />
+        {/* Windows */}
+        <rect x="230" y="162" width="12" height="16" rx="6" fill="#5a8ab0" />
+        <rect x="231" y="163" width="10" height="14" rx="5" fill="#7ab4d8" opacity="0.7" />
+        <rect x="306" y="168" width="12" height="16" rx="6" fill="#5a8ab0" />
+        <rect x="307" y="169" width="10" height="14" rx="5" fill="#7ab4d8" opacity="0.7" />
+        <rect x="258" y="165" width="11" height="15" rx="5.5" fill="#5a8ab0" />
+        <rect x="293" y="165" width="11" height="15" rx="5.5" fill="#5a8ab0" />
+        {/* Pennants / flags */}
+        <line x1="236" y1="120" x2="236" y2="96"  stroke="#8b6020" strokeWidth="2" />
+        <path d="M236 96 L252 103 L236 110Z" fill="#e84040" />
+        <line x1="316" y1="128" x2="316" y2="104" stroke="#8b6020" strokeWidth="2" />
+        <path d="M316 104 L332 111 L316 118Z" fill="#4040e8" />
+
+        {/* ── Far rolling hills ── */}
+        <path d="M0 310 Q40 272 80 290 Q120 308 160 278 Q200 248 240 272 Q280 295 320 268 Q345 252 360 260 L360 380 L0 380Z"
+          fill="#6abf50" />
+        <path d="M0 330 Q50 298 95 315 Q140 332 185 305 Q225 280 265 302 Q305 322 360 295 L360 400 L0 400Z"
+          fill="#5aad42" />
+
+        {/* ── Forest tree clusters ── */}
+        {/* Left cluster */}
+        {[[6,312],[22,320],[38,312],[54,320],[70,312],[4,328],[20,332]].map(([x,y],i) => (
+          <g key={i}>
+            <ellipse cx={x+14} cy={y-18} rx={13} ry={16} fill={i%2===0?'#2e7e28':'#3a9230'} />
+            <ellipse cx={x+14} cy={y-22} rx={10} ry={12} fill={i%2===0?'#3a9230':'#4aaa3a'} />
+            <rect x={x+11} y={y-4} width={6} height={12} rx={2} fill="#7a4820" />
+          </g>
+        ))}
+        {/* Right cluster */}
+        {[[276,298],[292,308],[308,298],[324,306],[340,298],[284,316],[300,320]].map(([x,y],i) => (
+          <g key={i}>
+            <ellipse cx={x+10} cy={y-16} rx={12} ry={15} fill={i%2===0?'#2e7e28':'#3a9230'} />
+            <ellipse cx={x+10} cy={y-20} rx={9}  ry={11} fill={i%2===0?'#3a9230':'#4aaa3a'} />
+            <rect x={x+7} y={y-4} width={6} height={10} rx={2} fill="#7a4820" />
+          </g>
+        ))}
+
+        {/* ── River ── */}
+        <path d="M10 455 Q68 418 135 440 Q200 462 266 422 Q312 396 355 410"
+          stroke="#3a8ed8" strokeWidth="22" fill="none" strokeLinecap="round" />
+        <path d="M10 455 Q68 418 135 440 Q200 462 266 422 Q312 396 355 410"
+          stroke="#5aaae8" strokeWidth="14" fill="none" strokeLinecap="round" />
+        <path d="M10 455 Q68 418 135 440 Q200 462 266 422 Q312 396 355 410"
+          stroke="#7ac0f0" strokeWidth="5"  fill="none" strokeLinecap="round" opacity="0.6" />
+        {/* River shimmer */}
+        <path d="M50 438 Q80 428 110 436" stroke="white" strokeWidth="1.5" fill="none" strokeLinecap="round" opacity="0.35" />
+        <path d="M180 450 Q210 440 240 446" stroke="white" strokeWidth="1.5" fill="none" strokeLinecap="round" opacity="0.35" />
+
+        {/* ── Wheat / grain fields ── */}
+        <path d="M0 480 Q35 465 70 475 L70 540 Q35 550 0 540Z" fill="#e8b830" />
+        <path d="M0 480 Q35 465 70 475 L70 540 Q35 550 0 540Z" fill="#d4a020" opacity="0.4" />
+        {/* Wheat lines */}
+        {[10,20,30,40,50,60].map((x,i)=>(
+          <line key={i} x1={x} y1="478" x2={x} y2="538" stroke="#c09018" strokeWidth="1" opacity="0.5"/>
+        ))}
+
+        <path d="M290 470 Q322 455 360 465 L360 535 Q328 548 290 538Z" fill="#e8b830" />
+        {[302,314,326,338,350].map((x,i)=>(
+          <line key={i} x1={x} y1="468" x2={x} y2="534" stroke="#c09018" strokeWidth="1" opacity="0.5"/>
+        ))}
+
+        {/* ── Pasture / green fields ── */}
+        <path d="M70 475 Q130 458 185 470 L185 545 Q130 558 70 540Z" fill="#5cb84a" />
+        <path d="M185 468 Q240 452 290 462 L290 532 Q240 548 185 538Z" fill="#64c452" />
+
+        {/* Windmill (left pasture) */}
+        <rect x="108" y="482" width="8" height="40" rx="2" fill="#c8a050" />
+        <circle cx="112" cy="482" r="5" fill="#b08840" />
+        {[0,90,180,270].map((a,i) => {
+          const r = (a * Math.PI)/180
+          return <line key={i} x1="112" y1="482"
+            x2={112+Math.cos(r)*18} y2={482+Math.sin(r)*18}
+            stroke="#d4a858" strokeWidth="3" strokeLinecap="round" />
+        })}
+
+        {/* Farmhouse (right pasture) */}
+        <rect x="218" y="492" width="22" height="16" rx="2" fill="#e8c880" />
+        <path d="M215 492 L229 480 L243 492Z" fill="#d44030" />
+        <rect x="225" y="498" width="7" height="10" rx="1" fill="#7ab4d8" />
+
+        {/* ── Rolling near hills ── */}
+        <path d="M0 548 Q55 518 110 535 Q165 552 220 520 Q268 492 315 514 Q342 526 360 510 L360 760 L0 760Z"
+          fill="#52a83a" />
+        <path d="M0 590 Q60 565 120 582 Q178 598 235 568 Q278 546 325 566 Q348 576 360 562 L360 760 L0 760Z"
+          fill="#4a9832" />
+
+        {/* Near trees */}
+        {Array.from({ length: 10 }, (_, i) => {
+          const x = i * 38 + 4
+          const y = 600 + (i % 3) * 8
+          return (
+            <g key={i}>
+              <ellipse cx={x+14} cy={y-22} rx={14} ry={18} fill={i%2===0?'#2e7e28':'#3a9230'} />
+              <ellipse cx={x+14} cy={y-28} rx={10} ry={13} fill={i%2===0?'#3a9230':'#4aaa3a'} />
+              <rect x={x+11} y={y-6} width={6} height={14} rx={2} fill="#7a4820" />
+            </g>
+          )
+        })}
+
+        {/* Ground base */}
+        <rect x="0" y="618" width="360" height="142" fill="#3e8228" />
       </svg>
-      {/* Header */}
+
+      {/* ── Restart button — top-left corner, unobtrusive ── */}
+      <motion.button
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 1.2 }}
+        onClick={onRestart}
+        style={{
+          position: 'absolute', top: 14, left: 14, zIndex: 20,
+          width: 34, height: 34, borderRadius: '50%',
+          background: 'rgba(0,0,0,0.28)', border: '1px solid rgba(255,255,255,0.14)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          cursor: 'pointer', color: 'rgba(255,255,255,0.45)', fontSize: 16,
+          backdropFilter: 'blur(4px)',
+        }}
+        whileTap={{ scale: 0.9 }}
+        whileHover={{ background: 'rgba(0,0,0,0.45)', color: 'rgba(255,255,255,0.75)' }}
+        title="New Game"
+      >
+        ↺
+      </motion.button>
+
+      {/* ── Header ── */}
       <motion.div
         className="text-center pt-8 pb-2 px-6"
+        style={{ position: 'relative', zIndex: 10 }}
         initial={{ opacity: 0, y: -12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
       >
-        <p className="font-black text-3xl tracking-widest text-white">NumKnight</p>
-        <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.28)', fontFamily: 'monospace', marginTop: 4, letterSpacing: '0.08em' }}>
+        <p className="font-black text-3xl tracking-widest text-white"
+          style={{ textShadow: '0 2px 8px rgba(0,0,0,0.6)' }}>
+          NumKnight
+        </p>
+        <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)', fontFamily: 'monospace', marginTop: 4, letterSpacing: '0.08em',
+          textShadow: '0 1px 4px rgba(0,0,0,0.8)' }}>
           v{APP_VERSION} · {DIFFICULTY}
         </p>
       </motion.div>
 
-      {/* Map */}
-      <div className="flex-1 px-4 pb-1" style={{ position: 'relative', overflow: 'visible' }}>
+      {/* ── Map ── */}
+      <div className="flex-1 min-h-0 px-4 pb-1" style={{ position: 'relative', zIndex: 10, overflow: 'visible' }}>
         <div style={{ position: 'relative', width: '100%', overflow: 'visible' }}>
           <svg
             viewBox={`0 0 ${VW} ${VH}`}
             style={{ width: '100%', display: 'block', overflow: 'visible' }}
           >
-            {/* Dim guide trail */}
-            <path d={PATH} fill="none" stroke="rgba(255,255,255,0.06)"
-              strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" />
-            {/* Animated gold draw */}
+            {/* Guide trail */}
+            <path d={PATH} fill="none" stroke="rgba(0,0,0,0.18)"
+              strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" />
+            {/* Animated gold path */}
             <motion.path
-              d={PATH} fill="none" stroke="#fbbf24" strokeWidth="3"
+              d={PATH} fill="none" stroke="#fbbf24" strokeWidth="3.5"
               strokeLinecap="round" strokeLinejoin="round"
               initial={{ pathLength: 0, opacity: 0 }}
-              animate={{ pathLength: 1, opacity: 0.72 }}
+              animate={{ pathLength: 1, opacity: 0.9 }}
               transition={{ duration: 1.5, ease: 'easeOut', delay: 0.15 }}
-              style={{ filter: 'drop-shadow(0 0 5px rgba(251,191,36,0.45))' }}
+              style={{ filter: 'drop-shadow(0 0 6px rgba(251,191,36,0.6))' }}
             />
           </svg>
 
@@ -378,8 +511,8 @@ export function WorldMapScreen({
         </div>
       </div>
 
-      {/* Info strip */}
-      <div className="px-6" style={{ minHeight: 24 }}>
+      {/* ── Info strip ── */}
+      <div className="px-6" style={{ minHeight: 22, position: 'relative', zIndex: 10 }}>
         {!canFight && (
           <motion.p
             key={selectedIndex}
@@ -388,8 +521,9 @@ export function WorldMapScreen({
             className="text-center text-xs font-bold tracking-widest"
             style={{
               color: selectedStatus === 'locked'
-                ? 'rgba(167,139,250,0.55)'
-                : 'rgba(251,191,36,0.55)',
+                ? 'rgba(167,139,250,0.75)'
+                : 'rgba(251,191,36,0.75)',
+              textShadow: '0 1px 4px rgba(0,0,0,0.8)',
             }}
           >
             {selectedStatus === 'locked' ? 'PATH NOT UNLOCKED' : 'WORLD CLEARED'}
@@ -397,8 +531,8 @@ export function WorldMapScreen({
         )}
       </div>
 
-      {/* Footer */}
-      <div className="px-6 pb-8 pt-2 flex flex-col gap-3">
+      {/* ── Footer — FIGHT button only ── */}
+      <div className="px-6 pb-6 pt-2" style={{ position: 'relative', zIndex: 10 }}>
         <motion.button
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -413,16 +547,6 @@ export function WorldMapScreen({
           }`}
         >
           {canFight ? 'FIGHT !' : selectedStatus === 'locked' ? 'LOCKED' : 'CLEARED'}
-        </motion.button>
-
-        <motion.button
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.1 }}
-          onClick={onRestart}
-          className="w-full text-white/28 text-sm font-bold tracking-widest py-1 cursor-pointer hover:text-white/50 transition-colors"
-        >
-          ↺ New Game
         </motion.button>
       </div>
     </div>
