@@ -70,7 +70,7 @@ const PRODUCTION = [
     playerHP: 3,
     enemy: { id: 'darkKnight', name: 'Dark Knight', hp: 6 },
     timer: 8,
-    multipliers: [6, 7, 8, 9],
+    multipliers: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
     factorRange: [1, 10],
   },
 
@@ -83,7 +83,7 @@ const PRODUCTION = [
     playerHP: 3,
     enemy: { id: 'dragon', name: 'Dragon', hp: 7 },
     timer: 5,
-    multipliers: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+    multipliers: [3, 4, 5, 6, 7, 8, 9],
     factorRange: [1, 10],
   },
 
