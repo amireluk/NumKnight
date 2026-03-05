@@ -2,11 +2,7 @@
 //  NUMKNIGHT — Campaign Configuration
 // ═══════════════════════════════════════════════════════════════════════
 //
-//  Quick-test flag: 1 HP enemies, 1 battle per world (fast full-run)
-export const DEBUG = false
-//
-// ─────────────────────────────────────────────────────────────────────
-//  Difficulty is now selected in-app; these are the three base configs.
+//  Change DIFFICULTY to switch the active config:  'easy' | 'medium' | 'hard'
 //
 //  Field reference:
 //    enemy.id     goblin | skeleton | orc | darkKnight | dragon
@@ -109,14 +105,6 @@ export const HARD = [
 
 // ── Active difficulty ─────────────────────────────────────────────────
 //  Change this to 'easy' | 'medium' | 'hard' to switch configs.
-export const DIFFICULTY = 'medium'
+export const DIFFICULTY = 'easy'
 
-const ALL = { easy: EASY, medium: MEDIUM, hard: HARD }
-
-export function getConfig(d) {
-  const base = ALL[d] ?? MEDIUM
-  if (!DEBUG) return base
-  return base.map(w => ({ ...w, battles: 1, enemy: { ...w.enemy, hp: 1 } }))
-}
-
-export const CAMPAIGN = getConfig(DIFFICULTY)
+export const CAMPAIGN = { easy: EASY, medium: MEDIUM, hard: HARD }[DIFFICULTY] ?? MEDIUM

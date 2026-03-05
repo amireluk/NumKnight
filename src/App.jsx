@@ -85,11 +85,14 @@ export default function App() {
   return (
     <AnimatePresence mode="wait">
       {screen === 'battle' && (
-        <motion.div key={`battle-${battleKey}`}
+        // Constant key so AnimatePresence only fades on screen-type changes,
+        // not between encounters in the same world (avoids background flash).
+        // BattleScreen itself is re-keyed by battleKey to reset internal state.
+        <motion.div key="battle-screen"
           initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
           transition={{ duration: 0.25 }} className="w-full"
         >
-          <BattleScreen world={world} battleIndex={run.battleIndex} onBattleEnd={handleBattleEnd} />
+          <BattleScreen key={battleKey} world={world} battleIndex={run.battleIndex} onBattleEnd={handleBattleEnd} />
         </motion.div>
       )}
 

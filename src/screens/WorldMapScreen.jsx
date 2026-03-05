@@ -1,5 +1,9 @@
+/* eslint-disable no-undef */
+const APP_VERSION = typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : 'dev'
+
 import { useState, useRef, useEffect } from 'react'
 import { motion } from 'framer-motion'
+import { DIFFICULTY } from '../game/campaign.config'
 
 const VW = 360
 const VH = 500
@@ -183,17 +187,12 @@ function WorldNode({ world, index, status, trophy, delay, isSelected, onClick })
         {world.name}
       </span>
 
-      {/* Stats: ×N and timer */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 4, opacity: isLocked ? 0.45 : 0.8 }}>
-        <span style={{ fontSize: 8, color: 'rgba(255,255,255,0.5)', fontWeight: 700 }}>
-          ×{world.battles}
+      {/* Timer indicator (only shown for timed worlds) */}
+      {world.timer !== null && (
+        <span style={{ fontSize: 8, color: '#fbbf24', fontWeight: 700, opacity: isLocked ? 0.45 : 0.85 }}>
+          ⏱{world.timer}s
         </span>
-        {world.timer !== null && (
-          <span style={{ fontSize: 8, color: '#fbbf24', fontWeight: 700, opacity: 0.85 }}>
-            ⏱{world.timer}s
-          </span>
-        )}
-      </div>
+      )}
     </motion.div>
   )
 }
@@ -257,6 +256,9 @@ export function WorldMapScreen({
         transition={{ duration: 0.4 }}
       >
         <p className="font-black text-3xl tracking-widest text-white">NumKnight</p>
+        <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.28)', fontFamily: 'monospace', marginTop: 4, letterSpacing: '0.08em' }}>
+          v{APP_VERSION} · {DIFFICULTY}
+        </p>
       </motion.div>
 
       {/* Map */}

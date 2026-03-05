@@ -2,7 +2,6 @@
 const APP_VERSION = typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : 'dev'
 
 import { useState, useEffect, useRef } from 'react'
-import { DEBUG } from '../game/campaign.config'
 import { motion, useAnimation } from 'framer-motion'
 import { makeRound, getTrophy } from '../game/battleLogic'
 import { playCorrect, playWrong, playSwordSwing, playImpact, playVictory, playDefeat } from '../game/sounds'
@@ -257,17 +256,10 @@ export function BattleScreen({ world, battleIndex, onBattleEnd }) {
           {/* Version label */}
           <div style={{
             position: 'absolute', top: 8, left: 10, zIndex: 2,
-            display: 'flex', flexDirection: 'column', gap: 1,
             pointerEvents: 'none', userSelect: 'none',
           }}>
             <span style={{ fontSize: 11, fontFamily: 'monospace', color: 'rgba(255,255,255,0.28)' }}>
               v{APP_VERSION}
-            </span>
-            <span style={{
-              fontSize: 10, fontFamily: 'monospace', letterSpacing: '0.06em',
-              color: DEBUG ? 'rgba(251,191,36,0.45)' : 'rgba(255,255,255,0.18)',
-            }}>
-              {DEBUG ? 'debug' : 'prod'}
             </span>
           </div>
 
@@ -348,19 +340,9 @@ export function BattleScreen({ world, battleIndex, onBattleEnd }) {
           <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.55)', fontWeight: 700, letterSpacing: '0.04em' }}>
             {world.icon}&nbsp;&nbsp;{world.name}
           </span>
-          <div style={{ display: 'flex', gap: 7, alignItems: 'center' }}>
-            {Array.from({ length: world.battles }).map((_, i) => (
-              <svg key={i} width="11" height="11" viewBox="0 0 11 11">
-                <circle
-                  cx="5.5" cy="5.5" r="4.5"
-                  fill={i < battleIndex ? '#fbbf24' : 'none'}
-                  stroke={i < battleIndex ? '#fbbf24' : i === battleIndex ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.28)'}
-                  strokeWidth="1.5"
-                />
-                {i === battleIndex && <circle cx="5.5" cy="5.5" r="2" fill="rgba(255,255,255,0.9)" />}
-              </svg>
-            ))}
-          </div>
+          <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.55)', fontWeight: 700, letterSpacing: '0.06em' }}>
+            Round {battleIndex + 1} / {world.battles}
+          </span>
         </motion.div>
 
         {/* Problem card */}

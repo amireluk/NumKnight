@@ -4,13 +4,13 @@ import { useEffect } from 'react'
 export function BattleIntro({ onComplete, battleIndex }) {
   const bannerControls = useAnimation()
   const roundControls  = useAnimation()
-  const showRound = battleIndex > 0
+  const showRound = true
 
   useEffect(() => {
     async function run() {
       // Battle 0: wait for both chars to slide in + landing shake
       // Battle 1+: knight already in place, just wait for enemy to arrive
-      await new Promise((r) => setTimeout(r, battleIndex === 0 ? 550 : 470))
+      await new Promise((r) => setTimeout(r, battleIndex === 0 ? 530 : 460))
 
       if (showRound) {
         // "ROUND N" slams in first (Mortal Kombat style)
