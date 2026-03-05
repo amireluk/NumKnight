@@ -246,8 +246,22 @@ export function WorldMapScreen({
   return (
     <div
       className="flex flex-col min-h-dvh max-w-md mx-auto select-none"
-      style={{ background: 'linear-gradient(160deg, #0d0d1e 0%, #110830 55%, #1a1040 100%)' }}
+      style={{ background: 'linear-gradient(160deg, #0d0d1e 0%, #110830 55%, #1a1040 100%)', position: 'relative', overflow: 'hidden' }}
     >
+      {/* Star field */}
+      <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: 0 }}
+        viewBox="0 0 360 700" preserveAspectRatio="xMidYMid slice">
+        {[
+          [18,22],[45,8],[72,35],[100,14],[130,28],[158,6],[185,40],[210,18],[238,32],[264,10],[290,24],[318,38],[344,12],
+          [30,68],[60,52],[88,72],[115,58],[142,80],[170,62],[196,75],[222,55],[250,70],[276,50],[302,66],[332,58],
+          [12,110],[40,96],[70,118],[98,102],[128,122],[155,95],[182,115],[208,98],[236,120],[262,105],[288,118],[315,92],[342,110],
+          [25,155],[55,140],[82,162],[108,148],[136,168],[163,142],[190,158],[216,144],[244,166],[270,152],[296,160],[325,138],
+          [8,200],[38,188],[66,205],[94,192],[122,210],[150,195],[178,208],[204,185],[232,202],[258,190],[284,204],[312,188],[340,200],
+        ].map(([cx, cy], i) => (
+          <circle key={i} cx={cx} cy={cy} r={i % 5 === 0 ? 1.1 : 0.65} fill="white"
+            opacity={0.12 + (i % 6) * 0.06} />
+        ))}
+      </svg>
       {/* Header */}
       <motion.div
         className="text-center pt-8 pb-2 px-6"

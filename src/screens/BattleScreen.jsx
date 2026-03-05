@@ -251,7 +251,7 @@ export function BattleScreen({ world, battleIndex, onBattleEnd }) {
 
         {/* Battle arena */}
         <div className="flex flex-1 min-h-0" style={{ position: 'relative' }}>
-          <BattleBackground />
+          <BattleBackground worldId={world.id} />
 
           {/* Version label */}
           <div style={{
