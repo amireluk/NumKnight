@@ -13,9 +13,10 @@ export default function App() {
   // 'battle' | 'result' | 'map'
   const [screen, setScreen] = useState(() => {
     const existing = loadRun()
-    // Show the map on first load if we're at the start of a non-first world
-    if (existing && existing.worldIndex > 0 && existing.battleIndex === 0) return 'map'
-    return 'battle'
+    // Show map whenever we're at the start of a world (battleIndex === 0),
+    // including the very first world. Skip map only if resuming mid-world.
+    if (existing && existing.battleIndex > 0) return 'battle'
+    return 'map'
   })
   const [battleResult, setBattleResult] = useState(null)
   const [battleKey, setBattleKey] = useState(0)
