@@ -5,27 +5,11 @@ import { useEffect, useState } from 'react'
 function KnightBodySVG() {
   return (
     <svg width="84" height="112" viewBox="0 0 90 120" fill="none">
-      <defs>
-        <radialGradient id="kn-skin" cx="38%" cy="32%" r="65%">
-          <stop offset="0%" stopColor="#ffe0b2" />
-          <stop offset="100%" stopColor="#ffb74d" />
-        </radialGradient>
-        <linearGradient id="kn-metal" x1="0.15" y1="0" x2="0.85" y2="1">
-          <stop offset="0%" stopColor="#eceff1" />
-          <stop offset="100%" stopColor="#78909c" />
-        </linearGradient>
-        <linearGradient id="kn-shield" x1="0.1" y1="0" x2="0.9" y2="1">
-          <stop offset="0%" stopColor="#42a5f5" />
-          <stop offset="100%" stopColor="#0d47a1" />
-        </linearGradient>
-      </defs>
-
       {/* Left arm */}
-      <rect x="4" y="60" width="17" height="26" rx="7" fill="url(#kn-metal)" stroke="#424242" strokeWidth="2" />
+      <rect x="4" y="60" width="17" height="26" rx="7" fill="#90a4ae" stroke="#424242" strokeWidth="2" />
 
       {/* Shield */}
-      <path d="M0 52 L14 52 L14 78 Q7 88 0 78Z" fill="url(#kn-shield)" stroke="#424242" strokeWidth="2.5" />
-      <path d="M2 55 L12 55 L12 68 Q7 74 2 68Z" fill="white" opacity="0.15" />
+      <path d="M0 52 L14 52 L14 78 Q7 88 0 78Z" fill="#1976d2" stroke="#424242" strokeWidth="2.5" />
       <line x1="7" y1="53" x2="7" y2="76" stroke="#ffd54f" strokeWidth="2.5" opacity="0.9" strokeLinecap="round" />
       <line x1="0" y1="65" x2="14" y2="65" stroke="#ffd54f" strokeWidth="2.5" opacity="0.9" strokeLinecap="round" />
 
@@ -36,31 +20,26 @@ function KnightBodySVG() {
       {/* Boots */}
       <rect x="18" y="104" width="26" height="14" rx="7" fill="#3e2723" stroke="#424242" strokeWidth="2" />
       <rect x="46" y="104" width="26" height="14" rx="7" fill="#3e2723" stroke="#424242" strokeWidth="2" />
-      <ellipse cx="27" cy="108" rx="9" ry="3.5" fill="white" opacity="0.1" />
-      <ellipse cx="55" cy="108" rx="9" ry="3.5" fill="white" opacity="0.1" />
 
       {/* Body */}
-      <rect x="19" y="58" width="52" height="36" rx="12" fill="url(#kn-metal)" stroke="#424242" strokeWidth="2.5" />
-      <ellipse cx="34" cy="67" rx="12" ry="8" fill="white" opacity="0.2" />
+      <rect x="19" y="58" width="52" height="36" rx="12" fill="#90a4ae" stroke="#424242" strokeWidth="2.5" />
       <line x1="45" y1="62" x2="45" y2="90" stroke="#78909c" strokeWidth="2" strokeLinecap="round" />
       <rect x="19" y="88" width="52" height="7" rx="3" fill="#4e342e" stroke="#3e2723" strokeWidth="1.5" />
       <rect x="40" y="88" width="10" height="7" rx="2" fill="#795548" stroke="#4e342e" strokeWidth="1" />
 
       {/* Neck */}
-      <rect x="36" y="54" width="18" height="10" rx="4" fill="url(#kn-skin)" stroke="#424242" strokeWidth="2" />
+      <rect x="36" y="54" width="18" height="10" rx="4" fill="#ffb74d" stroke="#424242" strokeWidth="2" />
 
       {/* Head */}
-      <ellipse cx="45" cy="36" rx="27" ry="26" fill="url(#kn-skin)" stroke="#424242" strokeWidth="2.5" />
-      <ellipse cx="34" cy="24" rx="14" ry="9" fill="white" opacity="0.2" />
+      <ellipse cx="45" cy="36" rx="27" ry="26" fill="#ffb74d" stroke="#424242" strokeWidth="2.5" />
 
       {/* Helmet cheek guards */}
-      <rect x="16" y="32" width="13" height="18" rx="6" fill="url(#kn-metal)" stroke="#424242" strokeWidth="2" />
-      <rect x="61" y="32" width="13" height="18" rx="6" fill="url(#kn-metal)" stroke="#424242" strokeWidth="2" />
+      <rect x="16" y="32" width="13" height="18" rx="6" fill="#90a4ae" stroke="#424242" strokeWidth="2" />
+      <rect x="61" y="32" width="13" height="18" rx="6" fill="#90a4ae" stroke="#424242" strokeWidth="2" />
 
       {/* Helmet dome */}
       <path d="M17 37 Q17 10 45 10 Q73 10 73 37 L70 39 Q63 34 56 38 L45 40 L34 38 Q27 34 20 39Z"
-        fill="url(#kn-metal)" stroke="#424242" strokeWidth="2.5" />
-      <ellipse cx="33" cy="21" rx="15" ry="8" fill="white" opacity="0.22" />
+        fill="#90a4ae" stroke="#424242" strokeWidth="2.5" />
       <path d="M16 37 Q45 31 74 37" stroke="#607d8b" strokeWidth="6" fill="none" strokeLinecap="butt" />
       <path d="M16 37 Q45 31 74 37" stroke="#cfd8dc" strokeWidth="1.5" fill="none" strokeLinecap="round" opacity="0.6" />
 
@@ -86,22 +65,15 @@ function KnightBodySVG() {
 function KnightSwordArmSVG() {
   return (
     <svg width="84" height="112" viewBox="0 0 90 120" fill="none" overflow="visible">
-      <defs>
-        <linearGradient id="kn-metal2" x1="0.15" y1="0" x2="0.85" y2="1">
-          <stop offset="0%" stopColor="#eceff1" />
-          <stop offset="100%" stopColor="#78909c" />
-        </linearGradient>
-      </defs>
       {/* Sword blade */}
       <rect x="73" y="8" width="7" height="44" rx="2" fill="#e0e0e0" stroke="#424242" strokeWidth="1.5" />
       <polygon points="76.5,4 72,11 81,11" fill="#e0e0e0" stroke="#424242" strokeWidth="1.5" />
-      <line x1="76.5" y1="8" x2="76.5" y2="48" stroke="white" strokeWidth="2" opacity="0.6" strokeLinecap="round" />
       {/* Crossguard + handle + pommel */}
       <rect x="65" y="50" width="22" height="6" rx="3" fill="#6d4c41" stroke="#3e2723" strokeWidth="1.5" />
       <rect x="74" y="56" width="6" height="12" rx="3" fill="#6d4c41" stroke="#3e2723" strokeWidth="1.5" />
       <circle cx="77" cy="69" r="4.5" fill="#8d6e63" stroke="#4e342e" strokeWidth="1.5" />
       {/* Right arm */}
-      <rect x="69" y="60" width="17" height="26" rx="7" fill="url(#kn-metal2)" stroke="#424242" strokeWidth="2" />
+      <rect x="69" y="60" width="17" height="26" rx="7" fill="#90a4ae" stroke="#424242" strokeWidth="2" />
     </svg>
   )
 }

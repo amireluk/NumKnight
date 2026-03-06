@@ -5,28 +5,46 @@ import { ResultScreen } from './screens/ResultScreen'
 import { WorldMapScreen } from './screens/WorldMapScreen'
 import { AreaClearedScreen } from './screens/AreaClearedScreen'
 import { LeaderboardScreen } from './screens/LeaderboardScreen'
-import { CAMPAIGN as WORLDS, DIFFICULTY } from './game/campaign.config'
+import { StartScreen } from './screens/StartScreen'
+import { EASY, MEDIUM, HARD } from './game/campaign.config'
 import { createNewRun, loadRun, saveRun, clearRun } from './game/runState'
 import { getTrophy, calcBattleScore } from './game/battleLogic'
 
-const TOTAL_BATTLES = WORLDS.reduce((sum, w) => sum + w.battles, 0)
+const CONFIGS = { easy: EASY, medium: MEDIUM, hard: HARD }
 
 export default function App() {
+  const [difficulty, setDifficulty] = useState('medium')
+  const [playerName, setPlayerName] = useState(() => localStorage.getItem('numknight_player_name') ?? '')
+
+  const worlds = CONFIGS[difficulty] ?? MEDIUM
+  const totalBattles = worlds.reduce((sum, w) => sum + w.battles, 0)
+
   const [run, setRun] = useState(() => loadRun() ?? createNewRun())
-  // 'map' | 'battle' | 'cleared' | 'result' — always start on map
-  const [screen, setScreen] = useState('map')
-  const [battleResult, setBattleResult] = useState(null)
+  const [screen, setScreen] = useState('start')
   const [clearedData, setClearedData] = useState(null)
   const [battleKey, setBattleKey] = useState(0)
-  // true when we just cleared a world — knight stays at cleared world
-  // until the player manually moves it to the new one
   const [mapIsTransition, setMapIsTransition] = useState(false)
-  // running score within the current world (resets each world)
   const [worldScore, setWorldScore] = useState(0)
+  // Holds score context passed to leaderboard
+  const [pendingScore, setPendingScore] = useState(null)
 
-  const world = WORLDS[run.worldIndex]
+  const world = worlds[run.worldIndex]
 
   useEffect(() => { saveRun(run) }, [run])
+
+  const handleStart = ({ name, diff }) => {
+    setPlayerName(name)
+    setDifficulty(diff)
+    clearRun()
+    const fresh = createNewRun()
+    setRun(fresh)
+    saveRun(fresh)
+    setBattleKey(0)
+    setWorldScore(0)
+    setMapIsTransition(false)
+    setPendingScore(null)
+    setScreen('map')
+  }
 
   const handleBattleEnd = ({ won, mistakes, timeBonus = 0 }) => {
     if (won) {
@@ -34,30 +52,30 @@ export default function App() {
       const battleScore = calcBattleScore(trophy, timeBonus)
       const newTrophies = [...run.trophies, trophy]
       const newWorldScore = worldScore + battleScore
-      const newRun = { ...run, trophies: newTrophies, totalScore: (run.totalScore ?? 0) + battleScore }
+      const newTotalScore = (run.totalScore ?? 0) + battleScore
+      const newRun = { ...run, trophies: newTrophies, totalScore: newTotalScore }
       setRun(newRun)
       saveRun(newRun)
       setWorldScore(newWorldScore)
 
-      const isVictory = newTrophies.length >= TOTAL_BATTLES
+      const isVictory = newTrophies.length >= totalBattles
       const isLastBattleInWorld = run.battleIndex + 1 >= world.battles
 
       if (isVictory) {
+        setPendingScore({ totalScore: newTotalScore, endWorld: world.name, cleared: true })
         setScreen('leaderboard')
       } else if (isLastBattleInWorld) {
-        // Show "Area Cleared" screen — slice the trophies for this world
         const offset = newTrophies.length - world.battles
         const worldTrophies = newTrophies.slice(offset)
-        setClearedData({ world, worldTrophies, worldScore: newWorldScore })
+        setClearedData({ world, worldTrophies, worldScore: newWorldScore, totalScore: newTotalScore })
         setScreen('cleared')
       } else {
-        // More battles in this world — go straight to the next one
         setRun((r) => ({ ...r, battleIndex: run.battleIndex + 1 }))
         setBattleKey((k) => k + 1)
         setScreen('battle')
       }
     } else {
-      setBattleResult({ won: false, worldName: world.name })
+      setPendingScore({ totalScore: run.totalScore ?? 0, endWorld: world.name, cleared: false })
       setScreen('result')
     }
   }
@@ -66,8 +84,7 @@ export default function App() {
     const nextWorldIndex = run.worldIndex + 1
     setClearedData(null)
     setWorldScore(0)
-    // Safety net: if this was somehow the last world, go to leaderboard
-    if (nextWorldIndex >= WORLDS.length) {
+    if (nextWorldIndex >= worlds.length) {
       setScreen('leaderboard')
       return
     }
@@ -82,25 +99,35 @@ export default function App() {
     setScreen('battle')
   }
 
+  const handleViewScores = () => {
+    setScreen('leaderboard')
+  }
+
   const handleRestart = () => {
     clearRun()
     const fresh = createNewRun()
     setRun(fresh)
     saveRun(fresh)
-    setBattleResult(null)
     setClearedData(null)
     setMapIsTransition(false)
     setWorldScore(0)
+    setPendingScore(null)
     setBattleKey((k) => k + 1)
-    setScreen('map')
+    setScreen('start')
   }
 
   return (
     <AnimatePresence mode="wait">
+      {screen === 'start' && (
+        <motion.div key="start"
+          initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+          transition={{ duration: 0.25 }} className="w-full"
+        >
+          <StartScreen onStart={handleStart} />
+        </motion.div>
+      )}
+
       {screen === 'battle' && (
-        // Constant key so AnimatePresence only fades on screen-type changes,
-        // not between encounters in the same world (avoids background flash).
-        // BattleScreen itself is re-keyed by battleKey to reset internal state.
         <motion.div key="battle-screen"
           initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
           transition={{ duration: 0.25 }} className="w-full"
@@ -118,6 +145,7 @@ export default function App() {
             world={clearedData.world}
             worldTrophies={clearedData.worldTrophies}
             worldScore={clearedData.worldScore}
+            totalScore={clearedData.totalScore}
             onContinue={handleClearContinue}
           />
         </motion.div>
@@ -129,9 +157,9 @@ export default function App() {
           transition={{ duration: 0.25 }} className="w-full"
         >
           <ResultScreen
-            won={battleResult?.won ?? false}
-            worldName={battleResult?.worldName ?? ''}
+            worldName={pendingScore?.endWorld ?? ''}
             onRestart={handleRestart}
+            onViewScores={handleViewScores}
           />
         </motion.div>
       )}
@@ -142,8 +170,11 @@ export default function App() {
           transition={{ duration: 0.3 }} className="w-full"
         >
           <LeaderboardScreen
-            totalScore={run.totalScore ?? 0}
-            difficulty={DIFFICULTY}
+            totalScore={pendingScore?.totalScore ?? 0}
+            endWorld={pendingScore?.endWorld ?? ''}
+            cleared={pendingScore?.cleared ?? false}
+            difficulty={difficulty}
+            playerName={playerName}
             onPlayAgain={handleRestart}
           />
         </motion.div>
@@ -155,10 +186,11 @@ export default function App() {
           transition={{ duration: 0.3 }} className="w-full"
         >
           <WorldMapScreen
-            worlds={WORLDS}
+            worlds={worlds}
             currentWorldIndex={run.worldIndex}
             trophies={run.trophies}
             isTransition={mapIsTransition}
+            difficulty={difficulty}
             onFight={handleFight}
             onRestart={handleRestart}
           />

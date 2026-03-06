@@ -1,9 +1,36 @@
+import { useState, useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
 
-const TROPHY_FILTER = {
-  gold:   'drop-shadow(0 0 18px rgba(251,191,36,0.9))',
-  silver: 'grayscale(1) brightness(1.5) contrast(0.85)',
-  bronze: 'sepia(1) saturate(1.4) hue-rotate(-10deg) brightness(0.82)',
+const TROPHY_COLOR = { gold: '#fbbf24', silver: '#c0c8d4', bronze: '#cd7c3a' }
+
+function TrophyCup({ trophy, size = 48 }) {
+  const color = TROPHY_COLOR[trophy]
+  const s = size
+  return (
+    <svg width={s} height={Math.round(s * 1.1)} viewBox="0 0 48 52" fill="none">
+      <path d="M10 4 L38 4 L34 28 Q32 36 24 38 Q16 36 14 28Z" fill={color} />
+      <path d="M10 8 Q2 8 2 17 Q2 26 10 26" stroke={color} strokeWidth="4.5" fill="none" strokeLinecap="round" />
+      <path d="M38 8 Q46 8 46 17 Q46 26 38 26" stroke={color} strokeWidth="4.5" fill="none" strokeLinecap="round" />
+      <rect x="20" y="38" width="8" height="7" fill={color} />
+      <rect x="12" y="45" width="24" height="5" rx="2.5" fill={color} />
+    </svg>
+  )
+}
+
+function animateCount(from, to, ms, onTick, onDone) {
+  const steps = Math.max(1, Math.ceil(ms / 16))
+  let step = 0
+  let raf
+  const tick = () => {
+    step++
+    const t = Math.min(step / steps, 1)
+    const ease = 1 - Math.pow(1 - t, 3)
+    onTick(Math.round(from + (to - from) * ease))
+    if (t < 1) { raf = requestAnimationFrame(tick) }
+    else { onDone?.() }
+  }
+  raf = requestAnimationFrame(tick)
+  return () => cancelAnimationFrame(raf)
 }
 
 // ── Per-region SVG illustrations ─────────────────────────────────────────────
@@ -34,10 +61,6 @@ function ForestScene() {
       <path d="M148 96 L160 62 L172 96Z" fill="#1e3e14" />
       <path d="M164 100 L176 68 L188 100Z" fill="#264c1a" />
       <path d="M142 100 L154 70 L166 100Z" fill="#1a3810" />
-      {/* Flowers */}
-      <circle cx="68"  cy="123" r="2.5" fill="#f9d84a" opacity="0.8" />
-      <circle cx="88"  cy="124" r="2"   fill="#f87171" opacity="0.7" />
-      <circle cx="110" cy="123" r="2.2" fill="#f9d84a" opacity="0.75" />
       {/* Birds */}
       <path d="M72 48 Q75 45 78 48" stroke="#2e6080" strokeWidth="1.2" fill="none" strokeLinecap="round" />
       <path d="M82 42 Q85 39 88 42" stroke="#2e6080" strokeWidth="1.2" fill="none" strokeLinecap="round" />
@@ -79,9 +102,6 @@ function SwampScene() {
       <ellipse cx="94"  cy="73" rx="2.5" ry="6" fill="#223820" />
       <line x1="108" y1="96" x2="108" y2="78" stroke="#223820" strokeWidth="2" strokeLinecap="round" />
       <ellipse cx="108" cy="76" rx="2.5" ry="6" fill="#223820" />
-      {/* Mist */}
-      <path d="M0 90 Q40 84 80 90 Q120 96 160 88 Q185 84 200 88 L200 98 L0 98Z"
-        fill="white" opacity="0.028" />
     </svg>
   )
 }
@@ -96,31 +116,21 @@ function MountainsScene() {
         </linearGradient>
       </defs>
       <rect width="200" height="140" rx="18" fill="url(#ac-sky-m)" />
-      {/* Pale sun */}
       <circle cx="162" cy="24" r="14" fill="#d8eaf4" opacity="0.35" />
       <circle cx="162" cy="24" r="9"  fill="#d8eaf4" opacity="0.65" />
-      {/* Far peaks */}
-      <path d="M0 88 L22 48 L40 72 L58 32 L78 60 L96 40 L114 64 L132 44 L150 68 L168 38 L188 62 L200 48 L200 100 L0 100Z"
-        fill="#324a58" />
-      {/* Far snow */}
+      <path d="M0 88 L22 48 L40 72 L58 32 L78 60 L96 40 L114 64 L132 44 L150 68 L168 38 L188 62 L200 48 L200 100 L0 100Z" fill="#324a58" />
       <path d="M22 48 L17 60 L27 60Z"  fill="#ddeef8" opacity="0.75" />
       <path d="M58 32 L53 46 L63 46Z"  fill="#ddeef8" opacity="0.75" />
       <path d="M96 40 L91 52 L101 52Z" fill="#ddeef8" opacity="0.75" />
       <path d="M132 44 L127 56 L137 56Z" fill="#ddeef8" opacity="0.75" />
       <path d="M168 38 L163 50 L173 50Z" fill="#ddeef8" opacity="0.75" />
-      {/* Near peaks */}
-      <path d="M0 110 L18 68 L36 92 L54 54 L72 82 L92 48 L112 76 L130 56 L150 80 L168 58 L188 82 L200 62 L200 140 L0 140Z"
-        fill="#263848" />
-      {/* Near snow */}
+      <path d="M0 110 L18 68 L36 92 L54 54 L72 82 L92 48 L112 76 L130 56 L150 80 L168 58 L188 82 L200 62 L200 140 L0 140Z" fill="#263848" />
       <path d="M18 68 L13 80 L23 80Z"  fill="#e0eef6" opacity="0.88" />
       <path d="M54 54 L49 68 L59 68Z"  fill="#e0eef6" opacity="0.88" />
       <path d="M92 48 L87 62 L97 62Z"  fill="#e0eef6" opacity="0.88" />
       <path d="M130 56 L125 68 L135 68Z" fill="#e0eef6" opacity="0.88" />
       <path d="M168 58 L163 70 L173 70Z" fill="#e0eef6" opacity="0.88" />
-      {/* Rocky ground */}
-      <path d="M0 118 Q25 110 50 115 Q80 122 110 112 Q140 104 170 114 Q188 120 200 112 L200 140 L0 140Z"
-        fill="#1c2c36" />
-      {/* Snow patches */}
+      <path d="M0 118 Q25 110 50 115 Q80 122 110 112 Q140 104 170 114 Q188 120 200 112 L200 140 L0 140Z" fill="#1c2c36" />
       <ellipse cx="30"  cy="118" rx="16" ry="4" fill="#ddeef8" opacity="0.45" />
       <ellipse cx="130" cy="115" rx="13" ry="3" fill="#ddeef8" opacity="0.38" />
     </svg>
@@ -137,33 +147,20 @@ function CastleScene() {
         </linearGradient>
       </defs>
       <rect width="200" height="140" rx="18" fill="url(#ac-sky-c)" />
-      {/* Stars */}
       {[[20,15],[45,8],[70,20],[95,10],[125,18],[150,8],[175,14],[188,24],[10,32],[55,28],[140,25]].map(([x,y],i) => (
         <circle key={i} cx={x} cy={y} r="0.8" fill="white" opacity={0.25 + (i%4)*0.1} />
       ))}
-      {/* Moon */}
       <circle cx="158" cy="26" r="14" fill="#c4d0de" opacity="0.30" />
       <circle cx="158" cy="26" r="9"  fill="#c4d0de" opacity="0.52" />
-      {/* Cloud */}
-      <path d="M130 20 Q138 14 148 18 Q154 14 156 20 Q160 18 161 24 Q160 28 153 26 Q147 30 138 27 Q130 30 128 24 Q126 20 130 20Z"
-        fill="#121e30" opacity="0.85" />
-      {/* Distant walls */}
+      <path d="M130 20 Q138 14 148 18 Q154 14 156 20 Q160 18 161 24 Q160 28 153 26 Q147 30 138 27 Q130 30 128 24 Q126 20 130 20Z" fill="#121e30" opacity="0.85" />
       <path d="M0 90 L0 78 L8 78 L8 72 L12 72 L12 78 L18 78 L18 72 L22 72 L22 78 L30 78 L30 90Z" fill="#060e18" />
       <path d="M160 90 L160 78 L168 78 L168 72 L172 72 L172 78 L180 78 L180 72 L184 72 L184 78 L192 78 L192 72 L196 72 L196 78 L200 78 L200 90Z" fill="#060e18" />
-      {/* Central tower */}
       <rect x="82" y="18" width="36" height="112" fill="#050c16" />
-      {/* Tower battlements */}
-      <path d="M80 18 L82 18 L82 12 L88 12 L88 18 L94 18 L94 12 L100 12 L100 18 L106 18 L106 12 L112 12 L112 18 L118 18 L118 22 L80 22Z"
-        fill="#050c16" />
-      {/* Window glowing */}
+      <path d="M80 18 L82 18 L82 12 L88 12 L88 18 L94 18 L94 12 L100 12 L100 18 L106 18 L106 12 L112 12 L112 18 L118 18 L118 22 L80 22Z" fill="#050c16" />
       <rect x="95" y="48" width="10" height="16" rx="5" fill="#6b4a08" />
       <rect x="96" y="49" width="8"  height="14" rx="4" fill="#f59e0b" opacity="0.42" />
-      {/* Side battlements */}
-      <path d="M0 112 L0 100 L8 100 L8 94 L13 94 L13 100 L20 100 L20 94 L25 94 L25 100 L32 100 L32 94 L37 94 L37 100 L44 100 L44 112Z"
-        fill="#040b14" />
-      <path d="M156 112 L156 100 L163 100 L163 94 L168 94 L168 100 L175 100 L175 94 L180 94 L180 100 L187 100 L187 94 L192 94 L192 100 L200 100 L200 112Z"
-        fill="#040b14" />
-      {/* Ground */}
+      <path d="M0 112 L0 100 L8 100 L8 94 L13 94 L13 100 L20 100 L20 94 L25 94 L25 100 L32 100 L32 94 L37 94 L37 100 L44 100 L44 112Z" fill="#040b14" />
+      <path d="M156 112 L156 100 L163 100 L163 94 L168 94 L168 100 L175 100 L175 94 L180 94 L180 100 L187 100 L187 94 L192 94 L192 100 L200 100 L200 112Z" fill="#040b14" />
       <rect x="0" y="110" width="200" height="30" rx="0" fill="#03080e" />
       {[20,40,60,80,100,120,140,160,180].map((x,i) => (
         <line key={i} x1={x} y1="110" x2={x} y2="140" stroke="#070f1a" strokeWidth="0.8" />
@@ -189,7 +186,6 @@ function DragonLairScene() {
       </defs>
       <rect width="200" height="140" rx="18" fill="url(#ac-sky-d)" />
       <rect width="200" height="140" rx="18" fill="url(#ac-lava-glow)" />
-      {/* Stalactites */}
       <path d="M0   0 L8   0 L4   20Z" fill="#120400" />
       <path d="M14  0 L22  0 L18  28Z" fill="#160500" />
       <path d="M30  0 L38  0 L34  18Z" fill="#120400" />
@@ -203,28 +199,20 @@ function DragonLairScene() {
       <path d="M160 0 L168 0 L164 17Z" fill="#120400" />
       <path d="M176 0 L184 0 L180 24Z" fill="#160500" />
       <path d="M192 0 L200 0 L196 19Z" fill="#120400" />
-      {/* Stalactite tip glow */}
       {[[4,20],[18,28],[51,32],[84,26],[116,30],[148,27],[180,24]].map(([x,y],i) => (
         <circle key={i} cx={x} cy={y} r="1.8" fill="#ff4500" opacity="0.45" />
       ))}
-      {/* Rock back wall */}
-      <path d="M0 80 Q22 68 40 75 Q62 62 85 72 Q108 58 130 68 Q152 55 175 65 Q190 56 200 62 L200 140 L0 140Z"
-        fill="#160400" />
-      {/* Ground */}
-      <path d="M0 100 Q28 90 55 97 Q85 104 115 92 Q145 82 170 92 Q188 98 200 90 L200 140 L0 140Z"
-        fill="#0e0200" />
-      {/* Lava cracks */}
+      <path d="M0 80 Q22 68 40 75 Q62 62 85 72 Q108 58 130 68 Q152 55 175 65 Q190 56 200 62 L200 140 L0 140Z" fill="#160400" />
+      <path d="M0 100 Q28 90 55 97 Q85 104 115 92 Q145 82 170 92 Q188 98 200 90 L200 140 L0 140Z" fill="#0e0200" />
       <path d="M15 104 Q28 98 36 106 Q42 103 52 108" stroke="#ff4500" strokeWidth="2.2" fill="none" strokeLinecap="round" opacity="0.9" />
       <path d="M15 104 Q28 98 36 106 Q42 103 52 108" stroke="#ffaa00" strokeWidth="0.8" fill="none" strokeLinecap="round" opacity="0.7" />
       <path d="M80 100 Q94 94 102 102 Q108 99 118 104" stroke="#ff4500" strokeWidth="2.2" fill="none" strokeLinecap="round" opacity="0.9" />
       <path d="M80 100 Q94 94 102 102 Q108 99 118 104" stroke="#ffaa00" strokeWidth="0.8" fill="none" strokeLinecap="round" opacity="0.7" />
       <path d="M148 98 Q160 92 170 100 Q176 97 186 103" stroke="#ff4500" strokeWidth="2"   fill="none" strokeLinecap="round" opacity="0.85" />
-      {/* Lava pools */}
       <ellipse cx="36"  cy="118" rx="20" ry="7"   fill="#6b1200" opacity="0.75" />
       <ellipse cx="36"  cy="118" rx="12" ry="4"   fill="#ff5500" opacity="0.50" />
       <ellipse cx="155" cy="120" rx="18" ry="6.5" fill="#6b1200" opacity="0.75" />
       <ellipse cx="155" cy="120" rx="10" ry="3.5" fill="#ff5500" opacity="0.50" />
-      {/* Ground base */}
       <rect x="0" y="128" width="200" height="12" rx="0" fill="#080100" />
     </svg>
   )
@@ -240,8 +228,38 @@ const WORLD_SCENES = {
 
 // ── Screen ────────────────────────────────────────────────────────────────────
 
-export function AreaClearedScreen({ world, worldTrophies, worldScore, onContinue }) {
-  const Scene = WORLD_SCENES[world.id] ?? ForestScene
+export function AreaClearedScreen({ world, worldTrophies, worldScore, totalScore, onContinue }) {
+  const Scene    = WORLD_SCENES[world.id] ?? ForestScene
+  const prevTotal = totalScore - worldScore
+
+  const [battleDisplay, setBattleDisplay] = useState(0)
+  const [totalDisplay,  setTotalDisplay]  = useState(prevTotal)
+  const [showContinue,  setShowContinue]  = useState(worldScore === 0)
+  const cancelRef = useRef([])
+
+  useEffect(() => {
+    if (worldScore === 0) return
+
+    // Phase 1: count battle score up — start after trophies animate in
+    const t1 = setTimeout(() => {
+      const cancel1 = animateCount(0, worldScore, 700, setBattleDisplay, () => {
+        // Hold, then transfer
+        const t2 = setTimeout(() => {
+          // Transfer: battle score down, total score up — simultaneously
+          animateCount(worldScore, 0, 650, setBattleDisplay)
+          const cancel2 = animateCount(prevTotal, totalScore, 650, setTotalDisplay, () => {
+            setShowContinue(true)
+          })
+          cancelRef.current.push(cancel2)
+        }, 500)
+        cancelRef.current.push(() => clearTimeout(t2))
+      })
+      cancelRef.current.push(cancel1)
+    }, 850)
+
+    cancelRef.current.push(() => clearTimeout(t1))
+    return () => cancelRef.current.forEach((fn) => fn?.())
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div
@@ -272,16 +290,12 @@ export function AreaClearedScreen({ world, worldTrophies, worldScore, onContinue
         initial={{ scale: 0.7, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ type: 'spring', stiffness: 180, damping: 15, delay: 0.1 }}
-        style={{
-          borderRadius: 20,
-          overflow: 'hidden',
-          boxShadow: '0 0 32px rgba(0,0,0,0.6)',
-        }}
+        style={{ borderRadius: 20, overflow: 'hidden', boxShadow: '0 0 32px rgba(0,0,0,0.6)' }}
       >
         <Scene />
       </motion.div>
 
-      {/* 3. Trophy row (per-battle) */}
+      {/* 3. Trophy row */}
       <div style={{ display: 'flex', gap: 24, alignItems: 'center', justifyContent: 'center' }}>
         {worldTrophies.map((trophy, i) => (
           <motion.div
@@ -290,45 +304,62 @@ export function AreaClearedScreen({ world, worldTrophies, worldScore, onContinue
             animate={{ scale: 1, opacity: 1, y: 0 }}
             transition={{ delay: 0.4 + i * 0.15, type: 'spring', stiffness: 260, damping: 16 }}
           >
-            <span style={{ fontSize: 48, filter: TROPHY_FILTER[trophy] }}>🏆</span>
+            <TrophyCup trophy={trophy} size={48} />
           </motion.div>
         ))}
       </div>
 
-      {/* 4. World score total */}
-      {worldScore > 0 && (
-        <motion.div
-          initial={{ opacity: 0, scale: 0.85 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.75, type: 'spring', stiffness: 220, damping: 15 }}
-          style={{
-            background: 'rgba(251,191,36,0.12)',
-            border: '1px solid rgba(251,191,36,0.28)',
-            borderRadius: 14, padding: '8px 32px',
-            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2,
-          }}
-        >
+      {/* 4. Score transfer display */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.85 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ delay: 0.7, type: 'spring', stiffness: 220, damping: 15 }}
+        style={{
+          width: '100%',
+          background: 'rgba(255,255,255,0.05)',
+          border: '1px solid rgba(255,255,255,0.10)',
+          borderRadius: 16, padding: '12px 20px',
+          display: 'flex', flexDirection: 'column', gap: 10,
+        }}
+      >
+        {/* Battle score row */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)', fontWeight: 700, letterSpacing: '0.15em' }}>
-            WORLD SCORE
+            {world.name.toUpperCase()} SCORE
           </span>
-          <span style={{ fontSize: 28, fontWeight: 900, color: '#fbbf24' }}>
-            {worldScore}
+          <span style={{ fontSize: 24, fontWeight: 900, color: '#fbbf24', minWidth: 60, textAlign: 'right' }}>
+            {battleDisplay.toLocaleString()}
           </span>
-        </motion.div>
-      )}
+        </div>
+        {/* Divider */}
+        <div style={{ height: 1, background: 'rgba(255,255,255,0.08)' }} />
+        {/* Total score row */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)', fontWeight: 700, letterSpacing: '0.15em' }}>
+            TOTAL
+          </span>
+          <span style={{ fontSize: 24, fontWeight: 900, color: 'white', minWidth: 60, textAlign: 'right' }}>
+            {totalDisplay.toLocaleString()}
+          </span>
+        </div>
+      </motion.div>
 
       {/* 5. Continue */}
-      <motion.button
-        initial={{ opacity: 0, y: 22 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 1.05, type: 'spring', stiffness: 210, damping: 18 }}
-        whileTap={{ scale: 0.95 }}
-        whileHover={{ scale: 1.04 }}
-        onClick={onContinue}
-        className="w-full bg-yellow-400 border-b-4 border-yellow-600 text-black font-black text-xl rounded-2xl h-16 shadow-xl cursor-pointer tracking-widest"
-      >
-        CONTINUE →
-      </motion.button>
+      {showContinue ? (
+        <motion.button
+          initial={{ opacity: 0, y: 22 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ type: 'spring', stiffness: 210, damping: 18 }}
+          whileTap={{ scale: 0.95 }}
+          whileHover={{ scale: 1.04 }}
+          onClick={onContinue}
+          className="w-full bg-yellow-400 border-b-4 border-yellow-600 text-black font-black text-xl rounded-2xl h-16 shadow-xl cursor-pointer tracking-widest"
+        >
+          CONTINUE →
+        </motion.button>
+      ) : (
+        <div style={{ height: 64 }} />
+      )}
     </div>
   )
 }

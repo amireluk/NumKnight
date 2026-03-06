@@ -36,10 +36,14 @@ function ForestBackground() {
         <path d="M-5 48 Q22 34 46 41 Q66 48 83 36 Q94 28 105 38 L105 55 L-5 55Z" fill="#5a7e4e" />
         {/* Ground */}
         <rect x="-5" y="46" width="115" height="12" fill="#3a5830" />
-        {/* A few simple flower dots */}
-        <circle cx="18" cy="47" r="1.4" fill="#f9d84a" opacity="0.7" />
-        <circle cx="55" cy="46" r="1.2" fill="#f87171" opacity="0.6" />
-        <circle cx="80" cy="47" r="1.3" fill="#f9d84a" opacity="0.65" />
+        {/* Grass tufts */}
+        {[18, 27, 55, 63, 80, 88].map((x, i) => (
+          <g key={i}>
+            <line x1={x}   y1="47" x2={x}   y2="44" stroke="#4a7040" strokeWidth="0.9" strokeLinecap="round" />
+            <line x1={x+2} y1="47" x2={x+2} y2="44.8" stroke="#3e6036" strokeWidth="0.9" strokeLinecap="round" />
+            <line x1={x-2} y1="47" x2={x-2} y2="45.2" stroke="#4a7040" strokeWidth="0.8" strokeLinecap="round" />
+          </g>
+        ))}
       </svg>
     </div>
   )
@@ -200,17 +204,6 @@ function CastleBackground() {
         <path d="M4 6 Q12 -2 22 2 Q28 -2 30 5 Q34 3 35 9 Q34 14 26 12 Q20 17 10 13 Q2 15 0 9 Q-2 4 4 6Z"
           fill="#0e1828" opacity="0.82" />
       </svg>
-      {/* Stars (tiny) */}
-      <svg style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '60%', pointerEvents: 'none' }}
-        viewBox="0 0 100 60">
-        {[
-          [12,8],[24,5],[40,3],[52,7],[68,4],[76,9],[88,6],
-          [6,18],[18,14],[35,16],[48,12],[62,18],[82,14],[95,11],
-          [10,26],[30,24],[44,28],[60,23],[78,26],[92,22],
-        ].map(([cx, cy], i) => (
-          <circle key={i} cx={cx} cy={cy} r="0.55" fill="white" opacity={0.4 + (i % 4) * 0.12} />
-        ))}
-      </svg>
       {/* Castle scene */}
       <svg style={{ position: 'absolute', bottom: 0, left: 0, width: '100%', height: '62%' }}
         viewBox="0 0 100 62" preserveAspectRatio="none" overflow="visible">
@@ -225,9 +218,6 @@ function CastleBackground() {
         {/* Tower battlements */}
         <path d="M38 2 L40 2 L40 -2 L44 -2 L44 2 L48 2 L48 -2 L52 -2 L52 2 L56 2 L56 -2 L60 -2 L60 2 L62 2 L62 6 L38 6Z"
           fill="#090e18" />
-        {/* Tower window — glowing amber */}
-        <rect x="47" y="18" width="6" height="10" rx="3" fill="#7c5a0a" />
-        <rect x="48" y="19" width="4" height="8"  rx="2" fill="#f59e0b" opacity="0.45" />
         {/* Side wall battlements */}
         <path d="M-5 52 L-5 40 L4 40 L4 34 L8 34 L8 40 L16 40 L16 34 L20 34 L20 40 L28 40 L28 34 L32 34 L32 40 L40 40 L40 52Z"
           fill="#080e1a" />
@@ -279,11 +269,6 @@ function DragonLairBackground() {
         <path d="M71 0 L77 0 L74 21Z"   fill="#0e0400" />
         <path d="M83 0 L88 0 L85.5 14Z" fill="#140500" />
         <path d="M94 0 L100 0 L97 18Z"  fill="#0e0400" />
-        {/* Glow at tips */}
-        <circle cx="2.5"  cy="16" r="1.2" fill="#ff4500" opacity="0.4" />
-        <circle cx="14"   cy="22" r="1.4" fill="#ff4500" opacity="0.4" />
-        <circle cx="37"   cy="20" r="1.3" fill="#ff4500" opacity="0.4" />
-        <circle cx="74"   cy="21" r="1.3" fill="#ff4500" opacity="0.4" />
       </svg>
       {/* Ground and lava */}
       <svg style={{ position: 'absolute', bottom: 0, left: 0, width: '100%', height: '58%' }}

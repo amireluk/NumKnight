@@ -45,31 +45,19 @@ function HitSplash({ color }) {
 }
 
 // ─────────────────────────────────────────────
-// GOBLIN (existing)
+// GOBLIN
 // ─────────────────────────────────────────────
 function GoblinBodySVG() {
   return (
     <svg width="84" height="112" viewBox="0 0 90 120" fill="none">
-      <defs>
-        <radialGradient id="gb-skin" cx="35%" cy="25%" r="72%">
-          <stop offset="0%" stopColor="#aed581" />
-          <stop offset="55%" stopColor="#8bc34a" />
-          <stop offset="100%" stopColor="#4e7c1f" />
-        </radialGradient>
-        <radialGradient id="gb-body" cx="28%" cy="18%" r="78%">
-          <stop offset="0%" stopColor="#aed581" />
-          <stop offset="50%" stopColor="#8bc34a" />
-          <stop offset="100%" stopColor="#3d6b14" />
-        </radialGradient>
-      </defs>
       <path d="M24 58 Q8 66 5 88 Q5 99 14 100 Q23 101 24 91 Q25 74 32 66Z"
-        fill="url(#gb-body)" stroke="#1b2a1b" strokeWidth="2.5" strokeLinejoin="round" />
-      <ellipse cx="12" cy="100" rx="10" ry="9" fill="url(#gb-skin)" stroke="#1b2a1b" strokeWidth="2.5" />
+        fill="#8bc34a" stroke="#1b2a1b" strokeWidth="2.5" strokeLinejoin="round" />
+      <ellipse cx="12" cy="100" rx="10" ry="9" fill="#8bc34a" stroke="#1b2a1b" strokeWidth="2.5" />
       <path d="M5 97 Q9 92 14 92 Q18 92 21 95" stroke="#558b2f" strokeWidth="2" fill="none" strokeLinecap="round" />
       <path d="M26 88 Q22 102 20 114 Q22 120 33 120 Q41 120 43 112 Q44 100 44 88Z"
-        fill="url(#gb-body)" stroke="#1b2a1b" strokeWidth="2.5" />
+        fill="#8bc34a" stroke="#1b2a1b" strokeWidth="2.5" />
       <path d="M64 88 Q68 102 70 114 Q68 120 57 120 Q49 120 47 112 Q46 100 46 88Z"
-        fill="url(#gb-body)" stroke="#1b2a1b" strokeWidth="2.5" />
+        fill="#8bc34a" stroke="#1b2a1b" strokeWidth="2.5" />
       <ellipse cx="29" cy="116" rx="12" ry="6" fill="#4a7c1f" stroke="#1b2a1b" strokeWidth="2" />
       <ellipse cx="61" cy="116" rx="12" ry="6" fill="#4a7c1f" stroke="#1b2a1b" strokeWidth="2" />
       <path d="M19 116 L16 120" stroke="#1b2a1b" strokeWidth="2.5" strokeLinecap="round" />
@@ -81,11 +69,9 @@ function GoblinBodySVG() {
       <path d="M65 118 L67 121" stroke="#1b2a1b" strokeWidth="2.5" strokeLinecap="round" />
       <path d="M71 116 L74 120" stroke="#1b2a1b" strokeWidth="2.5" strokeLinecap="round" />
       <path d="M18 57 Q12 70 12 82 Q12 95 30 96 Q45 98 60 96 Q78 95 78 82 Q78 70 72 57 Q62 52 45 52 Q28 52 18 57Z"
-        fill="url(#gb-body)" stroke="#1b2a1b" strokeWidth="2.5" />
-      <ellipse cx="35" cy="65" rx="14" ry="11" fill="white" opacity="0.18" />
+        fill="#8bc34a" stroke="#1b2a1b" strokeWidth="2.5" />
       <path d="M27 63 Q37 59 44 64" stroke="#558b2f" strokeWidth="2" fill="none" strokeLinecap="round" opacity="0.8" />
       <path d="M63 63 Q53 59 46 64" stroke="#558b2f" strokeWidth="2" fill="none" strokeLinecap="round" opacity="0.8" />
-      <ellipse cx="44" cy="82" rx="13" ry="10" fill="#aed581" opacity="0.2" />
       <ellipse cx="44" cy="85" rx="2.5" ry="2" fill="#558b2f" opacity="0.6" />
       <path d="M22 91 Q36 98 44 96 Q54 98 68 91 Q66 109 59 112 Q44 116 30 112 Q24 109 22 91Z"
         fill="#795548" stroke="#3e2723" strokeWidth="2" />
@@ -96,15 +82,12 @@ function GoblinBodySVG() {
       <rect x="21" y="89" width="48" height="6" rx="3" fill="#4e342e" stroke="#3e2723" strokeWidth="1.5" />
       <rect x="38" y="89" width="14" height="6" rx="2" fill="#6d4c41" stroke="#4e342e" strokeWidth="1" />
       <path d="M34 52 Q37 48 45 48 Q53 48 56 52 L56 58 Q52 54 45 54 Q38 54 34 58Z"
-        fill="url(#gb-skin)" stroke="#1b2a1b" strokeWidth="2" />
+        fill="#8bc34a" stroke="#1b2a1b" strokeWidth="2" />
       <ellipse cx="45" cy="58" rx="9" ry="4" fill="#558b2f" opacity="0.35" />
       <path d="M17 30 Q17 6 45 6 Q73 6 73 30 Q73 52 60 58 Q45 63 30 58 Q17 52 17 30Z"
-        fill="url(#gb-skin)" stroke="#1b2a1b" strokeWidth="2.5" />
-      <ellipse cx="32" cy="18" rx="16" ry="10" fill="white" opacity="0.2" />
+        fill="#8bc34a" stroke="#1b2a1b" strokeWidth="2.5" />
       <path d="M17 28 Q3 18 8 8 Q18 15 22 28Z" fill="#8bc34a" stroke="#1b2a1b" strokeWidth="2" />
       <path d="M73 28 Q87 18 82 8 Q72 15 68 28Z" fill="#8bc34a" stroke="#1b2a1b" strokeWidth="2" />
-      <path d="M14 26 Q6 18 10 10 Q16 16 18 26Z" fill="#aed581" opacity="0.3" />
-      <path d="M76 26 Q84 18 80 10 Q74 16 72 26Z" fill="#aed581" opacity="0.3" />
       <path d="M38 8 Q41 0 45 2 Q49 0 52 8 Q49 4 45 5 Q41 4 38 8Z" fill="#1a1a2e" stroke="#111" strokeWidth="1.5" />
       <path d="M39 8 Q43 1 44 3" stroke="#1a1a2e" strokeWidth="2.5" strokeLinecap="round" />
       <path d="M46 3 Q49 0 51 8" stroke="#1a1a2e" strokeWidth="2.5" strokeLinecap="round" />
@@ -126,12 +109,13 @@ function GoblinBodySVG() {
       <circle cx="49" cy="45" r="2.8" fill="#1b2a1b" />
       <path d="M20 52 Q34 67 45 64 Q56 67 70 52 L70 58 Q56 73 45 70 Q34 73 20 58Z"
         fill="#111" stroke="#1b2a1b" strokeWidth="2" />
-      <rect x="27" y="53" width="8" height="11" rx="2" fill="#f9a825" stroke="#e65100" strokeWidth="0.5" />
-      <rect x="37" y="52" width="8" height="12" rx="2" fill="#f9a825" stroke="#e65100" strokeWidth="0.5" />
-      <rect x="47" y="52" width="8" height="12" rx="2" fill="#f9a825" stroke="#e65100" strokeWidth="0.5" />
-      <rect x="57" y="53" width="8" height="11" rx="2" fill="#f9a825" stroke="#e65100" strokeWidth="0.5" />
-      <path d="M22 52 L25 64 L29 52Z" fill="#f9a825" stroke="#e65100" strokeWidth="0.5" />
-      <path d="M61 52 L65 64 L68 52Z" fill="#f9a825" stroke="#e65100" strokeWidth="0.5" />
+      {/* Teeth — smaller */}
+      <rect x="27" y="53" width="8" height="5" rx="2" fill="#f9a825" stroke="#e65100" strokeWidth="0.5" />
+      <rect x="37" y="52" width="8" height="6" rx="2" fill="#f9a825" stroke="#e65100" strokeWidth="0.5" />
+      <rect x="47" y="52" width="8" height="6" rx="2" fill="#f9a825" stroke="#e65100" strokeWidth="0.5" />
+      <rect x="57" y="53" width="8" height="5" rx="2" fill="#f9a825" stroke="#e65100" strokeWidth="0.5" />
+      <path d="M22 52 L24 58 L28 52Z" fill="#f9a825" stroke="#e65100" strokeWidth="0.5" />
+      <path d="M61 52 L64 58 L67 52Z" fill="#f9a825" stroke="#e65100" strokeWidth="0.5" />
       <path d="M20 52 Q45 48 70 52" stroke="#558b2f" strokeWidth="2.5" fill="none" strokeLinecap="round" />
       <circle cx="22" cy="42" r="3" fill="#6ca03a" stroke="#558b2f" strokeWidth="1.5" />
       <circle cx="68" cy="40" r="2.5" fill="#6ca03a" stroke="#558b2f" strokeWidth="1.5" />
@@ -143,18 +127,6 @@ function GoblinBodySVG() {
 function GoblinClubArmSVG() {
   return (
     <svg width="84" height="112" viewBox="0 0 90 120" fill="none" overflow="visible">
-      <defs>
-        <radialGradient id="gb-body2" cx="28%" cy="18%" r="78%">
-          <stop offset="0%" stopColor="#aed581" />
-          <stop offset="50%" stopColor="#8bc34a" />
-          <stop offset="100%" stopColor="#3d6b14" />
-        </radialGradient>
-        <radialGradient id="gb-skin2" cx="35%" cy="25%" r="72%">
-          <stop offset="0%" stopColor="#aed581" />
-          <stop offset="55%" stopColor="#8bc34a" />
-          <stop offset="100%" stopColor="#4e7c1f" />
-        </radialGradient>
-      </defs>
       <rect x="68" y="2" width="11" height="52" rx="4" fill="#6d4c41" stroke="#3e2723" strokeWidth="2" />
       <ellipse cx="73.5" cy="5" rx="11" ry="14" fill="#795548" stroke="#3e2723" strokeWidth="2.5" />
       <circle cx="67" cy="4" r="4" fill="#5d4037" stroke="#3e2723" strokeWidth="1.5" />
@@ -163,8 +135,8 @@ function GoblinClubArmSVG() {
       <circle cx="83" cy="20" r="2.5" fill="#5d4037" stroke="#3e2723" strokeWidth="1.5" />
       <line x1="71" y1="18" x2="70" y2="52" stroke="#5d4037" strokeWidth="1.5" strokeLinecap="round" opacity="0.5" />
       <path d="M66 54 Q80 56 84 70 Q86 82 78 84 Q70 86 68 76 Q66 64 60 62Z"
-        fill="url(#gb-body2)" stroke="#1b2a1b" strokeWidth="2.5" strokeLinejoin="round" />
-      <rect x="64" y="46" width="14" height="15" rx="6" fill="url(#gb-skin2)" stroke="#1b2a1b" strokeWidth="2" />
+        fill="#8bc34a" stroke="#1b2a1b" strokeWidth="2.5" strokeLinejoin="round" />
+      <rect x="64" y="46" width="14" height="15" rx="6" fill="#8bc34a" stroke="#1b2a1b" strokeWidth="2" />
       <path d="M65 49 Q71 46 77 49" stroke="#558b2f" strokeWidth="1.5" fill="none" strokeLinecap="round" />
     </svg>
   )
@@ -176,17 +148,9 @@ function GoblinClubArmSVG() {
 function SkeletonBodySVG() {
   return (
     <svg width="84" height="112" viewBox="0 0 90 120" fill="none">
-      <defs>
-        <radialGradient id="sk-bone" cx="30%" cy="20%" r="75%">
-          <stop offset="0%" stopColor="#f0ead8" />
-          <stop offset="60%" stopColor="#d8cdb4" />
-          <stop offset="100%" stopColor="#b5a88e" />
-        </radialGradient>
-      </defs>
-
       {/* Left arm (hanging bone) */}
       <path d="M26 56 Q10 66 8 84 Q8 95 16 96 Q24 97 26 86 Q28 72 34 64Z"
-        fill="url(#sk-bone)" stroke="#2a1a0a" strokeWidth="2.5" strokeLinejoin="round" />
+        fill="#d8cdb4" stroke="#2a1a0a" strokeWidth="2.5" strokeLinejoin="round" />
       <ellipse cx="14" cy="96" rx="9" ry="7" fill="#d8cdb4" stroke="#2a1a0a" strokeWidth="2" />
       {/* Knuckle lines */}
       <path d="M7 93 L6 98" stroke="#2a1a0a" strokeWidth="1.5" strokeLinecap="round" />
@@ -195,11 +159,11 @@ function SkeletonBodySVG() {
       <path d="M22 95 L23 100" stroke="#2a1a0a" strokeWidth="1.5" strokeLinecap="round" />
 
       {/* Left leg femur */}
-      <rect x="26" y="92" width="12" height="26" rx="6" fill="url(#sk-bone)" stroke="#2a1a0a" strokeWidth="2" />
+      <rect x="26" y="92" width="12" height="26" rx="6" fill="#d8cdb4" stroke="#2a1a0a" strokeWidth="2" />
       {/* Left knee joint */}
       <circle cx="32" cy="110" r="7" fill="#c8bd9a" stroke="#2a1a0a" strokeWidth="2" />
       {/* Left tibia */}
-      <rect x="28" y="108" width="8" height="14" rx="4" fill="url(#sk-bone)" stroke="#2a1a0a" strokeWidth="2" />
+      <rect x="28" y="108" width="8" height="14" rx="4" fill="#d8cdb4" stroke="#2a1a0a" strokeWidth="2" />
       {/* Left foot */}
       <ellipse cx="32" cy="120" rx="12" ry="5" fill="#c8bd9a" stroke="#2a1a0a" strokeWidth="2" />
       <path d="M22 119 L20 122" stroke="#2a1a0a" strokeWidth="2" strokeLinecap="round" />
@@ -208,11 +172,11 @@ function SkeletonBodySVG() {
       <path d="M37 121 L39 124" stroke="#2a1a0a" strokeWidth="2" strokeLinecap="round" />
 
       {/* Right leg femur */}
-      <rect x="52" y="92" width="12" height="26" rx="6" fill="url(#sk-bone)" stroke="#2a1a0a" strokeWidth="2" />
+      <rect x="52" y="92" width="12" height="26" rx="6" fill="#d8cdb4" stroke="#2a1a0a" strokeWidth="2" />
       {/* Right knee joint */}
       <circle cx="58" cy="110" r="7" fill="#c8bd9a" stroke="#2a1a0a" strokeWidth="2" />
       {/* Right tibia */}
-      <rect x="54" y="108" width="8" height="14" rx="4" fill="url(#sk-bone)" stroke="#2a1a0a" strokeWidth="2" />
+      <rect x="54" y="108" width="8" height="14" rx="4" fill="#d8cdb4" stroke="#2a1a0a" strokeWidth="2" />
       {/* Right foot */}
       <ellipse cx="58" cy="120" rx="12" ry="5" fill="#c8bd9a" stroke="#2a1a0a" strokeWidth="2" />
       <path d="M48 119 L46 122" stroke="#2a1a0a" strokeWidth="2" strokeLinecap="round" />
@@ -251,17 +215,15 @@ function SkeletonBodySVG() {
       <line x1="45" y1="38" x2="45" y2="48" stroke="#b5a88e" strokeWidth="6" strokeLinecap="round" />
 
       {/* Skull */}
-      <ellipse cx="45" cy="22" rx="23" ry="21" fill="url(#sk-bone)" stroke="#2a1a0a" strokeWidth="2.5" />
-      {/* Skull highlight */}
-      <ellipse cx="36" cy="13" rx="13" ry="8" fill="white" opacity="0.2" />
+      <ellipse cx="45" cy="22" rx="23" ry="21" fill="#d8cdb4" stroke="#2a1a0a" strokeWidth="2.5" />
       {/* Jaw */}
       <path d="M27 32 Q36 46 45 46 Q54 46 63 32 L61 40 Q53 52 45 52 Q37 52 29 40Z"
         fill="#d8cdb4" stroke="#2a1a0a" strokeWidth="2" />
-      {/* Teeth */}
-      <rect x="29" y="39" width="7" height="9" rx="2" fill="#f0ead8" stroke="#2a1a0a" strokeWidth="1" />
-      <rect x="38" y="39" width="7" height="10" rx="2" fill="#f0ead8" stroke="#2a1a0a" strokeWidth="1" />
-      <rect x="45" y="39" width="7" height="10" rx="2" fill="#f0ead8" stroke="#2a1a0a" strokeWidth="1" />
-      <rect x="54" y="39" width="7" height="9" rx="2" fill="#f0ead8" stroke="#2a1a0a" strokeWidth="1" />
+      {/* Teeth — smaller */}
+      <rect x="29" y="39" width="7" height="4" rx="2" fill="#f0ead8" stroke="#2a1a0a" strokeWidth="1" />
+      <rect x="38" y="39" width="7" height="5" rx="2" fill="#f0ead8" stroke="#2a1a0a" strokeWidth="1" />
+      <rect x="45" y="39" width="7" height="5" rx="2" fill="#f0ead8" stroke="#2a1a0a" strokeWidth="1" />
+      <rect x="54" y="39" width="7" height="4" rx="2" fill="#f0ead8" stroke="#2a1a0a" strokeWidth="1" />
       {/* Eye sockets */}
       <ellipse cx="33" cy="22" rx="9" ry="10" fill="#1a1228" />
       <ellipse cx="57" cy="22" rx="9" ry="10" fill="#1a1228" />
@@ -281,13 +243,6 @@ function SkeletonBodySVG() {
 function SkeletonScytheArmSVG() {
   return (
     <svg width="84" height="112" viewBox="0 0 90 120" fill="none" overflow="visible">
-      <defs>
-        <radialGradient id="sk-bone2" cx="30%" cy="20%" r="75%">
-          <stop offset="0%" stopColor="#f0ead8" />
-          <stop offset="60%" stopColor="#d8cdb4" />
-          <stop offset="100%" stopColor="#b5a88e" />
-        </radialGradient>
-      </defs>
       {/* Scythe pole */}
       <rect x="70" y="0" width="9" height="62" rx="4" fill="#5c3d1e" stroke="#2a1a0a" strokeWidth="2" />
       {/* Scythe blade (curved crescent) */}
@@ -301,7 +256,7 @@ function SkeletonScytheArmSVG() {
         fill="#4a5568" />
       {/* Right arm (bone) */}
       <path d="M64 54 Q78 56 82 70 Q84 82 76 84 Q68 86 66 76 Q64 64 58 62Z"
-        fill="url(#sk-bone2)" stroke="#2a1a0a" strokeWidth="2.5" strokeLinejoin="round" />
+        fill="#d8cdb4" stroke="#2a1a0a" strokeWidth="2.5" strokeLinejoin="round" />
       {/* Right hand */}
       <rect x="62" y="46" width="13" height="14" rx="5" fill="#c8bd9a" stroke="#2a1a0a" strokeWidth="2" />
       <path d="M63 49 Q68 46 75 49" stroke="#b5a88e" strokeWidth="1.5" fill="none" strokeLinecap="round" />
@@ -315,22 +270,9 @@ function SkeletonScytheArmSVG() {
 function OrcBodySVG() {
   return (
     <svg width="84" height="112" viewBox="0 0 90 120" fill="none">
-      <defs>
-        <radialGradient id="orc-skin" cx="30%" cy="20%" r="75%">
-          <stop offset="0%" stopColor="#8fae6a" />
-          <stop offset="60%" stopColor="#5e7a3a" />
-          <stop offset="100%" stopColor="#3a5222" />
-        </radialGradient>
-        <radialGradient id="orc-armor" cx="30%" cy="15%" r="80%">
-          <stop offset="0%" stopColor="#8a7560" />
-          <stop offset="60%" stopColor="#5a4a38" />
-          <stop offset="100%" stopColor="#3a2e22" />
-        </radialGradient>
-      </defs>
-
       {/* Left arm — thick */}
       <path d="M16 56 Q0 68 -2 90 Q-2 102 8 103 Q18 104 20 92 Q22 74 30 64Z"
-        fill="url(#orc-skin)" stroke="#1a1a0a" strokeWidth="2.5" strokeLinejoin="round" />
+        fill="#5e7a3a" stroke="#1a1a0a" strokeWidth="2.5" strokeLinejoin="round" />
       <ellipse cx="5" cy="103" rx="12" ry="10" fill="#5e7a3a" stroke="#1a1a0a" strokeWidth="2.5" />
       {/* Knuckles */}
       <circle cx="-2" cy="100" r="3.5" fill="#4a6030" stroke="#1a1a0a" strokeWidth="1.5" />
@@ -339,22 +281,20 @@ function OrcBodySVG() {
 
       {/* Legs — massive */}
       <path d="M24 90 Q18 106 16 118 Q20 124 34 122 Q44 120 44 110 Q44 96 44 90Z"
-        fill="url(#orc-skin)" stroke="#1a1a0a" strokeWidth="2.5" />
+        fill="#5e7a3a" stroke="#1a1a0a" strokeWidth="2.5" />
       <path d="M66 90 Q72 106 74 118 Q70 124 56 122 Q46 120 46 110 Q46 96 46 90Z"
-        fill="url(#orc-skin)" stroke="#1a1a0a" strokeWidth="2.5" />
+        fill="#5e7a3a" stroke="#1a1a0a" strokeWidth="2.5" />
       {/* Boots */}
       <ellipse cx="28" cy="119" rx="14" ry="6" fill="#3a2e22" stroke="#1a1a0a" strokeWidth="2" />
       <ellipse cx="62" cy="119" rx="14" ry="6" fill="#3a2e22" stroke="#1a1a0a" strokeWidth="2" />
 
       {/* Body — wide barrel chest */}
       <path d="M12 54 Q6 68 6 82 Q6 98 28 100 Q45 102 62 100 Q84 98 84 82 Q84 68 78 54 Q66 48 45 48 Q24 48 12 54Z"
-        fill="url(#orc-skin)" stroke="#1a1a0a" strokeWidth="2.5" />
-      {/* Chest highlight */}
-      <ellipse cx="32" cy="64" rx="16" ry="12" fill="white" opacity="0.12" />
+        fill="#5e7a3a" stroke="#1a1a0a" strokeWidth="2.5" />
 
       {/* Armor breastplate */}
       <path d="M20 62 Q32 58 45 60 Q58 58 70 62 Q72 78 65 86 Q55 92 45 90 Q35 92 25 86 Q18 78 20 62Z"
-        fill="url(#orc-armor)" stroke="#1a1a0a" strokeWidth="2" />
+        fill="#5a4a38" stroke="#1a1a0a" strokeWidth="2" />
       <path d="M28 64 Q45 60 62 64 Q64 72 58 80 Q52 86 45 84 Q38 86 32 80 Q26 72 28 64Z"
         fill="#6a5a48" opacity="0.5" />
       {/* Armor rivets */}
@@ -364,22 +304,19 @@ function OrcBodySVG() {
 
       {/* Neck */}
       <path d="M32 48 Q36 42 45 42 Q54 42 58 48 L58 56 Q54 50 45 50 Q36 50 32 56Z"
-        fill="url(#orc-skin)" stroke="#1a1a0a" strokeWidth="2" />
+        fill="#5e7a3a" stroke="#1a1a0a" strokeWidth="2" />
 
       {/* Head — wide and heavy */}
       <path d="M14 26 Q14 2 45 2 Q76 2 76 26 Q76 52 62 58 Q45 64 28 58 Q14 52 14 26Z"
-        fill="url(#orc-skin)" stroke="#1a1a0a" strokeWidth="2.5" />
-      <ellipse cx="30" cy="14" rx="18" ry="10" fill="white" opacity="0.15" />
+        fill="#5e7a3a" stroke="#1a1a0a" strokeWidth="2.5" />
 
       {/* Ears — wide */}
       <path d="M14 24 Q0 14 4 2 Q16 10 20 26Z" fill="#5e7a3a" stroke="#1a1a0a" strokeWidth="2" />
       <path d="M76 24 Q90 14 86 2 Q74 10 70 26Z" fill="#5e7a3a" stroke="#1a1a0a" strokeWidth="2" />
 
-      {/* Tusks */}
-      <path d="M32 54 Q28 62 24 68" stroke="#f0ead8" strokeWidth="8" strokeLinecap="round" />
-      <path d="M58 54 Q62 62 66 68" stroke="#f0ead8" strokeWidth="8" strokeLinecap="round" />
-      <path d="M32 54 Q28 62 24 68" stroke="#d8cdb4" strokeWidth="5" strokeLinecap="round" />
-      <path d="M58 54 Q62 62 66 68" stroke="#d8cdb4" strokeWidth="5" strokeLinecap="round" />
+      {/* Tusks — smaller */}
+      <path d="M32 54 Q29 60 26 64" stroke="#f0ead8" strokeWidth="3" strokeLinecap="round" />
+      <path d="M58 54 Q61 60 64 64" stroke="#f0ead8" strokeWidth="3" strokeLinecap="round" />
 
       {/* Heavy brows */}
       <path d="M16 24 Q28 14 42 20" stroke="#1a1a0a" strokeWidth="6" fill="none" strokeLinecap="round" />
@@ -413,13 +350,6 @@ function OrcBodySVG() {
 function OrcAxeArmSVG() {
   return (
     <svg width="84" height="112" viewBox="0 0 90 120" fill="none" overflow="visible">
-      <defs>
-        <radialGradient id="orc-skin3" cx="30%" cy="20%" r="75%">
-          <stop offset="0%" stopColor="#8fae6a" />
-          <stop offset="60%" stopColor="#5e7a3a" />
-          <stop offset="100%" stopColor="#3a5222" />
-        </radialGradient>
-      </defs>
       {/* Axe handle */}
       <rect x="68" y="4" width="11" height="56" rx="5" fill="#6b4226" stroke="#2a1a0a" strokeWidth="2" />
       {/* Handle grip wrap */}
@@ -436,7 +366,7 @@ function OrcAxeArmSVG() {
         fill="#546270" />
       {/* Right arm — thick */}
       <path d="M62 54 Q78 56 84 72 Q86 86 76 88 Q66 90 64 78 Q62 64 56 62Z"
-        fill="url(#orc-skin3)" stroke="#1a1a0a" strokeWidth="2.5" strokeLinejoin="round" />
+        fill="#5e7a3a" stroke="#1a1a0a" strokeWidth="2.5" strokeLinejoin="round" />
       {/* Right hand */}
       <rect x="60" y="46" width="16" height="16" rx="7" fill="#5e7a3a" stroke="#1a1a0a" strokeWidth="2" />
       <path d="M61 50 Q68 46 76 50" stroke="#3a5222" strokeWidth="2" fill="none" strokeLinecap="round" />
@@ -450,26 +380,13 @@ function OrcAxeArmSVG() {
 function DarkKnightBodySVG() {
   return (
     <svg width="84" height="112" viewBox="0 0 90 120" fill="none">
-      <defs>
-        <radialGradient id="dk-plate" cx="28%" cy="18%" r="78%">
-          <stop offset="0%" stopColor="#5a6472" />
-          <stop offset="55%" stopColor="#2e3640" />
-          <stop offset="100%" stopColor="#161c22" />
-        </radialGradient>
-        <radialGradient id="dk-dark" cx="28%" cy="18%" r="78%">
-          <stop offset="0%" stopColor="#3a4250" />
-          <stop offset="55%" stopColor="#1e242c" />
-          <stop offset="100%" stopColor="#0a0e12" />
-        </radialGradient>
-      </defs>
-
       {/* Left gauntlet arm */}
       <path d="M20 58 Q6 68 4 88 Q4 100 14 101 Q24 102 26 90 Q28 74 36 66Z"
-        fill="url(#dk-plate)" stroke="#0a0e12" strokeWidth="2.5" strokeLinejoin="round" />
+        fill="#2e3640" stroke="#0a0e12" strokeWidth="2.5" strokeLinejoin="round" />
       {/* Elbow plate */}
       <ellipse cx="20" cy="78" rx="9" ry="6" fill="#4a5462" stroke="#0a0e12" strokeWidth="2" />
       {/* Gauntlet */}
-      <rect x="4" y="92" width="20" height="14" rx="4" fill="url(#dk-dark)" stroke="#0a0e12" strokeWidth="2" />
+      <rect x="4" y="92" width="20" height="14" rx="4" fill="#1e242c" stroke="#0a0e12" strokeWidth="2" />
       <path d="M4 97 L24 97" stroke="#5a6472" strokeWidth="1" opacity="0.5" />
       <path d="M4 102 L24 102" stroke="#5a6472" strokeWidth="1" opacity="0.5" />
       {/* Fingers */}
@@ -480,15 +397,15 @@ function DarkKnightBodySVG() {
 
       {/* Legs — greaves */}
       <path d="M26 90 Q20 106 18 118 Q22 124 36 122 Q46 120 46 110 Q44 96 44 90Z"
-        fill="url(#dk-plate)" stroke="#0a0e12" strokeWidth="2.5" />
+        fill="#2e3640" stroke="#0a0e12" strokeWidth="2.5" />
       <path d="M64 90 Q70 106 72 118 Q68 124 54 122 Q44 120 44 110 Q46 96 46 90Z"
-        fill="url(#dk-plate)" stroke="#0a0e12" strokeWidth="2.5" />
+        fill="#2e3640" stroke="#0a0e12" strokeWidth="2.5" />
       {/* Knee guards */}
       <ellipse cx="30" cy="106" rx="10" ry="7" fill="#4a5462" stroke="#0a0e12" strokeWidth="2" />
       <ellipse cx="60" cy="106" rx="10" ry="7" fill="#4a5462" stroke="#0a0e12" strokeWidth="2" />
       {/* Sabatons (armored feet) */}
-      <rect x="14" y="115" width="26" height="8" rx="4" fill="url(#dk-dark)" stroke="#0a0e12" strokeWidth="2" />
-      <rect x="50" y="115" width="26" height="8" rx="4" fill="url(#dk-dark)" stroke="#0a0e12" strokeWidth="2" />
+      <rect x="14" y="115" width="26" height="8" rx="4" fill="#1e242c" stroke="#0a0e12" strokeWidth="2" />
+      <rect x="50" y="115" width="26" height="8" rx="4" fill="#1e242c" stroke="#0a0e12" strokeWidth="2" />
       <line x1="22" y1="115" x2="22" y2="123" stroke="#5a6472" strokeWidth="1" opacity="0.6" />
       <line x1="29" y1="115" x2="29" y2="123" stroke="#5a6472" strokeWidth="1" opacity="0.6" />
       <line x1="56" y1="115" x2="56" y2="123" stroke="#5a6472" strokeWidth="1" opacity="0.6" />
@@ -496,14 +413,11 @@ function DarkKnightBodySVG() {
 
       {/* Body — full plate */}
       <path d="M14 54 Q8 68 8 84 Q8 100 30 102 Q45 104 60 102 Q82 100 82 84 Q82 68 76 54 Q64 48 45 48 Q26 48 14 54Z"
-        fill="url(#dk-plate)" stroke="#0a0e12" strokeWidth="2.5" />
+        fill="#2e3640" stroke="#0a0e12" strokeWidth="2.5" />
       {/* Breastplate center line */}
       <line x1="45" y1="52" x2="45" y2="96" stroke="#0a0e12" strokeWidth="2" opacity="0.8" />
-      {/* Plate highlights */}
-      <path d="M20 58 Q32 52 44 54 Q36 62 20 66Z" fill="white" opacity="0.08" />
-      <path d="M70 58 Q58 52 46 54 Q54 62 70 66Z" fill="white" opacity="0.08" />
       {/* Belt/waist */}
-      <rect x="18" y="88" width="54" height="8" rx="2" fill="url(#dk-dark)" stroke="#0a0e12" strokeWidth="1.5" />
+      <rect x="18" y="88" width="54" height="8" rx="2" fill="#1e242c" stroke="#0a0e12" strokeWidth="1.5" />
       <rect x="38" y="87" width="14" height="10" rx="2" fill="#3a4250" stroke="#0a0e12" strokeWidth="1.5" />
       {/* Belt buckle */}
       <rect x="42" y="89" width="6" height="6" rx="1" fill="#8a9ab0" stroke="#0a0e12" strokeWidth="1" />
@@ -512,14 +426,14 @@ function DarkKnightBodySVG() {
       <ellipse cx="18" cy="56" rx="14" ry="10" fill="#4a5462" stroke="#0a0e12" strokeWidth="2" />
 
       {/* Neck gorget */}
-      <rect x="34" y="44" width="22" height="10" rx="4" fill="url(#dk-dark)" stroke="#0a0e12" strokeWidth="2" />
+      <rect x="34" y="44" width="22" height="10" rx="4" fill="#1e242c" stroke="#0a0e12" strokeWidth="2" />
 
       {/* Helmet */}
       <path d="M16 28 Q16 4 45 4 Q74 4 74 28 Q74 54 62 60 Q45 66 28 60 Q16 54 16 28Z"
-        fill="url(#dk-plate)" stroke="#0a0e12" strokeWidth="2.5" />
+        fill="#2e3640" stroke="#0a0e12" strokeWidth="2.5" />
       {/* Visor */}
       <path d="M22 34 Q45 30 68 34 L68 46 Q45 50 22 46Z"
-        fill="url(#dk-dark)" stroke="#0a0e12" strokeWidth="2" />
+        fill="#1e242c" stroke="#0a0e12" strokeWidth="2" />
       {/* Visor slits — red glow */}
       <rect x="26" y="37" width="16" height="4" rx="2" fill="#dc2626" opacity="0.9" />
       <rect x="48" y="37" width="16" height="4" rx="2" fill="#dc2626" opacity="0.9" />
@@ -539,13 +453,6 @@ function DarkKnightBodySVG() {
 function DarkKnightSwordArmSVG() {
   return (
     <svg width="84" height="112" viewBox="0 0 90 120" fill="none" overflow="visible">
-      <defs>
-        <radialGradient id="dk-plate2" cx="28%" cy="18%" r="78%">
-          <stop offset="0%" stopColor="#5a6472" />
-          <stop offset="55%" stopColor="#2e3640" />
-          <stop offset="100%" stopColor="#161c22" />
-        </radialGradient>
-      </defs>
       {/* Sword blade */}
       <rect x="70" y="-8" width="9" height="62" rx="1" fill="#b0bec5" stroke="#0a0e12" strokeWidth="2" />
       {/* Blade fuller (groove) */}
@@ -565,7 +472,7 @@ function DarkKnightSwordArmSVG() {
       <circle cx="75" cy="74" r="6" fill="#4a5462" stroke="#0a0e12" strokeWidth="2" />
       {/* Right arm gauntlet */}
       <path d="M62 56 Q78 58 84 74 Q86 86 76 88 Q66 90 64 78 Q62 64 56 62Z"
-        fill="url(#dk-plate2)" stroke="#0a0e12" strokeWidth="2.5" strokeLinejoin="round" />
+        fill="#2e3640" stroke="#0a0e12" strokeWidth="2.5" strokeLinejoin="round" />
       {/* Gauntlet */}
       <rect x="58" y="46" width="18" height="16" rx="5" fill="#2e3640" stroke="#0a0e12" strokeWidth="2" />
       <path d="M59 52 L76 52" stroke="#5a6472" strokeWidth="1.5" opacity="0.5" />
@@ -580,19 +487,6 @@ function DarkKnightSwordArmSVG() {
 function DragonBodySVG() {
   return (
     <svg width="84" height="112" viewBox="0 0 90 120" fill="none">
-      <defs>
-        <radialGradient id="dr-scale" cx="30%" cy="18%" r="78%">
-          <stop offset="0%" stopColor="#c0392b" />
-          <stop offset="55%" stopColor="#8b0000" />
-          <stop offset="100%" stopColor="#4a0000" />
-        </radialGradient>
-        <radialGradient id="dr-belly" cx="50%" cy="30%" r="70%">
-          <stop offset="0%" stopColor="#e8a87c" />
-          <stop offset="60%" stopColor="#c47c50" />
-          <stop offset="100%" stopColor="#8a5030" />
-        </radialGradient>
-      </defs>
-
       {/* Wing (left, behind body) */}
       <path d="M20 50 Q-10 20 -8 60 Q-6 90 20 80 Q10 70 8 58 Q10 40 20 50Z"
         fill="#6b0000" stroke="#1a0000" strokeWidth="2" opacity="0.9" />
@@ -601,12 +495,12 @@ function DragonBodySVG() {
 
       {/* Tail */}
       <path d="M24 100 Q10 108 8 118 Q10 122 16 120 Q22 118 26 110 Q28 102 24 100Z"
-        fill="url(#dr-scale)" stroke="#1a0000" strokeWidth="2" />
+        fill="#8b0000" stroke="#1a0000" strokeWidth="2" />
       <path d="M16 120 Q14 126 18 128 Q22 126 20 120Z" fill="#8b0000" stroke="#1a0000" strokeWidth="1.5" />
 
       {/* Left arm/claw */}
       <path d="M18 60 Q4 70 2 90 Q2 102 12 104 Q22 106 24 94 Q26 78 32 68Z"
-        fill="url(#dr-scale)" stroke="#1a0000" strokeWidth="2.5" strokeLinejoin="round" />
+        fill="#8b0000" stroke="#1a0000" strokeWidth="2.5" strokeLinejoin="round" />
       {/* Left claw */}
       <ellipse cx="9" cy="104" rx="11" ry="8" fill="#8b0000" stroke="#1a0000" strokeWidth="2" />
       <path d="M2 101 L-2 108" stroke="#1a0000" strokeWidth="3" strokeLinecap="round" />
@@ -616,9 +510,9 @@ function DragonBodySVG() {
 
       {/* Legs */}
       <path d="M24 94 Q18 108 16 120 Q20 126 36 124 Q46 122 46 112 Q44 98 44 94Z"
-        fill="url(#dr-scale)" stroke="#1a0000" strokeWidth="2.5" />
+        fill="#8b0000" stroke="#1a0000" strokeWidth="2.5" />
       <path d="M66 94 Q72 108 74 120 Q70 126 54 124 Q44 122 44 112 Q46 98 46 94Z"
-        fill="url(#dr-scale)" stroke="#1a0000" strokeWidth="2.5" />
+        fill="#8b0000" stroke="#1a0000" strokeWidth="2.5" />
       {/* Clawed feet */}
       <ellipse cx="30" cy="122" rx="14" ry="6" fill="#6b0000" stroke="#1a0000" strokeWidth="2" />
       <ellipse cx="60" cy="122" rx="14" ry="6" fill="#6b0000" stroke="#1a0000" strokeWidth="2" />
@@ -633,14 +527,14 @@ function DragonBodySVG() {
 
       {/* Body — large */}
       <path d="M12 52 Q6 68 6 84 Q6 102 30 104 Q45 106 60 104 Q84 102 84 84 Q84 68 78 52 Q64 44 45 44 Q26 44 12 52Z"
-        fill="url(#dr-scale)" stroke="#1a0000" strokeWidth="2.5" />
+        fill="#8b0000" stroke="#1a0000" strokeWidth="2.5" />
       {/* Belly scales */}
       <path d="M26 62 Q45 58 64 62 Q66 78 60 90 Q52 100 45 98 Q38 100 30 90 Q24 78 26 62Z"
-        fill="url(#dr-belly)" stroke="#c47c50" strokeWidth="1.5" />
+        fill="#c47c50" stroke="#c47c50" strokeWidth="1.5" />
       {/* Belly lines */}
-      <path d="M30 68 Q45 64 60 68" stroke="#c47c50" strokeWidth="1.5" fill="none" opacity="0.6" />
-      <path d="M28 76 Q45 72 62 76" stroke="#c47c50" strokeWidth="1.5" fill="none" opacity="0.6" />
-      <path d="M30 84 Q45 80 60 84" stroke="#c47c50" strokeWidth="1.5" fill="none" opacity="0.6" />
+      <path d="M30 68 Q45 64 60 68" stroke="#a06040" strokeWidth="1.5" fill="none" opacity="0.6" />
+      <path d="M28 76 Q45 72 62 76" stroke="#a06040" strokeWidth="1.5" fill="none" opacity="0.6" />
+      <path d="M30 84 Q45 80 60 84" stroke="#a06040" strokeWidth="1.5" fill="none" opacity="0.6" />
       {/* Back spines */}
       <path d="M35 44 Q32 34 35 30" stroke="#c0392b" strokeWidth="3" strokeLinecap="round" />
       <path d="M42 43 Q40 30 43 26" stroke="#c0392b" strokeWidth="3" strokeLinecap="round" />
@@ -649,15 +543,14 @@ function DragonBodySVG() {
 
       {/* Neck */}
       <path d="M30 44 Q34 36 45 34 Q56 36 60 44 L60 52 Q55 46 45 46 Q35 46 30 52Z"
-        fill="url(#dr-scale)" stroke="#1a0000" strokeWidth="2" />
+        fill="#8b0000" stroke="#1a0000" strokeWidth="2" />
       {/* Neck scales */}
-      <path d="M32 42 Q45 38 58 42" stroke="#8b0000" strokeWidth="2" fill="none" opacity="0.7" />
-      <path d="M31 47 Q45 43 59 47" stroke="#8b0000" strokeWidth="2" fill="none" opacity="0.7" />
+      <path d="M32 42 Q45 38 58 42" stroke="#6b0000" strokeWidth="2" fill="none" opacity="0.7" />
+      <path d="M31 47 Q45 43 59 47" stroke="#6b0000" strokeWidth="2" fill="none" opacity="0.7" />
 
       {/* Head — large, reptilian */}
       <path d="M14 22 Q14 -2 45 -2 Q76 -2 76 22 Q76 48 64 56 Q45 64 26 56 Q14 48 14 22Z"
-        fill="url(#dr-scale)" stroke="#1a0000" strokeWidth="2.5" />
-      <ellipse cx="32" cy="10" rx="18" ry="10" fill="white" opacity="0.1" />
+        fill="#8b0000" stroke="#1a0000" strokeWidth="2.5" />
 
       {/* Horns */}
       <path d="M26 4 Q18 -14 24 -18 Q30 -12 28 4Z" fill="#4a0000" stroke="#1a0000" strokeWidth="2" />
@@ -681,11 +574,11 @@ function DragonBodySVG() {
       {/* Nostrils */}
       <circle cx="38" cy="46" r="3.5" fill="#4a0000" />
       <circle cx="52" cy="46" r="3.5" fill="#4a0000" />
-      {/* Teeth */}
-      <path d="M30 50 L28 58" stroke="#f0ead8" strokeWidth="4" strokeLinecap="round" />
-      <path d="M38 53 L37 62" stroke="#f0ead8" strokeWidth="3.5" strokeLinecap="round" />
-      <path d="M52 53 L53 62" stroke="#f0ead8" strokeWidth="3.5" strokeLinecap="round" />
-      <path d="M60 50 L62 58" stroke="#f0ead8" strokeWidth="4" strokeLinecap="round" />
+      {/* Teeth — smaller */}
+      <path d="M30 50 L29 54" stroke="#f0ead8" strokeWidth="2" strokeLinecap="round" />
+      <path d="M38 53 L37 57" stroke="#f0ead8" strokeWidth="2" strokeLinecap="round" />
+      <path d="M52 53 L53 57" stroke="#f0ead8" strokeWidth="2" strokeLinecap="round" />
+      <path d="M60 50 L61 54" stroke="#f0ead8" strokeWidth="2" strokeLinecap="round" />
     </svg>
   )
 }
@@ -693,13 +586,6 @@ function DragonBodySVG() {
 function DragonClawArmSVG() {
   return (
     <svg width="84" height="112" viewBox="0 0 90 120" fill="none" overflow="visible">
-      <defs>
-        <radialGradient id="dr-scale2" cx="30%" cy="18%" r="78%">
-          <stop offset="0%" stopColor="#c0392b" />
-          <stop offset="55%" stopColor="#8b0000" />
-          <stop offset="100%" stopColor="#4a0000" />
-        </radialGradient>
-      </defs>
       {/* Fire breath */}
       <path d="M64 36 Q82 18 92 8 Q94 20 86 28 Q96 22 100 28 Q94 38 82 38 Q90 44 88 52 Q78 48 70 44Z"
         fill="#ff8c00" opacity="0.8" />
@@ -709,7 +595,7 @@ function DragonClawArmSVG() {
         fill="#fff176" opacity="0.7" />
       {/* Right arm */}
       <path d="M62 50 Q78 52 86 68 Q88 80 78 84 Q68 88 66 76 Q64 62 56 60Z"
-        fill="url(#dr-scale2)" stroke="#1a0000" strokeWidth="2.5" strokeLinejoin="round" />
+        fill="#8b0000" stroke="#1a0000" strokeWidth="2.5" strokeLinejoin="round" />
       {/* Claw (large) */}
       <ellipse cx="80" cy="82" rx="14" ry="10" fill="#8b0000" stroke="#1a0000" strokeWidth="2" />
       <path d="M70 80 L66 90" stroke="#1a0000" strokeWidth="3.5" strokeLinecap="round" />

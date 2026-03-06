@@ -1,11 +1,24 @@
 /* eslint-disable no-undef */
 const APP_VERSION = typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : 'dev'
 
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef } from 'react'
 import { motion } from 'framer-motion'
-import { DIFFICULTY } from '../game/campaign.config'
+import { EnemyCharacter } from '../components/EnemyCharacter'
 
-const TROPHY_EMOJI = { gold: '🥇', silver: '🥈', bronze: '🥉' }
+const TROPHY_COLOR = { gold: '#fbbf24', silver: '#c0c8d4', bronze: '#cd7c3a' }
+
+function TrophyCup({ trophy, size = 28 }) {
+  const color = TROPHY_COLOR[trophy]
+  return (
+    <svg width={size} height={Math.round(size * 1.1)} viewBox="0 0 48 52" fill="none">
+      <path d="M10 4 L38 4 L34 28 Q32 36 24 38 Q16 36 14 28Z" fill={color} />
+      <path d="M10 8 Q2 8 2 17 Q2 26 10 26" stroke={color} strokeWidth="4.5" fill="none" strokeLinecap="round" />
+      <path d="M38 8 Q46 8 46 17 Q46 26 38 26" stroke={color} strokeWidth="4.5" fill="none" strokeLinecap="round" />
+      <rect x="20" y="38" width="8" height="7" fill={color} />
+      <rect x="12" y="45" width="24" height="5" rx="2.5" fill={color} />
+    </svg>
+  )
+}
 
 function getBestTrophy(trophies, worlds, worldIndex) {
   const offset = worlds.slice(0, worldIndex).reduce((sum, w) => sum + w.battles, 0)
@@ -46,10 +59,14 @@ function ForestStrip() {
         <path key={i} d={`M${x-10} ${y} L${x} ${y-26} L${x+10} ${y}Z`}
           fill={i % 2 === 0 ? '#1e3e14' : '#264c1a'} />
       ))}
-      {/* Flowers */}
-      <circle cx="110" cy="87" r="2.2" fill="#f9d84a" opacity="0.8" />
-      <circle cx="200" cy="88" r="1.8" fill="#f87171" opacity="0.75" />
-      <circle cx="240" cy="87" r="2"   fill="#f9d84a" opacity="0.7" />
+      {/* Grass tufts */}
+      {[110, 122, 200, 212, 240, 252].map((x, i) => (
+        <g key={i}>
+          <line x1={x}   y1="87" x2={x}   y2="83" stroke="#4a7040" strokeWidth="1.1" strokeLinecap="round" />
+          <line x1={x+3} y1="87" x2={x+3} y2="84" stroke="#3e6036" strokeWidth="1.0" strokeLinecap="round" />
+          <line x1={x-3} y1="87" x2={x-3} y2="84.5" stroke="#4a7040" strokeWidth="1.0" strokeLinecap="round" />
+        </g>
+      ))}
     </svg>
   )
 }
@@ -153,10 +170,6 @@ function CastleStrip() {
         </linearGradient>
       </defs>
       <rect width="360" height="100" fill="url(#wm-cs-sky)" />
-      {/* Stars */}
-      {[[22,10],[58,7],[94,16],[136,9],[176,14],[218,7],[256,12],[296,8],[334,16],[42,24],[156,22],[282,20]].map(([x,y],i) => (
-        <circle key={i} cx={x} cy={y} r="0.9" fill="white" opacity={0.2 + (i % 3) * 0.1} />
-      ))}
       {/* Moon */}
       <circle cx="44" cy="20" r="14" fill="#c4d0de" opacity="0.28" />
       <circle cx="44" cy="20" r="9"  fill="#c4d0de" opacity="0.52" />
@@ -170,9 +183,6 @@ function CastleStrip() {
       <rect x="148" y="8" width="64" height="92" fill="#050c16" />
       <path d="M146 8 L148 8 L148 2 L156 2 L156 8 L164 8 L164 2 L172 2 L172 8 L180 8 L180 2 L188 2 L188 8 L196 8 L196 2 L204 2 L204 8 L212 8 L212 14 L146 14Z"
         fill="#050c16" />
-      {/* Glowing window */}
-      <rect x="172" y="32" width="16" height="22" rx="8" fill="#6b4a08" />
-      <rect x="174" y="34" width="12" height="18" rx="6" fill="#f59e0b" opacity="0.45" />
       {/* Right battlements */}
       <path d="M212 68 L212 58 L220 58 L220 52 L226 52 L226 58 L234 58 L234 52 L240 52 L240 58 L248 58 L248 52 L254 52 L254 58 L262 58 L262 52 L268 52 L268 58 L276 58 L276 52 L282 52 L282 58 L290 58 L290 52 L296 52 L296 58 L304 58 L304 52 L310 52 L310 58 L318 58 L318 52 L324 52 L324 58 L332 58 L332 52 L338 52 L338 58 L346 58 L346 52 L352 52 L352 58 L360 58 L360 68Z"
         fill="#040b14" />
@@ -207,10 +217,6 @@ function DragonLairStrip() {
         <path key={i} d={`M${x} 0 L${x + h * 0.45} 0 L${x + h * 0.22} ${h}Z`}
           fill={i % 2 === 0 ? '#120400' : '#1a0500'} />
       ))}
-      {/* Tip glows */}
-      {[[11,20],[33,30],[79,34],[125,28],[173,32],[221,26],[269,30],[317,26],[365,30]].map(([x,h],i) => (
-        <circle key={i} cx={x} cy={h} r="1.8" fill="#ff4500" opacity="0.5" />
-      ))}
       {/* Rock back wall */}
       <path d="M0 58 Q30 48 60 54 Q90 40 120 50 Q150 38 180 48 Q210 36 240 46 Q270 34 300 44 Q330 32 360 42 L360 100 L0 100Z"
         fill="#160400" />
@@ -242,31 +248,13 @@ const REGION_STRIPS = {
   dragonLair: DragonLairStrip,
 }
 
-// ── Knight helmet marker ─────────────────────────────────────────────────────
-
-function KnightHelmet() {
-  return (
-    <div style={{ filter: 'drop-shadow(0 0 7px rgba(251,191,36,0.9))' }}>
-      <svg width="22" height="28" viewBox="0 0 24 30" fill="none">
-        <path d="M 8 6 Q 12 0 16 6" stroke="#ef4444" strokeWidth="2.5" fill="none" strokeLinecap="round" />
-        <path d="M 3.5 17 Q 3.5 6 12 6 Q 20.5 6 20.5 17 L 20.5 21 L 3.5 21 Z" fill="#e2e8f0" />
-        <rect x="5"    y="14"   width="14" height="4.5" rx="1.5" fill="#1e293b" />
-        <rect x="6.5"  y="15.2" width="4"  height="1.8" rx="0.7" fill="#334155" />
-        <rect x="13.5" y="15.2" width="4"  height="1.8" rx="0.7" fill="#334155" />
-        <rect x="2.5"  y="20"   width="19" height="3.5" rx="2.5" fill="#94a3b8" />
-        <rect x="7"    y="23"   width="10" height="5"   rx="2"   fill="#cbd5e1" />
-        <ellipse cx="8.5" cy="10" rx="3" ry="2.5" fill="white" opacity="0.22" />
-      </svg>
-    </div>
-  )
-}
-
 // ── Region band ──────────────────────────────────────────────────────────────
 
-function RegionBand({ world, status, trophy, isSelected, isKnight, onClick, delay }) {
+function RegionBand({ world, status, trophy, isSelected, onClick, onDoubleTap, delay }) {
   const Strip    = REGION_STRIPS[world.id] ?? ForestStrip
-  const isLocked  = status === 'locked'
-  const isCurrent = status === 'current'
+  const isLocked    = status === 'locked'
+  const isCurrent   = status === 'current'
+  const isCompleted = status === 'completed'
 
   return (
     <motion.div
@@ -304,7 +292,48 @@ function RegionBand({ world, status, trophy, isSelected, isKnight, onClick, dela
 
       {/* Locked overlay */}
       {isLocked && (
-        <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.52)', pointerEvents: 'none' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.62)', pointerEvents: 'none' }} />
+      )}
+
+      {/* Cleared X */}
+      {isCompleted && (
+        <svg
+          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', zIndex: 3, pointerEvents: 'none' }}
+          viewBox="0 0 100 100"
+          preserveAspectRatio="none"
+        >
+          <line x1="5" y1="8" x2="95" y2="92" stroke="#ef4444" strokeWidth="4.5" opacity="0.68" strokeLinecap="round" />
+          <line x1="95" y1="8" x2="5" y2="92" stroke="#ef4444" strokeWidth="4.5" opacity="0.68" strokeLinecap="round" />
+        </svg>
+      )}
+
+      {/* Monster preview on selected non-locked band */}
+      {isSelected && !isLocked && (
+        <div style={{
+          position: 'absolute',
+          left: '50%', bottom: 0,
+          transform: 'translateX(-50%) scale(0.48)',
+          transformOrigin: 'center bottom',
+          zIndex: 2, pointerEvents: 'none',
+        }}>
+          <EnemyCharacter phase="idle" enemy={world.enemy} hitKey={0} />
+        </div>
+      )}
+      {/* Lock icon on selected locked band */}
+      {isSelected && isLocked && (
+        <div style={{
+          position: 'absolute', left: '50%', top: '50%',
+          transform: 'translate(-50%, -50%)',
+          zIndex: 2, pointerEvents: 'none',
+        }}>
+          <svg width="42" height="52" viewBox="0 0 42 52" fill="none">
+            <path d="M9 22 L9 15 Q9 4 21 4 Q33 4 33 15 L33 22"
+              stroke="rgba(255,255,255,0.28)" strokeWidth="6" fill="none" strokeLinecap="round" />
+            <rect x="4" y="20" width="34" height="28" rx="6" fill="rgba(255,255,255,0.14)" />
+            <circle cx="21" cy="32" r="5" fill="rgba(0,0,0,0.5)" />
+            <rect x="18.5" y="32" width="5" height="8" rx="2.5" fill="rgba(0,0,0,0.5)" />
+          </svg>
+        </div>
       )}
 
       {/* Current pulsing border */}
@@ -316,52 +345,28 @@ function RegionBand({ world, status, trophy, isSelected, isKnight, onClick, dela
         />
       )}
 
-      {/* Left: icon + name */}
+      {/* Left: region name */}
       <div style={{
         position: 'absolute', inset: 0, display: 'flex', alignItems: 'center',
         paddingInline: 14, gap: 10, pointerEvents: 'none',
       }}>
-        <span style={{ fontSize: 22, flexShrink: 0, filter: isLocked ? 'grayscale(1) brightness(0.35)' : undefined }}>
-          {world.icon}
+        <span style={{
+          fontSize: 14, fontWeight: 900, letterSpacing: '0.07em',
+          color: isLocked ? 'rgba(255,255,255,0.22)' : isCurrent ? '#fbbf24' : 'rgba(255,255,255,0.88)',
+          textShadow: '0 1px 5px rgba(0,0,0,0.95)',
+          lineHeight: 1,
+        }}>
+          {world.name}
         </span>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-          <span style={{
-            fontSize: 13, fontWeight: 900, letterSpacing: '0.07em',
-            color: isLocked ? 'rgba(255,255,255,0.25)' : isCurrent ? '#fbbf24' : 'rgba(255,255,255,0.88)',
-            textShadow: '0 1px 5px rgba(0,0,0,0.95)',
-            lineHeight: 1,
-          }}>
-            {world.name}
-          </span>
-          {world.timer !== null && !isLocked && (
-            <span style={{ fontSize: 9, color: '#fbbf24', fontWeight: 700, opacity: 0.82, letterSpacing: '0.04em' }}>
-              {world.timer}s / question
-            </span>
-          )}
-        </div>
       </div>
 
-      {/* Right: knight / trophy / lock */}
+      {/* Right: trophy or lock */}
       <div style={{
         position: 'absolute', right: 14, top: '50%', transform: 'translateY(-50%)',
-        display: 'flex', alignItems: 'center', gap: 8,
+        display: 'flex', alignItems: 'center', zIndex: 4,
       }}>
-        {isKnight && (
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ type: 'spring', stiffness: 320, damping: 18 }}
-          >
-            <KnightHelmet />
-          </motion.div>
-        )}
         {trophy && (
-          <span style={{ fontSize: 22, filter: 'drop-shadow(0 1px 4px rgba(0,0,0,0.8))', lineHeight: 1 }}>
-            {TROPHY_EMOJI[trophy]}
-          </span>
-        )}
-        {isLocked && (
-          <span style={{ fontSize: 18, opacity: 0.45 }}>🔒</span>
+          <TrophyCup trophy={trophy} size={28} />
         )}
       </div>
     </motion.div>
@@ -372,43 +377,31 @@ function RegionBand({ world, status, trophy, isSelected, isKnight, onClick, dela
 
 export function WorldMapScreen({
   worlds, currentWorldIndex, trophies,
-  isTransition, onFight, onRestart,
+  isTransition, difficulty, onFight, onRestart,
 }) {
   const initPos = isTransition ? Math.max(0, currentWorldIndex - 1) : currentWorldIndex
-
   const [selectedIndex, setSelectedIndex] = useState(initPos)
-  const [knightPos,     setKnightPos]     = useState(initPos)
-  const knightPosRef = useRef(initPos)
-  const targetRef    = useRef(initPos)
-  const stepTimerRef = useRef(null)
-
-  useEffect(() => () => {
-    if (stepTimerRef.current) clearTimeout(stepTimerRef.current)
-  }, [])
-
-  const scheduleStep = () => {
-    stepTimerRef.current = setTimeout(() => {
-      const curr   = knightPosRef.current
-      const target = targetRef.current
-      if (curr === target) return
-      const next = curr + (target > curr ? 1 : -1)
-      knightPosRef.current = next
-      setKnightPos(next)
-      if (next !== target) scheduleStep()
-    }, 150)
-  }
+  const lastTapRef = useRef({ i: -1, time: 0 })
 
   const handleBandClick = (i) => {
     setSelectedIndex(i)
-    if (stepTimerRef.current) clearTimeout(stepTimerRef.current)
-    targetRef.current = i
-    scheduleStep()
+    if (i === currentWorldIndex) {
+      const now = Date.now()
+      if (lastTapRef.current.i === i && now - lastTapRef.current.time < 350) {
+        onFight()
+        return
+      }
+      lastTapRef.current = { i, time: now }
+    }
   }
 
   const canFight = selectedIndex === currentWorldIndex
   const selectedStatus =
     selectedIndex < currentWorldIndex ? 'completed' :
     selectedIndex === currentWorldIndex ? 'current' : 'locked'
+
+  // Reversed display: Dragon Lair at top, Forest at bottom
+  const displayWorlds = [...worlds].reverse()
 
   return (
     <div
@@ -433,7 +426,7 @@ export function WorldMapScreen({
         whileHover={{ background: 'rgba(0,0,0,0.55)', color: 'rgba(255,255,255,0.75)' }}
         title="New Game"
       >
-        ↺
+        ←
       </motion.button>
 
       {/* Header */}
@@ -449,13 +442,14 @@ export function WorldMapScreen({
           NumKnight
         </p>
         <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.32)', fontFamily: 'monospace', marginTop: 2, letterSpacing: '0.08em' }}>
-          v{APP_VERSION} · {DIFFICULTY}
+          v{APP_VERSION} · {difficulty}
         </p>
       </motion.div>
 
-      {/* Region bands */}
+      {/* Region bands — Dragon Lair at top, Forest at bottom */}
       <div className="flex-1 min-h-0 flex flex-col px-4" style={{ gap: 4 }}>
-        {worlds.map((world, i) => {
+        {displayWorlds.map((world, di) => {
+          const i = worlds.length - 1 - di  // real world index
           const status =
             i < currentWorldIndex  ? 'completed' :
             i === currentWorldIndex ? 'current'   : 'locked'
@@ -467,29 +461,24 @@ export function WorldMapScreen({
               status={status}
               trophy={trophy}
               isSelected={selectedIndex === i}
-              isKnight={knightPos === i}
               onClick={() => handleBandClick(i)}
-              delay={0.08 + i * 0.06}
+              delay={0.08 + di * 0.06}
             />
           )
         })}
       </div>
 
-      {/* Info strip */}
+      {/* Info strip — only for cleared regions */}
       <div className="px-6 pt-2" style={{ minHeight: 22, flexShrink: 0 }}>
-        {!canFight && (
+        {!canFight && selectedStatus === 'completed' && (
           <motion.p
             key={selectedIndex}
             initial={{ opacity: 0, y: 4 }}
             animate={{ opacity: 1, y: 0 }}
             className="text-center text-xs font-bold tracking-widest"
-            style={{
-              color: selectedStatus === 'locked'
-                ? 'rgba(167,139,250,0.75)'
-                : 'rgba(251,191,36,0.75)',
-            }}
+            style={{ color: 'rgba(251,191,36,0.75)' }}
           >
-            {selectedStatus === 'locked' ? 'PATH NOT UNLOCKED' : 'WORLD CLEARED'}
+            WORLD CLEARED
           </motion.p>
         )}
       </div>

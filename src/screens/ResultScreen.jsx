@@ -21,7 +21,7 @@ function Gravestone() {
   )
 }
 
-export function ResultScreen({ won, worldName, onRestart }) {
+export function ResultScreen({ worldName, onRestart, onViewScores }) {
   // Game over (won === false)
   return (
     <div
@@ -52,10 +52,10 @@ export function ResultScreen({ won, worldName, onRestart }) {
         transition={{ delay: 0.7 }}
         whileTap={{ scale: 0.95 }}
         whileHover={{ scale: 1.04 }}
-        onClick={onRestart}
-        className="w-full bg-slate-700 border-b-4 border-slate-900 text-white font-black text-3xl rounded-2xl h-16 shadow-xl cursor-pointer"
+        onClick={onViewScores}
+        className="w-full bg-yellow-400 border-b-4 border-yellow-600 text-black font-black text-xl rounded-2xl h-16 shadow-xl cursor-pointer tracking-widest"
       >
-        ↺
+        SEE SCORES
       </motion.button>
     </div>
   )

@@ -3,7 +3,7 @@ const APP_VERSION = typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : '
 
 import { useState, useEffect, useRef } from 'react'
 import { motion, useAnimation } from 'framer-motion'
-import { makeRound, getTrophy, calcBattleScore } from '../game/battleLogic'
+import { makeRound, getTrophy } from '../game/battleLogic'
 import { playCorrect, playWrong, playSwordSwing, playImpact, playVictory, playDefeat } from '../game/sounds'
 import { HPBar } from '../components/HPBar'
 import { KnightCharacter } from '../components/KnightCharacter'
@@ -14,13 +14,27 @@ import { BattleIntro } from '../components/BattleIntro'
 
 const IDLE_BUTTON_STATES = ['idle', 'idle', 'idle', 'idle']
 
-const TROPHY_FILTER = {
-  gold:   'drop-shadow(0 0 22px rgba(251,191,36,0.9))',
-  silver: 'grayscale(1) brightness(1.5) contrast(0.85)',
-  bronze: 'sepia(1) saturate(1.4) hue-rotate(-10deg) brightness(0.82)',
-}
 const TROPHY_LABEL = { gold: 'PERFECT!', silver: 'GREAT!', bronze: 'SURVIVED!' }
-const TROPHY_COLOR = { gold: '#fbbf24', silver: '#cbd5e1', bronze: '#b45309' }
+const TROPHY_COLOR = { gold: '#fbbf24', silver: '#c0c8d4', bronze: '#cd7c3a' }
+
+function TrophyCup({ trophy, size = 80 }) {
+  const color = TROPHY_COLOR[trophy]
+  const s = size
+  return (
+    <svg width={s} height={Math.round(s * 1.1)} viewBox="0 0 48 52" fill="none">
+      {/* Cup body */}
+      <path d="M10 4 L38 4 L34 28 Q32 36 24 38 Q16 36 14 28Z" fill={color} />
+      {/* Left handle */}
+      <path d="M10 8 Q2 8 2 17 Q2 26 10 26" stroke={color} strokeWidth="4.5" fill="none" strokeLinecap="round" />
+      {/* Right handle */}
+      <path d="M38 8 Q46 8 46 17 Q46 26 38 26" stroke={color} strokeWidth="4.5" fill="none" strokeLinecap="round" />
+      {/* Stem */}
+      <rect x="20" y="38" width="8" height="7" fill={color} />
+      {/* Base */}
+      <rect x="12" y="45" width="24" height="5" rx="2.5" fill={color} />
+    </svg>
+  )
+}
 
 function ShadowBlob() {
   return (
@@ -46,7 +60,9 @@ function TimerBar({ timeLeft, maxTime }) {
 }
 
 // In-scene overlay shown when the enemy is defeated
-function TrophyOverlay({ trophy, score, onContinue }) {
+function TrophyOverlay({ trophy, timeBonus, onContinue }) {
+  const BASE_SCORE = { gold: 100, silver: 50, bronze: 25 }
+  const baseScore = BASE_SCORE[trophy] ?? 0
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -57,7 +73,7 @@ function TrophyOverlay({ trophy, score, onContinue }) {
         position: 'absolute', inset: 0, zIndex: 20,
         display: 'flex', flexDirection: 'column',
         alignItems: 'center', justifyContent: 'center',
-        background: 'rgba(0,0,0,0.52)',
+        background: 'rgba(0,0,0,0.78)',
         cursor: 'pointer', gap: 14,
       }}
     >
@@ -67,7 +83,7 @@ function TrophyOverlay({ trophy, score, onContinue }) {
         animate={{ y: 0,    scale: 1,   rotate: 0 }}
         transition={{ type: 'spring', stiffness: 170, damping: 13, delay: 0.05 }}
       >
-        <span style={{ fontSize: 92, filter: TROPHY_FILTER[trophy] }}>🏆</span>
+        <TrophyCup trophy={trophy} size={92} />
       </motion.div>
 
       {/* Quality label */}
@@ -84,15 +100,35 @@ function TrophyOverlay({ trophy, score, onContinue }) {
         {TROPHY_LABEL[trophy]}
       </motion.p>
 
-      {/* Battle score */}
+      {/* Base score */}
       <motion.p
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.55 }}
-        style={{ fontSize: 22, fontWeight: 900, color: 'white', letterSpacing: '0.06em' }}
+        style={{
+          fontSize: 22, fontWeight: 900, color: 'white', letterSpacing: '0.06em',
+          background: 'rgba(0,0,0,0.55)', borderRadius: 12,
+          padding: '4px 18px',
+        }}
       >
-        +{score} pts
+        +{baseScore.toLocaleString()} pts
       </motion.p>
+
+      {/* Time bonus */}
+      {timeBonus > 0 && (
+        <motion.p
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.72 }}
+          style={{
+            fontSize: 15, fontWeight: 800, color: '#fbbf24', letterSpacing: '0.05em',
+            background: 'rgba(0,0,0,0.55)', borderRadius: 10,
+            padding: '3px 14px',
+          }}
+        >
+          +{timeBonus.toLocaleString()} time bonus
+        </motion.p>
+      )}
 
       {/* Tap hint */}
       <motion.p
@@ -125,6 +161,7 @@ export function BattleScreen({ world, battleIndex, onBattleEnd }) {
   const wonMistakesRef  = useRef(0)
   const wonTimeBonusRef = useRef(0)
   const timeBonusAccRef = useRef(0) // accumulated per correct answer this battle
+  const timerActiveRef  = useRef(false) // set false to stop timer on enemy/player death
 
   // Timer
   const [timeLeft,  setTimeLeft]  = useState(world.timer ?? null)
@@ -150,14 +187,16 @@ export function BattleScreen({ world, battleIndex, onBattleEnd }) {
     setTimeLeft(world.timer)
     setTimedOut(false)
 
+    timerActiveRef.current = true
     const id = setInterval(() => {
+      if (!timerActiveRef.current) { clearInterval(id); return }
       setTimeLeft((t) => {
         if (t <= 1) { setTimedOut(true); clearInterval(id); return 0 }
         return t - 1
       })
     }, 1000)
 
-    return () => clearInterval(id)
+    return () => { timerActiveRef.current = false; clearInterval(id) }
   }, [round, introPlaying]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Timer expiry → wrong answer
@@ -178,6 +217,7 @@ export function BattleScreen({ world, battleIndex, onBattleEnd }) {
       setPlayerHP(newPlayerHP)
 
       if (newPlayerHP <= 0) {
+        timerActiveRef.current = false
         setPhase('lost')
         playDefeat()
         setTimeout(() => onBattleEnd({ won: false, mistakes: newMistakes }), 1100)
@@ -208,7 +248,7 @@ export function BattleScreen({ world, battleIndex, onBattleEnd }) {
     if (isCorrect) {
       // Accumulate time bonus for timed worlds
       if (world.timer && timeLeft !== null) {
-        timeBonusAccRef.current += Math.floor(timeLeft * 10)
+        timeBonusAccRef.current += Math.floor((timeLeft / world.timer) * 50)
       }
       playCorrect()
       setPhase('attacking')
@@ -220,6 +260,7 @@ export function BattleScreen({ world, battleIndex, onBattleEnd }) {
         setEnemyHP(newEnemyHP)
 
         if (newEnemyHP <= 0) {
+          timerActiveRef.current = false
           setPhase('won')
           playVictory()
           // Capture mistakes and timeBonus (state won't change after this point)
@@ -246,6 +287,7 @@ export function BattleScreen({ world, battleIndex, onBattleEnd }) {
         setPlayerHP(newPlayerHP)
 
         if (newPlayerHP <= 0) {
+          timerActiveRef.current = false
           setPhase('lost')
           playDefeat()
           setTimeout(() => onBattleEnd({ won: false, mistakes: newMistakes }), 1100)
@@ -269,6 +311,25 @@ export function BattleScreen({ world, battleIndex, onBattleEnd }) {
         {/* Battle arena */}
         <div className="flex flex-1 min-h-0" style={{ position: 'relative' }}>
           <BattleBackground worldId={world.id} />
+
+          {/* Region + round overlay at top of arena */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={introPlaying ? { opacity: 0 } : { opacity: 1 }}
+            transition={{ duration: 0.3 }}
+            style={{
+              position: 'absolute', top: 8, left: 0, right: 0, zIndex: 2,
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+              paddingInline: 12, pointerEvents: 'none',
+            }}
+          >
+            <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.72)', fontWeight: 700, letterSpacing: '0.04em', textShadow: '0 1px 5px rgba(0,0,0,0.9)' }}>
+              {world.name}
+            </span>
+            <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.72)', fontWeight: 700, letterSpacing: '0.06em', textShadow: '0 1px 5px rgba(0,0,0,0.9)' }}>
+              Round {battleIndex + 1} / {world.battles}
+            </span>
+          </motion.div>
 
           {/* Version label */}
           <div style={{
@@ -347,21 +408,6 @@ export function BattleScreen({ world, battleIndex, onBattleEnd }) {
           </div>
         </div>
 
-        {/* Campaign position strip */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={introPlaying ? { opacity: 0 } : { opacity: 1 }}
-          transition={{ duration: 0.3 }}
-          style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingInline: 4 }}
-        >
-          <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.55)', fontWeight: 700, letterSpacing: '0.04em' }}>
-            {world.name}
-          </span>
-          <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.55)', fontWeight: 700, letterSpacing: '0.06em' }}>
-            Round {battleIndex + 1} / {world.battles}
-          </span>
-        </motion.div>
-
         {/* Problem card */}
         <motion.div
           key={`${problem.a}-${problem.b}`}
@@ -401,13 +447,13 @@ export function BattleScreen({ world, battleIndex, onBattleEnd }) {
       </div>
 
       {/* Intro overlay */}
-      {introPlaying && <BattleIntro onComplete={() => setIntroPlaying(false)} battleIndex={battleIndex} />}
+      {introPlaying && <BattleIntro onComplete={() => setIntroPlaying(false)} battleIndex={battleIndex} isFinal={battleIndex === world.battles - 1} />}
 
       {/* In-scene trophy overlay — dims arena and shows trophy drop */}
       {showTrophy && (
         <TrophyOverlay
           trophy={getTrophy(wonMistakesRef.current)}
-          score={calcBattleScore(getTrophy(wonMistakesRef.current), wonTimeBonusRef.current)}
+          timeBonus={wonTimeBonusRef.current}
           onContinue={() => onBattleEnd({ won: true, mistakes: wonMistakesRef.current, timeBonus: wonTimeBonusRef.current })}
         />
       )}
