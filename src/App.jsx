@@ -114,6 +114,11 @@ export default function App() {
     setScreen('leaderboard')
   }
 
+  const handleViewLeaderboard = () => {
+    setPendingScore(null)
+    setScreen('leaderboard')
+  }
+
   const handleRestart = () => {
     clearRun()
     const fresh = createNewRun()
@@ -143,7 +148,7 @@ export default function App() {
           initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
           transition={{ duration: 0.25 }} className="w-full"
         >
-          <StartScreen onStart={handleStart} lang={lang} onLangChange={handleLangChange} t={t} />
+          <StartScreen onStart={handleStart} onViewLeaderboard={handleViewLeaderboard} lang={lang} onLangChange={handleLangChange} t={t} />
         </motion.div>
       )}
 

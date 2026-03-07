@@ -48,7 +48,8 @@ export const T = {
     fellAtShort: (name) => `Fell at ${name}`,
     noScores: 'No scores yet — be the first!',
     clearBoard: 'Clear',
-    confirmClear: 'Sure?',
+    confirmClear: '⚠ YES, ERASE ALL',
+    clearWarning: '! This will permanently erase all scores',
     playAgain: 'PLAY AGAIN',
 
     // World names (by id)
@@ -108,7 +109,8 @@ export const T = {
     fellAtShort: (name) => `נפל ב${name}`,
     noScores: 'אין שיאים עדיין — היה הראשון!',
     clearBoard: 'נקה',
-    confirmClear: 'בטוח?',
+    confirmClear: '⚠ כן, מחק הכל',
+    clearWarning: '! זה ימחק לצמיתות את כל השיאים',
     playAgain: 'שחק שוב',
 
     // World names (by id)

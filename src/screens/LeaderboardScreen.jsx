@@ -85,21 +85,32 @@ export function LeaderboardScreen({ totalScore, endWorld, cleared, difficulty, p
             {(t?.diffLabel ?? DIFF_LABEL_DEFAULT)[difficulty] ?? difficulty}
           </span>
         </div>
-        <motion.button
-          onClick={handleClear}
-          onBlur={() => setClearConfirm(false)}
-          whileTap={{ scale: 0.92 }}
-          style={{
-            padding: '7px 14px', borderRadius: 10, cursor: 'pointer',
-            fontSize: 11, fontWeight: 900, letterSpacing: '0.06em',
-            border: `1.5px solid ${clearConfirm ? 'rgba(239,68,68,0.8)' : 'rgba(255,255,255,0.18)'}`,
-            background: clearConfirm ? 'rgba(239,68,68,0.22)' : 'rgba(255,255,255,0.08)',
-            color: clearConfirm ? '#ef4444' : 'rgba(255,255,255,0.4)',
-            transition: 'all 0.18s', flexShrink: 0,
-          }}
-        >
-          {clearConfirm ? (t?.confirmClear ?? 'Sure?') : (t?.clearBoard ?? 'Clear')}
-        </motion.button>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
+          <motion.button
+            onClick={handleClear}
+            onBlur={() => setClearConfirm(false)}
+            whileTap={{ scale: 0.92 }}
+            style={{
+              padding: '7px 14px', borderRadius: 10, cursor: 'pointer',
+              fontSize: 11, fontWeight: 900, letterSpacing: '0.06em',
+              border: `1.5px solid ${clearConfirm ? 'rgba(239,68,68,0.8)' : 'rgba(255,255,255,0.18)'}`,
+              background: clearConfirm ? 'rgba(239,68,68,0.22)' : 'rgba(255,255,255,0.08)',
+              color: clearConfirm ? '#ef4444' : 'rgba(255,255,255,0.4)',
+              transition: 'all 0.18s', flexShrink: 0,
+            }}
+          >
+            {clearConfirm ? (t?.confirmClear ?? '⚠ YES, ERASE ALL') : (t?.clearBoard ?? 'Clear')}
+          </motion.button>
+          {clearConfirm && (
+            <motion.p
+              initial={{ opacity: 0, y: -4 }}
+              animate={{ opacity: 1, y: 0 }}
+              style={{ fontSize: 9, color: '#ef4444', fontWeight: 700, letterSpacing: '0.05em', textAlign: 'right', maxWidth: 120 }}
+            >
+              {t?.clearWarning ?? '! This will permanently erase all scores'}
+            </motion.p>
+          )}
+        </div>
       </motion.div>
 
       {/* Scores list */}
