@@ -178,11 +178,11 @@ function CastleStrip() {
         </linearGradient>
       </defs>
       <rect width="360" height="100" fill="url(#wm-cs-sky)" />
-      {/* Moon */}
-      <circle cx="44" cy="20" r="14" fill="#c4d0de" opacity="0.28" />
-      <circle cx="44" cy="20" r="9"  fill="#c4d0de" opacity="0.52" />
-      {/* Storm cloud */}
-      <path d="M140 14 Q152 8 166 12 Q172 6 176 14 Q182 10 184 18 Q182 24 172 22 Q162 26 150 22 Q140 24 136 18 Q134 12 140 14Z"
+      {/* Moon — top-right, matching BattleBackground and CastleScene */}
+      <circle cx="316" cy="20" r="14" fill="#c4d0de" opacity="0.28" />
+      <circle cx="316" cy="20" r="9"  fill="#c4d0de" opacity="0.52" />
+      {/* Storm cloud — partly covering moon */}
+      <path d="M288 14 Q300 8 314 12 Q320 6 324 14 Q330 10 332 18 Q330 24 320 22 Q310 26 298 22 Q288 24 284 18 Q282 12 288 14Z"
         fill="#121e30" opacity="0.9" />
       {/* Left battlements */}
       <path d="M0 68 L0 58 L8 58 L8 52 L14 52 L14 58 L22 58 L22 52 L28 52 L28 58 L36 58 L36 52 L42 52 L42 58 L52 58 L52 68Z"
