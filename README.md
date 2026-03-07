@@ -1,27 +1,46 @@
 # ⚔️ NumKnight
 
-A fun, mobile-first math practice app for kids in 2nd–3rd grade. Fight enemies by solving multiplication problems — get it right and your knight attacks, get it wrong and the enemy strikes back!
+A mobile-first multiplication battle game for kids in 2nd–3rd grade. Fight enemies by solving multiplication problems — get it right and your knight attacks, get it wrong and the enemy strikes back!
 
 ## What is this?
 
-NumKnight wraps multiplication table practice inside a battle game. Kids progress through worlds of increasing difficulty, facing new enemies and harder problems as they go. No time pressure, no frustration — just math disguised as adventure.
+NumKnight wraps multiplication table practice inside an RPG battle game. Kids progress through 5 worlds of increasing difficulty, facing new enemies and harder math as they go. Score points, earn trophies, and climb the leaderboard.
 
-## Features (current)
+## Features
 
-- ⚔️ Knight vs enemy battles driven by multiplication problems
+- ⚔️ Knight vs enemy battles driven by multiplication questions
 - 4 answer choices per question (smart distractors, not random)
 - HP system — correct answers damage the enemy, wrong answers hurt you
-- Combo mechanic — 3 correct answers in a row = ⚡ Power Strike (double damage)
-- Animated knight and goblin characters (SVG + Framer Motion)
-- Star rating based on accuracy after each battle
-- 4 worlds planned with increasing difficulty (tables 1–3 up to full 10×10)
+- Trophy rating per battle (gold / silver / bronze based on mistakes)
+- 5 worlds with unique enemies, backgrounds, and music difficulty
+- Timer pressure in later worlds (Castle: 8s, Dragon Lair: 5s)
+- Scoring system with time bonuses
+- Local leaderboard (top 10 runs saved to browser)
+- **3 difficulty modes** — Easy (1 battle/world, no timer), Medium, Hard
+- **World Map** between worlds showing progress and trophies
+- **Area Cleared screen** with animated score transfer
+- **i18n** — English and Hebrew UI
+- **Design Mode** — browse all screens/backgrounds (append `?design` to URL)
+- Deploys to a single self-contained HTML file (no server needed)
 
-## Tech Stack
+## World progression
+
+| # | World | Enemy | Medium HP | Timer |
+|---|-------|-------|-----------|-------|
+| 1 | Forest 🌲 | Goblin | 4 | — |
+| 2 | Swamp 🌿 | Skeleton | 5 | — |
+| 3 | Mountains ⛰️ | Orc | 6 | — |
+| 4 | Castle 🏰 | Dark Knight | 6 | 8s |
+| 5 | Dragon Lair 🐉 | Dragon | 7 | 5s |
+
+## Tech stack
 
 - **React 18** + **Vite**
 - **Tailwind CSS** for styling
 - **Framer Motion** for animations
-- Pure frontend — no backend, no login, no data stored
+- `vite-plugin-singlefile` — entire app builds to one self-contained `index.html`
+- No router — screen state managed in `App.jsx`
+- No backend — all data stored in `localStorage`
 
 ## Running locally
 
@@ -40,14 +59,37 @@ npm run dev -- --host
 
 Then open the Network URL shown in the terminal on your phone.
 
-## Project status
+## Building & deploying
 
-| Phase | Description | Status |
-|-------|-------------|--------|
-| 0 | Project setup | ✅ Done |
-| 1 | Core battle loop | ✅ Done |
-| 2 | World & enemy variety | 🔄 In progress |
-| 3 | Campaign map | ⏳ Pending |
-| 4 | Rewards & polish | ⏳ Pending |
+```bash
+npm run build    # bumps patch version, builds dist/
+npm run deploy   # build + publish to GitHub Pages via gh-pages
+```
 
-See [`PLAN.md`](./PLAN.md) for the full execution plan and [`PROGRESS.md`](./PROGRESS.md) for current status.
+The build produces a single `dist/index.html` that can be opened directly in any browser or hosted anywhere.
+
+## Project structure
+
+```
+src/
+  components/         # Reusable UI (HPBar, AnswerButton, EnemyCharacter, KnightCharacter, …)
+  screens/            # Full screens (StartScreen, WorldMapScreen, BattleScreen, ResultScreen, …)
+  game/               # Pure logic & config
+    campaign.config.js  ← single source of truth for all level design
+    battleLogic.js      ← makeRound, generateOptions, getTrophy, calcBattleScore
+    runState.js         ← localStorage helpers
+    scoreState.js       ← leaderboard helpers
+    i18n.js             ← EN + Hebrew translations
+    sounds.js           ← Web Audio sound effects
+  App.jsx             # Campaign state machine
+scripts/
+  bump-version.js     # Auto-increments patch version before each build
+```
+
+## For developers / AI agents
+
+See [`CLAUDE.md`](./CLAUDE.md) for full architecture notes, key file descriptions, campaign config reference, and the feature roadmap.
+
+See [`PROGRESS.md`](./PROGRESS.md) for current implementation status.
+
+GitHub repo: https://github.com/amireluk/NumKnight

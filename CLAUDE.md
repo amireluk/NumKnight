@@ -29,18 +29,24 @@ This runs `npm run build` (bumps version + builds) then `gh-pages -d dist` to pu
 
 | File | Purpose |
 |------|---------|
-| `src/game/campaign.config.js` | **Single source of truth for all level design** — edit this to tune worlds |
-| `src/game/worldConfig.js` | Thin re-export: `CAMPAIGN as WORLDS` |
+| `src/game/campaign.config.js` | **Single source of truth for all level design** — defines EASY/MEDIUM/HARD configs |
 | `src/game/runState.js` | localStorage helpers: `createNewRun / loadRun / saveRun / clearRun` |
-| `src/game/battleLogic.js` | `makeRound(multipliers, factorRange)`, `generateOptions`, `getTrophy` |
+| `src/game/battleLogic.js` | `makeRound`, `generateOptions`, `getTrophy`, `calcBattleScore` |
+| `src/game/scoreState.js` | Leaderboard helpers: `saveScore / loadScores` (key: `numknight_scores`) |
+| `src/game/i18n.js` | EN + Hebrew translations; `T[lang]` object; `LANG_KEY` constant |
 | `src/game/sounds.js` | `playCorrect/Wrong/SwordSwing/Impact/Victory/Defeat` |
-| `src/App.jsx` | Campaign state machine, run persistence |
-| `src/screens/BattleScreen.jsx` | Battle UI + countdown timer |
-| `src/screens/ResultScreen.jsx` | Trophy result + game over screens |
+| `src/App.jsx` | Campaign state machine — screen routing, run persistence, score tracking |
+| `src/screens/StartScreen.jsx` | Name input + Easy/Medium/Hard difficulty picker + lang toggle |
+| `src/screens/WorldMapScreen.jsx` | Vertical 5-world map with trophies and world bands |
+| `src/screens/BattleScreen.jsx` | Battle UI + countdown timer + TrophyOverlay |
+| `src/screens/ResultScreen.jsx` | Trophy result (win) or game over (loss) |
+| `src/screens/AreaClearedScreen.jsx` | World cleared — trophy grid + animated score transfer |
+| `src/screens/LeaderboardScreen.jsx` | Top-10 local leaderboard with name entry |
+| `src/screens/DesignScreen.jsx` | Dev tool — browse all screens/backgrounds (add `?design` to URL) |
 | `src/components/EnemyCharacter.jsx` | All 5 enemy SVGs + shared animation logic |
 | `src/components/KnightCharacter.jsx` | Player SVG |
-| `src/components/BattleBackground.jsx` | 3-layer background: sky gradient, sun (CSS), hills (SVG anchored to bottom) |
-| `src/components/BattleIntro.jsx` | Sword emoji slam-in animation on battle start |
+| `src/components/BattleBackground.jsx` | Per-world 3-layer background (sky, light source, terrain) |
+| `src/components/BattleIntro.jsx` | Fighting-game style slide-in + sword banner on battle start |
 | `src/components/HPBar.jsx` | HP bar component |
 | `src/components/AnswerButton.jsx` | Answer button with idle/correct/wrong states |
 | `scripts/bump-version.js` | Increments patch version in package.json before each build |
@@ -50,36 +56,34 @@ This runs `npm run build` (bumps version + builds) then `gh-pages -d dist` to pu
 
 ## Campaign config (`campaign.config.js`)
 
-```
-export const DEBUG = false   // ← true = 1 HP enemies, 1 battle/world (fast test)
-```
+Three named configs — `EASY`, `MEDIUM`, `HARD` — are exported. The active config is determined at runtime by the difficulty the player picks on `StartScreen`. Each world entry shape:
 
-Each world entry shape:
 ```js
 {
   id, name, icon,
   battles,       // number of fights in this world
   playerHP,      // hits before death (3 = gold/silver/bronze possible)
   enemy: { id, name, hp },   // id: goblin|skeleton|orc|darkKnight|dragon
-  timer,         // null = unlimited | 8 = 8s/question (miss = damage)
+  timer,         // null = unlimited | N = N seconds/question (miss = damage)
   multipliers,   // times-tables for left factor  a × b
-  factorRange,   // [min, max] for right factor (e.g. [1,5] = easier)
+  factorRange,   // [min, max] for right factor
 }
 ```
 
-DEBUG config is auto-derived from PRODUCTION (`battles:1, enemy.hp:1`) — only one flag to flip.
-
 ---
 
-## World table (production)
+## World table (Medium difficulty)
 
 | # | World | Enemy | HP | Timer | Multipliers |
 |---|-------|-------|----|-------|-------------|
 | 0 | Forest 🌲 | Goblin | 4 | — | 2,3,4 |
 | 1 | Swamp 🌿 | Skeleton | 5 | — | 2–6 |
 | 2 | Mountains ⛰️ | Orc | 6 | — | 3–8 |
-| 3 | Castle 🏰 | Dark Knight | 6 | 8s | 6–9 |
-| 4 | Dragon Lair 🐉 | Dragon | 7 | 5s | 1–10 |
+| 3 | Castle 🏰 | Dark Knight | 6 | 8s | full 1–10 |
+| 4 | Dragon Lair 🐉 | Dragon | 7 | 5s | 3–9 |
+
+Easy: 1 battle/world, hp:1, no timers — good for quick testing.
+Hard: tighter timers (Castle 6s, Dragon Lair 4s), Dragon Lair playerHP:2.
 
 ---
 
@@ -87,14 +91,26 @@ DEBUG config is auto-derived from PRODUCTION (`battles:1, enemy.hp:1`) — only 
 
 ### Run state (localStorage key: `numknight_run`)
 ```js
-{ worldIndex, battleIndex, trophies[] }
-// trophies: 'gold'|'silver'|'bronze' — one per completed battle
+{
+  worldIndex,
+  battleIndex,
+  trophies[],      // 'gold'|'silver'|'bronze' — one per completed battle
+  totalScore,      // cumulative score across all battles
+  worldScores[],   // score per world (indexed by worldIndex)
+}
 ```
 - Victory when `trophies.length >= sum of all worlds' battles`
-- Death (playerHP → 0) → game over → full reset
+- Death (playerHP → 0) → game over → leaderboard → restart
 
 ### Trophy logic
 - 0 mistakes → gold, 1 → silver, 2 → bronze, 3 hits → dead
+
+### Scoring
+```
+battleScore = calcBattleScore(trophy, timeBonus)
+  trophy multiplier: gold×3, silver×2, bronze×1
+  timeBonus: only for timed worlds — floor((timeLeft / world.timer) × 50) per correct answer
+```
 
 ### Multiplier system
 - Each world has an explicit `multipliers` array in the config
@@ -105,10 +121,16 @@ DEBUG config is auto-derived from PRODUCTION (`battles:1, enemy.hp:1`) — only 
 - Expiry = wrong answer (highlights correct button, deals damage)
 - Visual: draining bar green→amber→red + seconds label inside problem card
 
+### i18n
+- `src/game/i18n.js` exports `T` (translation map) and `LANG_KEY` (localStorage key)
+- `lang` state lives in `App.jsx`, passed as `lang` + `t` props to all screens
+- Screens apply `dir="rtl"` when `lang === 'he'`
+- Toggle on `StartScreen` (EN / עב)
+
 ### Screen flow
 ```
-battle → result (won)  → next battle / next world / victory
-       → result (lost) → game over → restart from world 0
+start → map → battle → result (won)  → next battle OR cleared → map / leaderboard (victory)
+                     → result (lost) → leaderboard → start
 ```
 
 ---
@@ -146,12 +168,19 @@ The arena div has **no** `overflow:hidden` so weapon/wing sprites aren't clipped
 ---
 
 ## What was last worked on
-- Full campaign implementation (all 5 worlds, 3 battles each)
-- All 5 enemy character SVGs
-- Trophy result screen with `CONTINUE →`
-- Background clipping fixes (sun always visible, hills always at bottom)
-- DEBUG/prod config flag
-- Version auto-bump on build
+- Knight RTL/flicker fix, world name translated on defeat screen
+- gh-pages deploy script (`npm run deploy`)
+- Grounded forest trees, brightened castle, overhauled dragon lair background
+- Design mode: phone frame, bottom nav, swipe support
+- Knight strolls castle fields, layered behind trees and castle
+- i18n (EN + Hebrew), difficulty system (Easy/Medium/Hard), StartScreen
+- Scoring, local leaderboard, Area Cleared screen with animated score transfer
+- All 5 per-world backgrounds and all 5 enemy SVGs
+
+## Implementation status
+- **Phases 1–4** (World Map, Backgrounds, Scoring, Leaderboard): ✅ Complete
+- **Phase 5** (Visual Polish): ⏳ Pending
+- **Phase 6** (Backend Leaderboard): ⏳ Pending
 
 ---
 
@@ -159,7 +188,10 @@ The arena div has **no** `overflow:hidden` so weapon/wing sprites aren't clipped
 
 # ROADMAP
 
-## Phase 1 — World Map Screen
+> Phases 1–4 are **complete**. See PROGRESS.md for details.
+> Phases 5–6 are pending. See PLAN.md and PLAN_PENDING.md.
+
+## Phase 1 — World Map Screen ✅ COMPLETE
 **Goal:** Show the player where they are in the campaign between battles.
 
 ### What it looks like
@@ -182,7 +214,7 @@ The arena div has **no** `overflow:hidden` so weapon/wing sprites aren't clipped
 
 ---
 
-## Phase 2 — Per-World Backgrounds
+## Phase 2 — Per-World Backgrounds ✅ COMPLETE
 **Goal:** Each region feels visually distinct.
 
 ### Palette plan
@@ -203,7 +235,7 @@ The arena div has **no** `overflow:hidden` so weapon/wing sprites aren't clipped
 
 ---
 
-## Phase 3 — Scoring System
+## Phase 3 — Scoring System ✅ COMPLETE
 **Goal:** Give players a numeric score to chase, rewarding speed and accuracy.
 
 ### Score formula (per battle)
@@ -238,7 +270,7 @@ timeBonus        = only for timed worlds (timer !== null)
 
 ---
 
-## Phase 4 — Local Leaderboard
+## Phase 4 — Local Leaderboard ✅ COMPLETE
 **Goal:** Top runs stored in the browser, shown after each completed run.
 
 ### Data (localStorage key: `numknight_scores`)
@@ -267,7 +299,7 @@ timeBonus        = only for timed worlds (timer !== null)
 
 ---
 
-## Phase 5 — Visual Polish
+## Phase 5 — Visual Polish ⏳ PENDING
 **Goal:** Juice up the moments that matter most.
 
 ### Priority list
@@ -288,7 +320,7 @@ timeBonus        = only for timed worlds (timer !== null)
 
 ---
 
-## Phase 6 — Cross-Device Backend Leaderboard
+## Phase 6 — Cross-Device Backend Leaderboard ⏳ PENDING
 **Goal:** Global high scores visible across all devices/players.
 
 ### Recommended stack
@@ -331,10 +363,10 @@ CREATE INDEX ON scores(total_score DESC);
 
 ## Suggested implementation order
 ```
-Phase 1 (World Map)      ← highest gameplay impact, sets up the visual journey
-Phase 2 (Backgrounds)   ← pairs naturally with map work, same context
-Phase 3 (Scoring)       ← adds replayability, needed before leaderboard
-Phase 4 (Local LB)      ← can ship without backend, validates the loop
-Phase 5 (Polish)        ← do incrementally alongside other phases
-Phase 6 (Backend LB)    ← last, biggest lift, needs Phase 3+4 done first
+Phase 1 (World Map)      ✅ Done
+Phase 2 (Backgrounds)   ✅ Done
+Phase 3 (Scoring)       ✅ Done
+Phase 4 (Local LB)      ✅ Done
+Phase 5 (Polish)        ← next up — do incrementally, high impact per effort
+Phase 6 (Backend LB)    ← last, biggest lift
 ```

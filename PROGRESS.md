@@ -1,88 +1,93 @@
 # NumKnight — Progress Tracker
 
 > Update this file at the end of each session.
-> Last updated: 2026-02-27
+> Last updated: 2026-03-07 | Version: 1.3.34
 
 ---
 
-## Phase 0 — Project Setup ✅ COMPLETE
+## Summary
 
-- [x] Verify Node.js and npm are installed (Node 22, npm 11)
-- [x] Scaffold project with Vite + React inside `/NumKnight`
-- [x] Install dependencies: Tailwind CSS, Framer Motion
-- [x] Configure Tailwind + PostCSS
-- [x] Set up folder structure (components, screens, game)
-- [ ] Push initial scaffold to GitHub ← _pending, do at end of next session_
-- [ ] Confirm app runs on mobile browser via local network ← _not yet tested_
+The core game is feature-complete through Phase 4 of the roadmap. Phases 5–6 (visual polish and backend leaderboard) are still pending.
 
 ---
 
-## Phase 1 — Core Battle Loop ✅ COMPLETE
+## ✅ Complete
 
-- [x] BattleScreen layout — knight side, enemy side, HP bars, problem area, answer buttons
-- [x] Problem generator — random multiplication from table range
-- [x] Distractor generator — 3 smart wrong answers near correct answer
-- [x] Answer handling — correct/wrong tap updates HP
-- [x] Battle end detection — win/lose after HP hits 0
-- [x] Basic animations — knight attack, enemy attack (Framer Motion), HP bar decrease
-- [x] Win/Lose screen — ResultScreen with star rating and Play Again
-- [x] Combo mechanic — every 3rd correct answer = power strike (double damage)
+### Foundation
+- [x] Project scaffold — Vite + React + Tailwind + Framer Motion
+- [x] Single-file build (`vite-plugin-singlefile` → one `index.html`)
+- [x] Auto version bump on build (`scripts/bump-version.js`)
+- [x] GitHub Pages deploy (`npm run deploy` via `gh-pages`)
+- [x] `localStorage` run persistence across page reloads
+- [x] Design mode — browse all screens at `?design` URL param
 
-**Milestone reached:** Full battle is playable end to end. ✅
+### Campaign & Battle
+- [x] Full 5-world campaign (Forest → Swamp → Mountains → Castle → Dragon Lair)
+- [x] All 5 enemies: Goblin, Skeleton, Orc, Dark Knight, Dragon (SVG + Framer Motion)
+- [x] Knight SVG character with attack/hit/idle animations
+- [x] HP system — 3 hits = death (enables gold/silver/bronze trophies)
+- [x] Trophy rating per battle (gold/silver/bronze based on mistake count)
+- [x] Timer mechanic — Castle (8s), Dragon Lair (5s); timeout = damage
+- [x] Battle intro sequence (fighting-game style slide-in + sword banner)
+- [x] Smart distractors — 3 wrong answers near the correct answer
+- [x] Sound effects — correct, wrong, sword swing, impact, victory, defeat
+
+### Screens
+- [x] `StartScreen` — name input + Easy / Medium / Hard difficulty picker
+- [x] `WorldMapScreen` — vertical map with 5 world bands, trophy indicators, knight position
+- [x] `BattleScreen` — full battle UI with countdown timer, HP bars, encounter dots
+- [x] `ResultScreen` — trophy result (win) or game over (loss)
+- [x] `AreaClearedScreen` — world score + trophy grid, animated score transfer to total
+- [x] `LeaderboardScreen` — top 10 local runs, name entry, score display
+
+### Scoring
+- [x] Per-battle score: base points × trophy multiplier + time bonus
+- [x] World score accumulation
+- [x] Run total score tracked in `runState`
+- [x] Scores persisted to `localStorage` (`numknight_scores`)
+
+### Per-world Backgrounds
+- [x] Forest — blue sky, sun, green hills
+- [x] Swamp — purple-grey sky, dim moon, dead trees, dark ground
+- [x] Mountains — cold grey-blue sky, rocky peaks, snow patches
+- [x] Castle — dark navy sky, stone battlements, storm clouds
+- [x] Dragon Lair — deep red sky, volcanic rock, lava glow
+
+### i18n
+- [x] English and Hebrew translations (`src/game/i18n.js`)
+- [x] Language toggle on StartScreen (EN / עב)
+- [x] RTL layout support when lang = `'he'`
+- [x] `lang` + `t` passed from `App.jsx` to all screens
+
+### Difficulty System
+- [x] 3 difficulty configs in `campaign.config.js`: `EASY`, `MEDIUM`, `HARD`
+- [x] Difficulty selected on StartScreen, drives all world/enemy/timer parameters
+- [x] Player name persisted to `localStorage`
 
 ---
 
-## Phase 2 — World & Enemy Variety 🔄 IN PROGRESS
+## ⏳ Pending (from Roadmap)
 
-- [x] World config file — all 4 worlds defined (tableRange, playerHP, enemyHP, enemies)
-- [x] Knight design — SVG knight with armor, sword, shield, plume
-- [x] Goblin enemy — SVG goblin with animations
-- [ ] All enemy designs — Slime, Orc, Troll, Dark Knight, Wizard, Dragon
-- [ ] HP scaling per world — wired up correctly per world (7/6/5/4)
-- [ ] Enemy attack animations — unique feel per enemy type
-- [ ] Battle entry screen — show enemy name and world before battle starts
+### Phase 5 — Visual Polish
+- [ ] Enemy death animation (fall off-screen when HP → 0)
+- [ ] Player death animation (knight topples/falls)
+- [ ] Screen flash on hit (brief red overlay)
+- [ ] Victory particle burst (confetti on gold trophy)
+- [ ] Answer button shake on wrong answer
+- [ ] HP bar smooth lerp + flash red on damage
+- [ ] Idle enemy variety (random actions during long idle)
 
-**Milestone:** Each world feels different, enemies have personality.
-
----
-
-## Phase 3 — Campaign Map ⏳ PENDING
-
-- [ ] MapScreen layout — scrollable map with battle nodes
-- [ ] World sections — 4 visually distinct world zones
-- [ ] Node states — locked / unlocked / completed (with star display)
-- [ ] Unlock logic — completing a battle unlocks the next node
-- [ ] Navigation — tap node → battle → result → back to map
-- [ ] Home screen — title screen with "Play" button
-
----
-
-## Phase 4 — Rewards & Polish ⏳ PENDING
-
-- [ ] Coin reward — earn coins on win, display total
-- [ ] Item drops — unlock cosmetic items
-- [ ] Knight customization — equip unlocked items
-- [ ] Sound effects — sword swing, hit, level up, wrong answer
-- [ ] Screen transitions — smooth page transitions
-- [ ] Mobile UX pass — touch targets, layout on small screens
-- [ ] PWA setup — manifest.json + service worker for home screen install
-
----
-
-## Phase 5 — Future / Optional ⏳ OUT OF SCOPE FOR V1
-
-- [ ] localStorage persistence
-- [ ] Timer / Hard Mode toggle
-- [ ] More math operations
-- [ ] Additional game modes
-- [ ] Parent dashboard
-- [ ] Background music
+### Phase 6 — Backend Leaderboard
+- [ ] Supabase schema + REST API
+- [ ] `src/game/api.js` — `submitScore` / `fetchLeaderboard`
+- [ ] Global leaderboard with offline fallback to local
+- [ ] Player name persisted across devices
 
 ---
 
 ## Notes
 
-- App runs on `npm run dev` → `http://localhost:5173`
-- For mobile testing: `npm run dev -- --host` → open Network URL on phone
-- No backend at any phase — pure frontend
-- GitHub repo: https://github.com/amireluk/NumKnight
+- `npm run dev` → `http://localhost:5173`
+- Mobile testing: `npm run dev -- --host` → open Network URL on phone
+- `npm run deploy` → builds + publishes to GitHub Pages
+- GitHub: https://github.com/amireluk/NumKnight
