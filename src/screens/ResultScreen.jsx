@@ -66,33 +66,12 @@ export function ResultScreen({ worldName, worldId, enemy, totalScore, onRestart,
           </div>
         </div>
 
-        {/* Sword planted pommel-up in the ground, right of knight */}
-        <svg
-          style={{ position: 'absolute', left: '55%', bottom: 0, zIndex: 2, pointerEvents: 'none' }}
-          width="30" height="88" viewBox="0 0 30 88" fill="none"
-        >
-          {/* Pommel */}
-          <ellipse cx="15" cy="7" rx="8.5" ry="6.5" fill="#8d6e63" stroke="#4e342e" strokeWidth="1.5" />
-          <ellipse cx="15" cy="6" rx="5.5" ry="3.5" fill="#b08070" opacity="0.55" />
-          {/* Handle / grip wrap */}
-          <rect x="12" y="12" width="6" height="20" rx="3" fill="#7c5040" stroke="#4e342e" strokeWidth="1.2" />
-          <line x1="12" y1="16" x2="18" y2="16" stroke="#5a3828" strokeWidth="1.2" opacity="0.5" />
-          <line x1="12" y1="20" x2="18" y2="20" stroke="#5a3828" strokeWidth="1.2" opacity="0.5" />
-          <line x1="12" y1="24" x2="18" y2="24" stroke="#5a3828" strokeWidth="1.2" opacity="0.5" />
-          {/* Crossguard */}
-          <rect x="1" y="30" width="28" height="6" rx="3" fill="#6d4c41" stroke="#3e2723" strokeWidth="1.5" />
-          {/* Blade (lower half buried in ground) */}
-          <path d="M13 36 L17 36 L16 82 L15 88 L14 82Z" fill="#c8d0da" stroke="#424242" strokeWidth="0.9" />
-          {/* Blade shine */}
-          <line x1="14.5" y1="38" x2="14" y2="78" stroke="#e8eef4" strokeWidth="1.2" opacity="0.55" strokeLinecap="round" />
-        </svg>
-
-        {/* Enemy standing victorious — right side */}
+        {/* Enemy standing victorious — moved closer to center */}
         {enemy && (
           <div style={{
             position: 'absolute', inset: 0, zIndex: 3,
             display: 'flex', alignItems: 'flex-end', justifyContent: 'flex-end',
-            paddingBottom: 20, paddingRight: 16,
+            paddingBottom: 20, paddingRight: '26%',
           }}>
             <EnemyCharacter phase="idle" enemy={enemy} hitKey={0} />
           </div>
