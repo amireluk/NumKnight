@@ -17,10 +17,12 @@ const NAME_KEY = 'numknight_player_name'
 const PEEK = 18  // px of adjacent card visible on each side
 const GAP = 10   // px gap between cards
 
-// Pill indicator dims — 3 fixed slots, content rotates
+// Pill indicator — 5-slot virtual track (same infinite-carousel trick as main cards)
 const PILL_W = 84
-const PILL_PEEK = 46  // width of each side slot (enough to read text)
 const PILL_GAP = 8
+const PILL_SIDE_VISIBLE = 50  // px of ±1 slot shown on each side
+const PILL_CONTAINER_W = PILL_W + 2 * (PILL_GAP + PILL_SIDE_VISIBLE)  // 200px
+const PILL_BASE_X = (PILL_CONTAINER_W - PILL_W) / 2 - 2 * (PILL_W + PILL_GAP)  // centers slot[2]
 
 export function LeaderboardScreen({ totalScore, endWorld, cleared, difficulty, playerName, onBack, lang, t }) {
   const isRtl = lang === 'he'
@@ -57,6 +59,12 @@ export function LeaderboardScreen({ totalScore, endWorld, cleared, difficulty, p
   const [containerWidth, setContainerWidth] = useState(() => Math.min(window.innerWidth, 448))
   const [animated, setAnimated] = useState(true)
 
+  // Pill indicator state — pillIndex lags viewIndex so content holds during slide animation
+  const [pillIndex, setPillIndex] = useState(DIFFS.indexOf(difficulty))
+  const [pillExtraX, setPillExtraX] = useState(0)
+  const [pillAnimated, setPillAnimated] = useState(true)
+  const animatingRef = useRef(false)
+
   useEffect(() => {
     if (containerRef.current) setContainerWidth(containerRef.current.offsetWidth)
   }, [])
@@ -64,17 +72,31 @@ export function LeaderboardScreen({ totalScore, endWorld, cleared, difficulty, p
   const [clearConfirm, setClearConfirm] = useState(false)
   useEffect(() => { setClearConfirm(false) }, [viewIndex])
 
-  // Circular navigation — disable animation on wrap to avoid sliding through all panels
+  // Circular navigation — pills animate like the main carousel, both run simultaneously
   const goTo = (next) => {
+    if (next === viewIndex || animatingRef.current) return
+    animatingRef.current = true
+
+    const rawDiff = (next - viewIndex + 3) % 3
+    const pillDir = rawDiff === 1 ? -1 : 1  // -1 slides left (forward), +1 slides right (back)
+
+    // Main carousel: update immediately (handles its own wrap detection)
     const wrapping = (viewIndex === 0 && next === 2) || (viewIndex === 2 && next === 0)
-    if (wrapping) {
-      setAnimated(false)
-      setViewIndex(next)
-      requestAnimationFrame(() => requestAnimationFrame(() => setAnimated(true)))
-    } else {
-      setAnimated(true)
-      setViewIndex(next)
-    }
+    setAnimated(!wrapping)
+    setViewIndex(next)
+
+    // Pill indicator: animate track, then snap content
+    setPillAnimated(true)
+    setPillExtraX(pillDir * (PILL_W + PILL_GAP))
+    setTimeout(() => {
+      setPillAnimated(false)
+      setPillExtraX(0)
+      setPillIndex(next)
+      requestAnimationFrame(() => {
+        setPillAnimated(true)
+        animatingRef.current = false
+      })
+    }, 290)
   }
 
   // Touch swipe on outer div so whole screen is swipeable
@@ -107,17 +129,9 @@ export function LeaderboardScreen({ totalScore, endWorld, cleared, difficulty, p
 
   const cardWidth = containerWidth - 2 * PEEK
   const trackX = PEEK - viewIndex * (cardWidth + GAP)
+  const pillTrackX = PILL_BASE_X + pillExtraX
 
-  // Rotating pill slots: always show prev/active/next regardless of wrap
-  const prevIdx = (viewIndex + 2) % 3
-  const nextIdx = (viewIndex + 1) % 3
   const diffLabels = t?.diffLabel ?? DIFF_LABEL_DEFAULT
-
-  const pillSlots = [
-    { diffIdx: prevIdx, isActive: false, onClick: () => goTo(prevIdx), width: PILL_PEEK },
-    { diffIdx: viewIndex, isActive: true,  onClick: null,               width: PILL_W   },
-    { diffIdx: nextIdx, isActive: false, onClick: () => goTo(nextIdx), width: PILL_PEEK },
-  ]
 
   return (
     <div
@@ -141,40 +155,49 @@ export function LeaderboardScreen({ totalScore, endWorld, cleared, difficulty, p
       >
         <p className="text-white font-black text-3xl tracking-wide">{t?.kingdomRecords ?? 'Kingdom Records'}</p>
 
-        {/* Pill indicator — 3 fixed slots, content rotates so side pills always show */}
+        {/* Pill indicator — 5-slot virtual track, same infinite-carousel trick as main cards */}
         <div style={{
-          display: 'flex',
-          gap: PILL_GAP,
-          alignItems: 'center',
-          maskImage: 'linear-gradient(to right, transparent 0%, black 18%, black 82%, transparent 100%)',
-          WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 18%, black 82%, transparent 100%)',
+          width: PILL_CONTAINER_W,
+          overflow: 'hidden',
+          maskImage: 'linear-gradient(to right, transparent 0%, black 22%, black 78%, transparent 100%)',
+          WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 22%, black 78%, transparent 100%)',
         }}>
-          {pillSlots.map(({ diffIdx, isActive, onClick, width }, si) => (
-            <button
-              key={`${si}-${diffIdx}`}
-              onClick={onClick ?? undefined}
-              style={{
-                width,
-                overflow: 'hidden',
-                flexShrink: 0,
-                background: DIFF_COLOR[DIFFS[diffIdx]],
-                color: '#000',
-                borderRadius: 99,
-                padding: '4px 0',
-                fontSize: 11,
-                fontWeight: 900,
-                letterSpacing: '0.08em',
-                opacity: isActive ? 1 : 0.68,
-                transform: `scale(${isActive ? 1 : 0.88})`,
-                cursor: isActive ? 'default' : 'pointer',
-                border: 'none',
-                textAlign: 'center',
-                whiteSpace: 'nowrap',
-              }}
-            >
-              {diffLabels[DIFFS[diffIdx]] ?? DIFFS[diffIdx]}
-            </button>
-          ))}
+          <div style={{
+            display: 'flex',
+            gap: PILL_GAP,
+            transform: `translateX(${pillTrackX}px)`,
+            transition: pillAnimated ? 'transform 0.28s ease' : 'none',
+          }}>
+            {[-2, -1, 0, 1, 2].map((offset) => {
+              const diffIdx = (pillIndex + offset + 300) % 3
+              const isActive = offset === 0
+              return (
+                <button
+                  key={offset}
+                  onClick={isActive ? undefined : () => goTo(diffIdx)}
+                  style={{
+                    width: PILL_W,
+                    flexShrink: 0,
+                    background: DIFF_COLOR[DIFFS[diffIdx]],
+                    color: '#000',
+                    borderRadius: 99,
+                    padding: '4px 0',
+                    fontSize: 11,
+                    fontWeight: 900,
+                    letterSpacing: '0.08em',
+                    opacity: isActive ? 1 : 0.68,
+                    transform: `scale(${isActive ? 1 : 0.88})`,
+                    transition: 'opacity 0.28s, transform 0.28s',
+                    cursor: isActive ? 'default' : 'pointer',
+                    border: 'none',
+                    textAlign: 'center',
+                  }}
+                >
+                  {diffLabels[DIFFS[diffIdx]] ?? DIFFS[diffIdx]}
+                </button>
+              )
+            })}
+          </div>
         </div>
 
         {/* Dot indicators */}
