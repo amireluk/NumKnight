@@ -100,7 +100,7 @@ export const T = {
     yourScore: 'הניקוד שלך',
     conquered: 'ניצחון',
     fellAtShort: (name) => `נפל ב${name}`,
-    noScores: '!אין שיאים עדיין — היה הראשון',
+    noScores: 'אין שיאים עדיין — היה הראשון!',
     playAgain: 'שחק שוב',
 
     // World names (by id)
