@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion'
 import { EnemyCharacter } from '../components/EnemyCharacter'
 import { BattleBackground } from '../components/BattleBackground'
+import { KnightBodySVG, KnightSwordArmSVG } from '../components/KnightCharacter'
 
 export function ResultScreen({ worldName, worldId, enemy, totalScore, onRestart, onViewScores, lang, t }) {
   const isRtl = lang === 'he'
@@ -47,12 +48,41 @@ export function ResultScreen({ worldName, worldId, enemy, totalScore, onRestart,
         {/* Dim overlay for drama */}
         <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.25)', zIndex: 1 }} />
 
-        {/* Enemy standing victorious */}
+        {/* Fallen knight — lies on back at bottom-left */}
+        <div style={{
+          position: 'absolute', left: 10, bottom: 10, zIndex: 2,
+          pointerEvents: 'none', overflow: 'visible',
+          width: 84, height: 112,
+          transform: 'rotate(-90deg) scale(0.42)',
+          transformOrigin: 'center bottom',
+        }}>
+          <KnightBodySVG />
+          <div style={{ position: 'absolute', top: 0, left: 0, overflow: 'visible', transformOrigin: '73px 58px' }}>
+            <KnightSwordArmSVG />
+          </div>
+        </div>
+
+        {/* Sword stuck in ground next to the fallen knight */}
+        <svg
+          style={{ position: 'absolute', left: 54, bottom: 0, zIndex: 2, pointerEvents: 'none' }}
+          width="14" height="52" viewBox="0 0 14 52" fill="none"
+        >
+          {/* Blade going into ground */}
+          <rect x="5.5" y="14" width="3" height="34" rx="1" fill="#c8d0da" stroke="#424242" strokeWidth="0.7" />
+          {/* Crossguard */}
+          <rect x="0" y="10" width="14" height="4" rx="2" fill="#6d4c41" stroke="#3e2723" strokeWidth="0.8" />
+          {/* Handle */}
+          <rect x="5" y="2" width="4" height="10" rx="2" fill="#8d6050" stroke="#3e2723" strokeWidth="0.7" />
+          {/* Pommel */}
+          <ellipse cx="7" cy="1.5" rx="4" ry="3" fill="#7c5040" stroke="#4e342e" strokeWidth="0.8" />
+        </svg>
+
+        {/* Enemy standing victorious — shifted right */}
         {enemy && (
           <div style={{
-            position: 'absolute', inset: 0, zIndex: 2,
-            display: 'flex', alignItems: 'flex-end', justifyContent: 'center',
-            paddingBottom: 20,
+            position: 'absolute', inset: 0, zIndex: 3,
+            display: 'flex', alignItems: 'flex-end', justifyContent: 'flex-end',
+            paddingBottom: 20, paddingRight: 24,
           }}>
             <EnemyCharacter phase="idle" enemy={enemy} hitKey={0} />
           </div>

@@ -2,7 +2,7 @@ import { motion, useAnimation, AnimatePresence } from 'framer-motion'
 import { useEffect, useState } from 'react'
 
 // Static body — everything except the sword arm
-function KnightBodySVG() {
+export function KnightBodySVG() {
   return (
     <svg width="84" height="112" viewBox="0 0 90 120" fill="none">
       {/* Left arm */}
@@ -62,7 +62,7 @@ function KnightBodySVG() {
 }
 
 // Sword arm only — same viewBox, overlaid on top of body
-function KnightSwordArmSVG() {
+export function KnightSwordArmSVG() {
   return (
     <svg width="84" height="112" viewBox="0 0 90 120" fill="none" overflow="visible">
       {/* Sword blade */}

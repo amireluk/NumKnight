@@ -267,8 +267,9 @@ export function AreaClearedScreen({ world, worldTrophies, worldScore, totalScore
   return (
     <div
       dir={isRtl ? 'rtl' : 'ltr'}
-      className="flex flex-col items-center justify-center min-h-dvh max-w-md mx-auto px-4 gap-4"
+      className="flex flex-col items-center h-dvh max-w-md mx-auto px-4 py-5 gap-4"
       style={{
+        overflow: 'hidden',
         background:
           'radial-gradient(ellipse at 50% 38%, rgba(251,191,36,0.11) 0%, transparent 65%), ' +
           'linear-gradient(to bottom, #1e3a70, #2d5aaa)',
@@ -289,12 +290,12 @@ export function AreaClearedScreen({ world, worldTrophies, worldScore, totalScore
         </p>
       </motion.div>
 
-      {/* 2. Region illustration — full width */}
+      {/* 2. Region illustration — full width, capped so content fits */}
       <motion.div
         initial={{ scale: 0.7, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ type: 'spring', stiffness: 180, damping: 15, delay: 0.1 }}
-        style={{ width: '100%', borderRadius: 20, overflow: 'hidden', boxShadow: '0 0 32px rgba(0,0,0,0.6)' }}
+        style={{ width: '100%', maxHeight: '30vh', borderRadius: 20, overflow: 'hidden', boxShadow: '0 0 32px rgba(0,0,0,0.6)', flexShrink: 0 }}
       >
         <Scene />
       </motion.div>
