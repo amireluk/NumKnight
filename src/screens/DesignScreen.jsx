@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { BattleBackground } from '../components/BattleBackground'
 import { KnightCharacter, FallenKnightScene } from '../components/KnightCharacter'
 import { EnemyCharacter } from '../components/EnemyCharacter'
@@ -267,18 +267,81 @@ const CATS = [
   { id: 'screen', label: 'Screens' },
 ]
 
+// ── PhoneFrame ────────────────────────────────────────────────────────────────
+
+const PHONE_W = 390
+const PHONE_H = 844
+
+function PhoneFrame({ children, onSwipeLeft, onSwipeRight }) {
+  const wrapRef  = useRef(null)
+  const [scale, setScale] = useState(1)
+  const swipeX   = useRef(null)
+
+  useEffect(() => {
+    const el = wrapRef.current
+    if (!el) return
+    const ro = new ResizeObserver(([entry]) => {
+      const { width, height } = entry.contentRect
+      setScale(Math.min(1, Math.min((width - 32) / PHONE_W, (height - 32) / PHONE_H)))
+    })
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
+
+  const handlePointerDown = (e) => { swipeX.current = e.clientX }
+  const handlePointerUp   = (e) => {
+    if (swipeX.current === null) return
+    const dx = e.clientX - swipeX.current
+    swipeX.current = null
+    if (dx < -40) onSwipeLeft?.()
+    if (dx >  40) onSwipeRight?.()
+  }
+
+  return (
+    <div
+      ref={wrapRef}
+      style={{
+        flex: 1, overflow: 'hidden',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        background: 'radial-gradient(ellipse at 50% 60%, #1a1a2e 0%, #0a0a0a 100%)',
+      }}
+    >
+      {/* Phone shell */}
+      <div
+        style={{
+          width: PHONE_W * scale,
+          height: PHONE_H * scale,
+          borderRadius: 44 * scale,
+          overflow: 'hidden',
+          boxShadow: `0 0 0 ${2 * scale}px #333, 0 ${24 * scale}px ${64 * scale}px rgba(0,0,0,0.7)`,
+          flexShrink: 0,
+        }}
+        onPointerDown={handlePointerDown}
+        onPointerUp={handlePointerUp}
+      >
+        {/* Zoom container — CSS zoom scales content+click-targets uniformly */}
+        <div style={{ width: PHONE_W, height: PHONE_H, zoom: scale, overflow: 'hidden' }}>
+          {children}
+        </div>
+      </div>
+    </div>
+  )
+}
+
 // ── Main component ────────────────────────────────────────────────────────────
 
 export function DesignScreen({ onExit }) {
   const [cat, setCat] = useState('all')
   const [idx, setIdx] = useState(0)
 
-  const slides      = cat === 'all' ? SLIDES : SLIDES.filter(s => s.category === cat)
-  const clampedIdx  = Math.min(idx, slides.length - 1)
-  const slide       = slides[clampedIdx]
+  const slides     = cat === 'all' ? SLIDES : SLIDES.filter(s => s.category === cat)
+  const clampedIdx = Math.min(idx, slides.length - 1)
+  const slide      = slides[clampedIdx]
 
-  const go = (dir) =>
-    setIdx(i => Math.max(0, Math.min(slides.length - 1, i + dir)))
+  const go = useCallback((dir) =>
+    setIdx(i => Math.max(0, Math.min(slides.length - 1, i + dir))),
+    [slides.length]
+  )
 
   const jumpCat = (newCat) => { setCat(newCat); setIdx(0) }
 
@@ -291,7 +354,7 @@ export function DesignScreen({ onExit }) {
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }) // intentionally no dep array — always uses latest go/onExit
+  }, [go, onExit])
 
   return (
     <div style={{
@@ -300,104 +363,104 @@ export function DesignScreen({ onExit }) {
       background: '#0a0a0a', userSelect: 'none',
     }}>
 
-      {/* Top bar */}
+      {/* Top bar: exit + category pills in one row */}
       <div style={{
-        display: 'flex', alignItems: 'center', height: 44,
-        padding: '0 10px', background: 'rgba(0,0,0,0.88)',
-        flexShrink: 0, zIndex: 200, gap: 8,
+        display: 'flex', alignItems: 'center', gap: 6,
+        padding: '0 10px', height: 48,
+        background: 'rgba(0,0,0,0.90)', flexShrink: 0, zIndex: 200,
       }}>
         <button
           onClick={onExit}
           style={{
             background: 'rgba(255,255,255,0.12)', border: 'none', borderRadius: 8,
-            color: 'white', padding: '4px 10px', cursor: 'pointer',
-            fontSize: 14, fontWeight: 700, flexShrink: 0,
+            color: 'white', padding: '5px 10px', cursor: 'pointer',
+            fontSize: 16, fontWeight: 700, flexShrink: 0, lineHeight: 1,
           }}
         >
           ←
         </button>
-        <span style={{
-          flex: 1, color: 'white', fontWeight: 900, fontSize: 12,
-          letterSpacing: '0.06em', textAlign: 'center', textTransform: 'uppercase',
-          overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-        }}>
-          {slide?.label}
-        </span>
-        <span style={{
-          color: 'rgba(255,255,255,0.30)', fontSize: 11,
-          fontFamily: 'monospace', flexShrink: 0,
-        }}>
-          {clampedIdx + 1}/{slides.length}
-        </span>
+
+        <div style={{ display: 'flex', gap: 5, overflowX: 'auto', flex: 1 }}>
+          {CATS.map(c => (
+            <button
+              key={c.id}
+              onClick={() => jumpCat(c.id)}
+              style={{
+                padding: '4px 11px', borderRadius: 20, cursor: 'pointer', flexShrink: 0,
+                border: cat === c.id
+                  ? '1.5px solid rgba(251,191,36,0.9)'
+                  : '1.5px solid rgba(255,255,255,0.14)',
+                background: cat === c.id
+                  ? 'rgba(251,191,36,0.18)'
+                  : 'rgba(255,255,255,0.07)',
+                color: cat === c.id ? '#fbbf24' : 'rgba(255,255,255,0.40)',
+                fontSize: 11, fontWeight: 900, letterSpacing: '0.05em',
+                transition: 'all 0.12s',
+              }}
+            >
+              {c.label}
+            </button>
+          ))}
+        </div>
       </div>
 
-      {/* Category pills */}
-      <div style={{
-        display: 'flex', gap: 5, padding: '6px 10px',
-        background: 'rgba(0,0,0,0.72)', overflowX: 'auto',
-        flexShrink: 0, zIndex: 200,
-      }}>
-        {CATS.map(c => (
-          <button
-            key={c.id}
-            onClick={() => jumpCat(c.id)}
-            style={{
-              padding: '4px 12px', borderRadius: 20, cursor: 'pointer', flexShrink: 0,
-              border: cat === c.id
-                ? '1.5px solid rgba(251,191,36,0.9)'
-                : '1.5px solid rgba(255,255,255,0.14)',
-              background: cat === c.id
-                ? 'rgba(251,191,36,0.18)'
-                : 'rgba(255,255,255,0.07)',
-              color: cat === c.id ? '#fbbf24' : 'rgba(255,255,255,0.40)',
-              fontSize: 11, fontWeight: 900, letterSpacing: '0.06em',
-              transition: 'all 0.12s',
-            }}
-          >
-            {c.label}
-          </button>
-        ))}
-      </div>
-
-      {/* Slide area */}
-      <div style={{ flex: 1, position: 'relative', overflow: 'hidden' }}>
-
-        {/* Slide content — key forces remount on slide change */}
+      {/* Phone frame area */}
+      <PhoneFrame onSwipeLeft={() => go(1)} onSwipeRight={() => go(-1)}>
         <div key={slide?.id} style={{ width: '100%', height: '100%' }}>
           {slide?.render()}
         </div>
+      </PhoneFrame>
 
-        {/* Prev tap zone */}
-        {clampedIdx > 0 && (
-          <button
-            onClick={() => go(-1)}
-            style={{
-              position: 'absolute', left: 0, top: 0, bottom: 0, width: 44,
-              background: 'linear-gradient(to right, rgba(0,0,0,0.38), transparent)',
-              border: 'none', cursor: 'pointer', zIndex: 100,
-              display: 'flex', alignItems: 'center', paddingLeft: 6,
-              color: 'rgba(255,255,255,0.65)', fontSize: 28,
-            }}
-          >
-            ‹
-          </button>
-        )}
+      {/* Bottom nav bar */}
+      <div style={{
+        display: 'flex', alignItems: 'center',
+        height: 60, padding: '0 6px',
+        background: 'rgba(0,0,0,0.90)', flexShrink: 0, zIndex: 200, gap: 6,
+      }}>
+        <button
+          onClick={() => go(-1)}
+          disabled={clampedIdx === 0}
+          style={{
+            width: 52, height: 44,
+            background: clampedIdx === 0 ? 'rgba(255,255,255,0.04)' : 'rgba(255,255,255,0.12)',
+            border: 'none', borderRadius: 10, cursor: clampedIdx === 0 ? 'default' : 'pointer',
+            color: clampedIdx === 0 ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.80)',
+            fontSize: 28, lineHeight: 1, flexShrink: 0,
+          }}
+        >
+          ‹
+        </button>
 
-        {/* Next tap zone */}
-        {clampedIdx < slides.length - 1 && (
-          <button
-            onClick={() => go(1)}
-            style={{
-              position: 'absolute', right: 0, top: 0, bottom: 0, width: 44,
-              background: 'linear-gradient(to left, rgba(0,0,0,0.38), transparent)',
-              border: 'none', cursor: 'pointer', zIndex: 100,
-              display: 'flex', alignItems: 'center', justifyContent: 'flex-end', paddingRight: 6,
-              color: 'rgba(255,255,255,0.65)', fontSize: 28,
-            }}
-          >
-            ›
-          </button>
-        )}
+        <div style={{ flex: 1, textAlign: 'center', overflow: 'hidden' }}>
+          <div style={{
+            color: 'white', fontWeight: 900, fontSize: 12,
+            letterSpacing: '0.06em', textTransform: 'uppercase',
+            overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+          }}>
+            {slide?.label}
+          </div>
+          <div style={{
+            color: 'rgba(255,255,255,0.30)', fontSize: 10,
+            fontFamily: 'monospace', marginTop: 2,
+          }}>
+            {clampedIdx + 1} / {slides.length}
+          </div>
+        </div>
+
+        <button
+          onClick={() => go(1)}
+          disabled={clampedIdx === slides.length - 1}
+          style={{
+            width: 52, height: 44,
+            background: clampedIdx === slides.length - 1 ? 'rgba(255,255,255,0.04)' : 'rgba(255,255,255,0.12)',
+            border: 'none', borderRadius: 10,
+            cursor: clampedIdx === slides.length - 1 ? 'default' : 'pointer',
+            color: clampedIdx === slides.length - 1 ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.80)',
+            fontSize: 28, lineHeight: 1, flexShrink: 0,
+          }}
+        >
+          ›
+        </button>
       </div>
     </div>
   )
