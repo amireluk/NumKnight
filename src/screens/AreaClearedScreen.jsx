@@ -233,7 +233,6 @@ export function AreaClearedScreen({ world, worldTrophies, worldScore, totalScore
   const Scene     = WORLD_SCENES[world.id] ?? ForestScene
   const prevTotal = totalScore - worldScore
 
-  const [tapRevealed,   setTapRevealed]   = useState(worldScore === 0)
   const [battleDisplay, setBattleDisplay] = useState(0)
   const [totalDisplay,  setTotalDisplay]  = useState(prevTotal)
   const [showContinue,  setShowContinue]  = useState(worldScore === 0)
@@ -241,7 +240,7 @@ export function AreaClearedScreen({ world, worldTrophies, worldScore, totalScore
   const roundControls = useAnimation()
 
   useEffect(() => {
-    if (!tapRevealed || worldScore === 0) return
+    if (worldScore === 0) return
 
     const t1 = setTimeout(() => {
       const cancel1 = animateCount(0, worldScore, 700, setBattleDisplay, () => {
@@ -259,11 +258,11 @@ export function AreaClearedScreen({ world, worldTrophies, worldScore, totalScore
         cancelRef.current.push(() => clearTimeout(t2))
       })
       cancelRef.current.push(cancel1)
-    }, 320)
+    }, 600)
 
     cancelRef.current.push(() => clearTimeout(t1))
     return () => cancelRef.current.forEach((fn) => fn?.())
-  }, [tapRevealed]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div
@@ -330,66 +329,40 @@ export function AreaClearedScreen({ world, worldTrophies, worldScore, totalScore
         {/* Divider */}
         <div style={{ height: 1, background: 'rgba(255,255,255,0.22)' }} />
 
-        {/* Tap to reveal OR score rows */}
-        {!tapRevealed ? (
-          <motion.button
-            onClick={() => setTapRevealed(true)}
-            animate={{
-              boxShadow: [
-                '0 0 0px rgba(251,191,36,0)',
-                '0 0 20px rgba(251,191,36,0.50)',
-                '0 0 0px rgba(251,191,36,0)',
-              ],
-            }}
-            transition={{ duration: 1.6, repeat: Infinity, ease: 'easeInOut' }}
-            style={{
-              width: '100%', padding: '14px 20px', borderRadius: 10,
-              background: 'rgba(251,191,36,0.10)', border: '1px solid rgba(251,191,36,0.30)',
-              cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
-              color: '#fbbf24', fontWeight: 900, fontSize: 14, letterSpacing: '0.08em',
-            }}
+        {/* Round score — counts up, pulses on transfer */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)', fontWeight: 700, letterSpacing: '0.15em' }}>
+            {t?.roundScore ?? 'ROUND SCORE'}
+          </span>
+          <motion.span
+            animate={roundControls}
+            style={{ fontSize: 22, fontWeight: 900, color: '#fbbf24', minWidth: 60, textAlign: 'right', display: 'inline-block' }}
           >
-            <span style={{ fontSize: 20, lineHeight: 1 }}>★</span>
-            {t?.tapReveal ?? 'Tap to reveal score'}
-          </motion.button>
-        ) : (
-          <>
-            {/* Round score — counts up, pulses on transfer */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)', fontWeight: 700, letterSpacing: '0.15em' }}>
-                {t?.roundScore ?? 'ROUND SCORE'}
-              </span>
-              <motion.span
-                animate={roundControls}
-                style={{ fontSize: 22, fontWeight: 900, color: '#fbbf24', minWidth: 60, textAlign: 'right', display: 'inline-block' }}
-              >
-                +{battleDisplay.toLocaleString()}
-              </motion.span>
-            </div>
-            {/* Divider */}
-            <div style={{ height: 1, background: 'rgba(255,255,255,0.22)' }} />
-            {/* Previous total — static */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)', fontWeight: 700, letterSpacing: '0.15em' }}>
-                {t?.previous ?? 'PREVIOUS'}
-              </span>
-              <span style={{ fontSize: 18, fontWeight: 700, color: 'rgba(255,255,255,0.45)', minWidth: 60, textAlign: 'right' }}>
-                {prevTotal.toLocaleString()}
-              </span>
-            </div>
-            {/* Divider */}
-            <div style={{ height: 1, background: 'rgba(255,255,255,0.22)' }} />
-            {/* New total — counts up */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)', fontWeight: 700, letterSpacing: '0.15em' }}>
-                {t?.newTotal ?? 'NEW TOTAL'}
-              </span>
-              <span style={{ fontSize: 26, fontWeight: 900, color: 'white', minWidth: 60, textAlign: 'right' }}>
-                {totalDisplay.toLocaleString()}
-              </span>
-            </div>
-          </>
-        )}
+            +{battleDisplay.toLocaleString()}
+          </motion.span>
+        </div>
+        {/* Divider */}
+        <div style={{ height: 1, background: 'rgba(255,255,255,0.22)' }} />
+        {/* Previous total — static */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)', fontWeight: 700, letterSpacing: '0.15em' }}>
+            {t?.previous ?? 'PREVIOUS'}
+          </span>
+          <span style={{ fontSize: 18, fontWeight: 700, color: 'rgba(255,255,255,0.45)', minWidth: 60, textAlign: 'right' }}>
+            {prevTotal.toLocaleString()}
+          </span>
+        </div>
+        {/* Divider */}
+        <div style={{ height: 1, background: 'rgba(255,255,255,0.22)' }} />
+        {/* New total — counts up */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)', fontWeight: 700, letterSpacing: '0.15em' }}>
+            {t?.newTotal ?? 'NEW TOTAL'}
+          </span>
+          <span style={{ fontSize: 26, fontWeight: 900, color: 'white', minWidth: 60, textAlign: 'right' }}>
+            {totalDisplay.toLocaleString()}
+          </span>
+        </div>
       </motion.div>
 
       {/* 4. Continue */}
