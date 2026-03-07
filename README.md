@@ -38,7 +38,7 @@ NumKnight wraps multiplication table practice inside an RPG battle game. Kids pr
 - **React 18** + **Vite**
 - **Tailwind CSS** for styling
 - **Framer Motion** for animations
-- `vite-plugin-singlefile` — entire app builds to one self-contained `index.html`
+- Standard Vite multi-file build with browser caching; deployed to GitHub Pages
 - No router — screen state managed in `App.jsx`
 - No backend — all data stored in `localStorage`
 
@@ -65,8 +65,6 @@ Then open the Network URL shown in the terminal on your phone.
 npm run build    # bumps patch version, builds dist/
 npm run deploy   # build + publish to GitHub Pages via gh-pages
 ```
-
-The build produces a single `dist/index.html` that can be opened directly in any browser or hosted anywhere.
 
 ## Project structure
 

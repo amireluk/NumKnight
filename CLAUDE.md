@@ -19,7 +19,7 @@ This runs `npm run build` (bumps version + builds) then `gh-pages -d dist` to pu
 
 ## Stack
 - React 18 + Vite, Tailwind CSS, Framer Motion
-- `vite-plugin-singlefile` → entire app builds to a single self-contained HTML file
+- Standard Vite build output — JS/CSS chunks with browser caching; deployed to GitHub Pages at `/NumKnight/`
 - No router — screen state managed in `App.jsx`
 - Platform: Windows 11, shell: bash
 
