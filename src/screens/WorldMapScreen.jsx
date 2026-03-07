@@ -1,6 +1,4 @@
-/* eslint-disable no-undef */
-const APP_VERSION = typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : 'dev'
-
+import { useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { EnemyCharacter } from '../components/EnemyCharacter'
 import { KnightCharacter } from '../components/KnightCharacter'
@@ -392,7 +390,7 @@ function RegionBand({ world, status, trophy, score, delay, onTap, t }) {
             textShadow: '0 1px 4px rgba(0,0,0,0.9)',
           }}
         >
-          {t?.tapToFight ?? '⚔ TAP TO FIGHT'}
+          ⚔
         </motion.div>
       )}
     </motion.div>
@@ -403,9 +401,17 @@ function RegionBand({ world, status, trophy, score, delay, onTap, t }) {
 
 export function WorldMapScreen({
   worlds, currentWorldIndex, trophies, worldScores,
-  isTransition, difficulty, onFight, onRestart, lang, t,
+  isTransition, difficulty, onFight, onRestart, onBack, lang, t,
 }) {
   const isRtl = lang === 'he'
+
+  // Android hardware back → new game screen
+  useEffect(() => {
+    window.history.pushState(null, '', window.location.href)
+    const onPop = () => { onBack?.() }
+    window.addEventListener('popstate', onPop)
+    return () => window.removeEventListener('popstate', onPop)
+  }, [onBack])
   // Natural order: Forest at top, Dragon Lair at bottom
   const displayWorlds = worlds
 
@@ -452,9 +458,6 @@ export function WorldMapScreen({
         <p className="font-black text-3xl tracking-widest text-white"
           style={{ textShadow: '0 2px 8px rgba(0,0,0,0.6)' }}>
           NumKnight
-        </p>
-        <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.32)', fontFamily: 'monospace', marginTop: 2, letterSpacing: '0.08em' }}>
-          v{APP_VERSION} · {difficulty}
         </p>
       </motion.div>
 

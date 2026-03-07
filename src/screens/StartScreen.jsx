@@ -16,24 +16,6 @@ export function StartScreen({ onNewGame, onViewLeaderboard, lang, onLangChange, 
           'linear-gradient(to bottom, #1e3a70, #2d5aaa)',
       }}
     >
-      {/* Language toggle */}
-      <div dir="ltr" style={{ width: '100%', display: 'flex', justifyContent: 'flex-end', position: 'relative', zIndex: 1 }}>
-        <button
-          onClick={() => onLangChange(lang === 'en' ? 'he' : 'en')}
-          style={{
-            display: 'flex', alignItems: 'center', gap: 5,
-            padding: '5px 11px', borderRadius: 20, cursor: 'pointer',
-            fontSize: 12, fontWeight: 900, letterSpacing: '0.06em',
-            border: '1.5px solid rgba(255,255,255,0.22)',
-            background: 'rgba(255,255,255,0.10)',
-            color: 'rgba(255,255,255,0.70)',
-            transition: 'all 0.15s',
-          }}
-        >
-          {lang === 'en' ? 'EN' : 'עב'}
-        </button>
-      </div>
-
       {/* Title */}
       <motion.div
         initial={{ opacity: 0, y: -22 }}
@@ -83,6 +65,24 @@ export function StartScreen({ onNewGame, onViewLeaderboard, lang, onLangChange, 
       >
         {t?.kingdomRecords ?? 'KINGDOM RECORDS'}
       </motion.button>
+
+      {/* Language toggle — centered, below leaderboard */}
+      <div dir="ltr" style={{ width: '100%', display: 'flex', justifyContent: 'center', position: 'relative', zIndex: 1 }}>
+        <button
+          onClick={() => onLangChange(lang === 'en' ? 'he' : 'en')}
+          style={{
+            display: 'flex', alignItems: 'center', gap: 5,
+            padding: '5px 14px', borderRadius: 20, cursor: 'pointer',
+            fontSize: 12, fontWeight: 900, letterSpacing: '0.06em',
+            border: '1.5px solid rgba(255,255,255,0.22)',
+            background: 'rgba(255,255,255,0.10)',
+            color: 'rgba(255,255,255,0.70)',
+            transition: 'all 0.15s',
+          }}
+        >
+          🌐 {lang === 'en' ? 'EN' : 'עב'}
+        </button>
+      </div>
 
       {/* Scenery layers */}
       <KingdomBackground difficulty="easy" />

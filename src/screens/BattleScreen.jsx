@@ -314,15 +314,12 @@ export function BattleScreen({ world, battleIndex, onBattleEnd, lang, t }) {
         <div className="flex flex-1 min-h-0" style={{ position: 'relative' }}>
           <BattleBackground worldId={world.id} />
 
-          {/* Version + region + round — stacked top-left */}
+          {/* Region + round — stacked top-left */}
           <div style={{
             position: 'absolute', top: 8, left: 10, zIndex: 2,
             pointerEvents: 'none', userSelect: 'none',
             display: 'flex', flexDirection: 'column', gap: 2,
           }}>
-            <span style={{ fontSize: 11, fontFamily: 'monospace', color: 'rgba(255,255,255,0.28)' }}>
-              v{APP_VERSION}
-            </span>
             <motion.div
               initial={{ opacity: 0 }}
               animate={introPlaying ? { opacity: 0 } : { opacity: 1 }}

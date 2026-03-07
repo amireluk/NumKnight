@@ -82,7 +82,7 @@ export function LeaderboardScreen({ totalScore, endWorld, cleared, difficulty, p
         </span>
       </motion.div>
 
-      {/* Scores list */}
+      {/* Scores list + clear button as one unit */}
       <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 6 }}>
         {Array.from({ length: 3 }, (_, i) => {
           const entry = displayScores[i] ?? null
@@ -160,38 +160,35 @@ export function LeaderboardScreen({ totalScore, endWorld, cleared, difficulty, p
             </motion.div>
           )
         })}
-      </div>
 
-      {/* Clear button — right after the table */}
-      <div style={{ flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'stretch', gap: 4 }}>
-        <motion.button
-          onClick={handleClear}
-          onBlur={() => setClearConfirm(false)}
-          whileTap={{ scale: 0.97 }}
-          style={{
-            padding: '9px 14px', borderRadius: 10, cursor: 'pointer',
-            fontSize: 11, fontWeight: 900, letterSpacing: '0.06em',
-            border: `1.5px solid ${clearConfirm ? 'rgba(239,68,68,0.8)' : 'rgba(255,255,255,0.14)'}`,
-            background: clearConfirm ? 'rgba(239,68,68,0.18)' : 'rgba(255,255,255,0.06)',
-            color: clearConfirm ? '#ef4444' : 'rgba(255,255,255,0.30)',
-            transition: 'all 0.18s',
-          }}
-        >
-          {clearConfirm ? (t?.confirmClear ?? '⚠ YES, ERASE ALL') : (t?.clearBoard ?? 'Clear all scores')}
-        </motion.button>
-        {clearConfirm && (
-          <motion.p
-            initial={{ opacity: 0, y: -4 }}
-            animate={{ opacity: 1, y: 0 }}
-            style={{ fontSize: 10, color: '#ef4444', fontWeight: 700, textAlign: 'center' }}
+        {/* Clear button — snapped directly below last row */}
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'stretch', gap: 4 }}>
+          <motion.button
+            onClick={handleClear}
+            onBlur={() => setClearConfirm(false)}
+            whileTap={{ scale: 0.97 }}
+            style={{
+              padding: '9px 14px', borderRadius: 10, cursor: 'pointer',
+              fontSize: 11, fontWeight: 900, letterSpacing: '0.06em',
+              border: `1.5px solid ${clearConfirm ? 'rgba(239,68,68,0.8)' : 'rgba(255,255,255,0.14)'}`,
+              background: clearConfirm ? 'rgba(239,68,68,0.18)' : 'rgba(255,255,255,0.06)',
+              color: clearConfirm ? '#ef4444' : 'rgba(255,255,255,0.30)',
+              transition: 'all 0.18s',
+            }}
           >
-            {t?.clearWarning ?? '⚠ This will permanently erase all scores'}
-          </motion.p>
-        )}
+            {clearConfirm ? (t?.confirmClear ?? '⚠ YES, ERASE ALL') : (t?.clearBoard ?? 'Clear all scores')}
+          </motion.button>
+          {clearConfirm && (
+            <motion.p
+              initial={{ opacity: 0, y: -4 }}
+              animate={{ opacity: 1, y: 0 }}
+              style={{ fontSize: 10, color: '#ef4444', fontWeight: 700, textAlign: 'center' }}
+            >
+              {t?.clearWarning ?? '⚠ This will permanently erase all scores'}
+            </motion.p>
+          )}
+        </div>
       </div>
-
-      {/* Spacer so back button is visually separated */}
-      <div style={{ flexShrink: 0, height: 8 }} />
 
       {/* Back button */}
       <motion.button

@@ -235,6 +235,7 @@ export default function App() {
             difficulty={difficulty}
             onFight={handleFight}
             onRestart={handleRestart}
+            onBack={() => setScreen('newgame')}
             lang={lang} t={t}
           />
         </motion.div>

@@ -82,11 +82,8 @@ export function StrollingKnight() {
   )
 }
 
-// Sky + ground background layer — difficulty changes atmosphere
-export function KingdomBackground({ difficulty = 'easy' }) {
-  const isHard   = difficulty === 'hard'
-  const isMedium = difficulty === 'medium'
-
+// Sky + ground background — always the same (difficulty only affects the castle)
+export function KingdomBackground() {
   return (
     <svg
       style={{ position: 'absolute', bottom: 0, left: 0, width: '100%', pointerEvents: 'none', display: 'block', zIndex: 0 }}
@@ -96,75 +93,26 @@ export function KingdomBackground({ difficulty = 'easy' }) {
     >
       <defs>
         <linearGradient id="ks-sky" x1="0" y1="0" x2="0" y2="1">
-          {isHard ? <>
-            <stop offset="0%"   stopColor="#050408" stopOpacity="0" />
-            <stop offset="30%"  stopColor="#0a0612" stopOpacity="0" />
-            <stop offset="54%"  stopColor="#12091e" stopOpacity="0.7" />
-            <stop offset="76%"  stopColor="#1a0d28" stopOpacity="0.95" />
-            <stop offset="100%" stopColor="#200c30" stopOpacity="1" />
-          </> : isMedium ? <>
-            <stop offset="0%"   stopColor="#2a4a7a" stopOpacity="0" />
-            <stop offset="30%"  stopColor="#2a4a7a" stopOpacity="0" />
-            <stop offset="54%"  stopColor="#3a5a88" stopOpacity="0.6" />
-            <stop offset="76%"  stopColor="#4a70a0" stopOpacity="0.92" />
-            <stop offset="100%" stopColor="#607898" stopOpacity="1" />
-          </> : <>
-            <stop offset="0%"   stopColor="#4a80c0" stopOpacity="0" />
-            <stop offset="30%"  stopColor="#4a80c0" stopOpacity="0" />
-            <stop offset="54%"  stopColor="#5a8ed4" stopOpacity="0.55" />
-            <stop offset="76%"  stopColor="#7ab0d8" stopOpacity="0.92" />
-            <stop offset="100%" stopColor="#a8d0e8" stopOpacity="1" />
-          </>}
+          <stop offset="0%"   stopColor="#4a80c0" stopOpacity="0" />
+          <stop offset="30%"  stopColor="#4a80c0" stopOpacity="0" />
+          <stop offset="54%"  stopColor="#5a8ed4" stopOpacity="0.55" />
+          <stop offset="76%"  stopColor="#7ab0d8" stopOpacity="0.92" />
+          <stop offset="100%" stopColor="#a8d0e8" stopOpacity="1" />
         </linearGradient>
       </defs>
       <rect width="400" height="230" fill="url(#ks-sky)" />
-
-      {/* Light source */}
-      {!isHard && <>
-        <circle cx="310" cy="148" r="28" fill={isMedium ? "#e8802a" : "#ffd060"} opacity={isMedium ? 0.15 : 0.28} />
-        <circle cx="310" cy="148" r="18" fill={isMedium ? "#f09050" : "#ffdc80"} opacity={isMedium ? 0.30 : 0.55} />
-        <circle cx="310" cy="148" r="11" fill={isMedium ? "#f8b070" : "#ffe8a0"} opacity={isMedium ? 0.50 : 0.80} />
-      </>}
-
-      {/* Clouds */}
-      {isHard ? <>
-        <ellipse cx="80"  cy="100" rx="50" ry="20" fill="#1a1020" opacity="0.90" />
-        <ellipse cx="110" cy="92"  rx="34" ry="16" fill="#200c28" opacity="0.85" />
-        <ellipse cx="50"  cy="106" rx="30" ry="14" fill="#150a1e" opacity="0.80" />
-        <ellipse cx="240" cy="105" rx="44" ry="18" fill="#1a1020" opacity="0.88" />
-        <ellipse cx="270" cy="97"  rx="28" ry="14" fill="#200c28" opacity="0.82" />
-        <ellipse cx="210" cy="110" rx="22" ry="12" fill="#120810" opacity="0.75" />
-      </> : isMedium ? <>
-        <ellipse cx="80"  cy="110" rx="34" ry="14" fill="#8090a0" opacity="0.14" />
-        <ellipse cx="104" cy="104" rx="22" ry="12" fill="#7080a0" opacity="0.11" />
-        <ellipse cx="58"  cy="108" rx="20" ry="10" fill="#8090a0" opacity="0.10" />
-        <ellipse cx="240" cy="118" rx="28" ry="11" fill="#7080a0" opacity="0.11" />
-        <ellipse cx="262" cy="113" rx="18" ry="10" fill="#8090a0" opacity="0.08" />
-      </> : <>
-        <ellipse cx="80"  cy="110" rx="34" ry="14" fill="white" opacity="0.18" />
-        <ellipse cx="104" cy="104" rx="22" ry="12" fill="white" opacity="0.14" />
-        <ellipse cx="58"  cy="108" rx="20" ry="10" fill="white" opacity="0.12" />
-        <ellipse cx="240" cy="118" rx="28" ry="11" fill="white" opacity="0.14" />
-        <ellipse cx="262" cy="113" rx="18" ry="10" fill="white" opacity="0.10" />
-      </>}
-
-      {/* Ground hills */}
-      {isHard ? <>
-        <path d="M0 162 Q40 142 80 154 Q120 164 162 144 Q202 126 244 144 Q286 162 328 142 Q364 126 400 140 L400 230 L0 230Z" fill="#3a3025" />
-        <path d="M0 180 Q50 166 100 174 Q155 182 210 170 Q264 158 320 172 Q362 180 400 170 L400 230 L0 230Z" fill="#2a2018" />
-        <path d="M0 194 Q80 186 160 192 Q240 198 320 190 Q370 186 400 192 L400 230 L0 230Z" fill="#1e1810" />
-        <rect x="0" y="206" width="400" height="24" fill="#160e08" />
-      </> : isMedium ? <>
-        <path d="M0 162 Q40 142 80 154 Q120 164 162 144 Q202 126 244 144 Q286 162 328 142 Q364 126 400 140 L400 230 L0 230Z" fill="#5a8f50" />
-        <path d="M0 180 Q50 166 100 174 Q155 182 210 170 Q264 158 320 172 Q362 180 400 170 L400 230 L0 230Z" fill="#4a7f40" />
-        <path d="M0 194 Q80 186 160 192 Q240 198 320 190 Q370 186 400 192 L400 230 L0 230Z" fill="#3a6f30" />
-        <rect x="0" y="206" width="400" height="24" fill="#2a5f20" />
-      </> : <>
-        <path d="M0 162 Q40 142 80 154 Q120 164 162 144 Q202 126 244 144 Q286 162 328 142 Q364 126 400 140 L400 230 L0 230Z" fill="#7abf6a" />
-        <path d="M0 180 Q50 166 100 174 Q155 182 210 170 Q264 158 320 172 Q362 180 400 170 L400 230 L0 230Z" fill="#5aaf48" />
-        <path d="M0 194 Q80 186 160 192 Q240 198 320 190 Q370 186 400 192 L400 230 L0 230Z" fill="#4a9a38" />
-        <rect x="0" y="206" width="400" height="24" fill="#3a8828" />
-      </>}
+      <circle cx="310" cy="148" r="28" fill="#ffd060" opacity="0.28" />
+      <circle cx="310" cy="148" r="18" fill="#ffdc80" opacity="0.55" />
+      <circle cx="310" cy="148" r="11" fill="#ffe8a0" opacity="0.80" />
+      <ellipse cx="80"  cy="110" rx="34" ry="14" fill="white" opacity="0.18" />
+      <ellipse cx="104" cy="104" rx="22" ry="12" fill="white" opacity="0.14" />
+      <ellipse cx="58"  cy="108" rx="20" ry="10" fill="white" opacity="0.12" />
+      <ellipse cx="240" cy="118" rx="28" ry="11" fill="white" opacity="0.14" />
+      <ellipse cx="262" cy="113" rx="18" ry="10" fill="white" opacity="0.10" />
+      <path d="M0 162 Q40 142 80 154 Q120 164 162 144 Q202 126 244 144 Q286 162 328 142 Q364 126 400 140 L400 230 L0 230Z" fill="#7abf6a" />
+      <path d="M0 180 Q50 166 100 174 Q155 182 210 170 Q264 158 320 172 Q362 180 400 170 L400 230 L0 230Z" fill="#5aaf48" />
+      <path d="M0 194 Q80 186 160 192 Q240 198 320 190 Q370 186 400 192 L400 230 L0 230Z" fill="#4a9a38" />
+      <rect x="0" y="206" width="400" height="24" fill="#3a8828" />
     </svg>
   )
 }
@@ -269,13 +217,46 @@ export function KingdomForeground({ difficulty = 'easy' }) {
       <rect x="246" y="100" width="2" height="14" fill={c.flagpole} />
       <path d="M248 100 L260 106 L248 112Z" fill={c.flags} />
 
-      {/* Hard: cracks + sinister window glow */}
+      {/* Hard: cracks + sinister window glow + iron spikes */}
       {isHard && <>
+        {/* Cracks */}
         <path d="M175 130 L178 145 L173 155" stroke="#100a18" strokeWidth="1.5" strokeLinecap="round" opacity="0.8" />
         <path d="M215 135 L218 148 L222 158" stroke="#100a18" strokeWidth="1.5" strokeLinecap="round" opacity="0.8" />
+        {/* Ominous glow */}
         <rect x="183" y="130" width="34" height="38" rx="17" fill="#ff2200" opacity="0.12" />
         <rect x="140" y="144" width="22" height="28" rx="11" fill="#ff1500" opacity="0.10" />
         <rect x="238" y="144" width="22" height="28" rx="11" fill="#ff1500" opacity="0.10" />
+        {/* Iron spikes on battlement top */}
+        <path d="M168 108 L170 98 L172 108Z" fill="#1a1520" />
+        <path d="M174 108 L176 98 L178 108Z" fill="#1a1520" />
+        <path d="M180 108 L182 98 L184 108Z" fill="#1a1520" />
+        <path d="M186 108 L188 98 L190 108Z" fill="#1a1520" />
+        <path d="M192 108 L194 98 L196 108Z" fill="#1a1520" />
+        <path d="M198 108 L200 98 L202 108Z" fill="#1a1520" />
+        <path d="M204 108 L206 98 L208 108Z" fill="#1a1520" />
+        <path d="M210 108 L212 98 L214 108Z" fill="#1a1520" />
+        <path d="M216 108 L218 98 L220 108Z" fill="#1a1520" />
+        <path d="M222 108 L224 98 L226 108Z" fill="#1a1520" />
+        {/* Iron spikes on left tower battlements */}
+        <path d="M139 124 L141 115 L143 124Z" fill="#1a1520" />
+        <path d="M145 124 L147 115 L149 124Z" fill="#1a1520" />
+        <path d="M151 124 L153 115 L155 124Z" fill="#1a1520" />
+        <path d="M157 124 L159 115 L161 124Z" fill="#1a1520" />
+        {/* Iron spikes on right tower battlements */}
+        <path d="M233 124 L235 115 L237 124Z" fill="#1a1520" />
+        <path d="M239 124 L241 115 L243 124Z" fill="#1a1520" />
+        <path d="M245 124 L247 115 L249 124Z" fill="#1a1520" />
+        <path d="M251 124 L253 115 L255 124Z" fill="#1a1520" />
+      </>}
+
+      {/* Medium: wall torches */}
+      {isMedium && <>
+        <rect x="161" y="152" width="3" height="8" rx="1" fill="#5a4030" />
+        <ellipse cx="162.5" cy="151" rx="2.5" ry="3" fill="#ff8020" opacity="0.85" />
+        <ellipse cx="162.5" cy="150" rx="1.5" ry="2" fill="#ffcc60" opacity="0.70" />
+        <rect x="236" y="152" width="3" height="8" rx="1" fill="#5a4030" />
+        <ellipse cx="237.5" cy="151" rx="2.5" ry="3" fill="#ff8020" opacity="0.85" />
+        <ellipse cx="237.5" cy="150" rx="1.5" ry="2" fill="#ffcc60" opacity="0.70" />
       </>}
 
       {/* Right trees */}
@@ -289,22 +270,3 @@ export function KingdomForeground({ difficulty = 'easy' }) {
   )
 }
 
-// Returns the outer-div CSS background string for a given difficulty
-export function bgStyle(difficulty) {
-  if (difficulty === 'hard') {
-    return (
-      'radial-gradient(ellipse at 50% 20%, rgba(160,0,0,0.15) 0%, transparent 55%), ' +
-      'linear-gradient(to bottom, #04030a, #0c0616)'
-    )
-  }
-  if (difficulty === 'medium') {
-    return (
-      'radial-gradient(ellipse at 50% 20%, rgba(251,191,36,0.07) 0%, transparent 55%), ' +
-      'linear-gradient(to bottom, #0f2040, #182860)'
-    )
-  }
-  return (
-    'radial-gradient(ellipse at 50% 20%, rgba(251,191,36,0.12) 0%, transparent 55%), ' +
-    'linear-gradient(to bottom, #1e3a70, #2d5aaa)'
-  )
-}

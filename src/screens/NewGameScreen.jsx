@@ -1,6 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, useAnimation } from 'framer-motion'
-import { KingdomBackground, KingdomForeground, StrollingKnight, bgStyle } from '../components/KingdomScenery'
+import { KingdomBackground, KingdomForeground, StrollingKnight } from '../components/KingdomScenery'
 import { CAMPAIGN } from '../game/campaign.config'
 
 const NAME_KEY = 'numknight_player_name'
@@ -18,6 +18,14 @@ export function NewGameScreen({ onStart, onBack, lang, t }) {
   const [nameError, setNameError] = useState(false)
   const [difficulty, setDifficulty] = useState('medium')
   const nameShake = useAnimation()
+
+  // Android hardware back → main screen
+  useEffect(() => {
+    window.history.pushState(null, '', window.location.href)
+    const onPop = () => { onBack() }
+    window.addEventListener('popstate', onPop)
+    return () => window.removeEventListener('popstate', onPop)
+  }, [onBack])
 
   const handleStart = () => {
     const trimmed = name.trim().slice(0, 16)
@@ -37,8 +45,9 @@ export function NewGameScreen({ onStart, onBack, lang, t }) {
       style={{
         position: 'relative',
         paddingBottom: 210,
-        background: bgStyle(difficulty),
-        transition: 'background 0.6s ease',
+        background:
+          'radial-gradient(ellipse at 50% 20%, rgba(251,191,36,0.12) 0%, transparent 55%), ' +
+          'linear-gradient(to bottom, #1e3a70, #2d5aaa)',
       }}
     >
       {/* Back button */}
@@ -144,8 +153,8 @@ export function NewGameScreen({ onStart, onBack, lang, t }) {
         {t?.startAdventure ?? 'START ADVENTURE'}
       </motion.button>
 
-      {/* Scenery layers — castle style reacts to difficulty */}
-      <KingdomBackground difficulty={difficulty} />
+      {/* Scenery — only the castle changes with difficulty */}
+      <KingdomBackground />
       <StrollingKnight />
       <KingdomForeground difficulty={difficulty} />
     </div>

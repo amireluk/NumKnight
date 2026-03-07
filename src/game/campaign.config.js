@@ -90,17 +90,17 @@ export const MEDIUM = [
 export const HARD = [
   {
     id: 'forest', name: 'Forest', battles: 3,
-    enemy: { id: 'goblin', name: 'Goblin', hp: 4 },
+    enemy: { id: 'goblin', name: 'Goblin', hp: 5 },
     timer: null, multipliers: [1, 2, 3, 4, 5], factorRange: [1, 10],
   },
   {
     id: 'swamp', name: 'Swamp', battles: 3,
-    enemy: { id: 'skeleton', name: 'Skeleton', hp: 4 },
+    enemy: { id: 'skeleton', name: 'Skeleton', hp: 5 },
     timer: 10, multipliers: [2, 3, 4, 5, 6], factorRange: [1, 10],
   },
   {
     id: 'mountains', name: 'Mountains', battles: 3,
-    enemy: { id: 'orc', name: 'Orc', hp: 4 },
+    enemy: { id: 'orc', name: 'Orc', hp: 5 },
     timer: 8, multipliers: [3, 4, 5, 6, 7, 8], factorRange: [1, 10],
   },
   {
