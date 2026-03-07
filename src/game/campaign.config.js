@@ -22,29 +22,29 @@
 //  Total: 22 questions on a perfect run.
 export const EASY = [
   {
-    id: 'forest', name: 'Forest', battles: 1,
-    enemy: { id: 'goblin', name: 'Goblin', hp: 2 },
-    timer: null, multipliers: [1, 2, 10], factorRange: [1, 10],
+    id: 'forest', name: 'Forest', battles: 3,
+    enemy: { id: 'goblin', name: 'Goblin', hp: 3 },
+    timer: null, multipliers: [0, 1, 2], factorRange: [1, 10],
   },
   {
-    id: 'swamp', name: 'Swamp', battles: 1,
-    enemy: { id: 'skeleton', name: 'Skeleton', hp: 2 },
-    timer: null, multipliers: [1, 2, 5, 10], factorRange: [1, 10],
+    id: 'swamp', name: 'Swamp', battles: 3,
+    enemy: { id: 'skeleton', name: 'Skeleton', hp: 3 },
+    timer: null, multipliers: [2, 5, 10], factorRange: [1, 10],
   },
   {
-    id: 'mountains', name: 'Mountains', battles: 2,
+    id: 'mountains', name: 'Mountains', battles: 3,
     enemy: { id: 'orc', name: 'Orc', hp: 3 },
-    timer: null, multipliers: [2, 3, 5, 10], factorRange: [1, 10],
+    timer: null, multipliers: [3, 4, 6], factorRange: [1, 10],
   },
   {
-    id: 'castle', name: 'Castle', battles: 2,
+    id: 'castle', name: 'Castle', battles: 3,
     enemy: { id: 'darkKnight', name: 'Dark Knight', hp: 3 },
-    timer: null, multipliers: [2, 3, 4, 5, 10], factorRange: [1, 10],
+    timer: null, multipliers: [7, 8, 9], factorRange: [1, 10],
   },
   {
     id: 'dragonLair', name: 'Dragon Lair', battles: 2,
     enemy: { id: 'dragon', name: 'Dragon', hp: 3 },
-    timer: null, multipliers: [2, 3, 4, 5, 10], factorRange: [1, 10],
+    timer: null, multipliers: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10], factorRange: [1, 10],
   },
 ]
 
