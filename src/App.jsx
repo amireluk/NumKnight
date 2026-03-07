@@ -9,12 +9,17 @@ import { StartScreen } from './screens/StartScreen'
 import { EASY, MEDIUM, HARD } from './game/campaign.config'
 import { createNewRun, loadRun, saveRun, clearRun } from './game/runState'
 import { getTrophy, calcBattleScore } from './game/battleLogic'
+import { LANG_KEY, T } from './game/i18n'
 
 const CONFIGS = { easy: EASY, medium: MEDIUM, hard: HARD }
 
 export default function App() {
   const [difficulty, setDifficulty] = useState('medium')
   const [playerName, setPlayerName] = useState(() => localStorage.getItem('numknight_player_name') ?? '')
+  const [lang, setLang] = useState(() => localStorage.getItem(LANG_KEY) ?? 'he')
+
+  const handleLangChange = (l) => { setLang(l); localStorage.setItem(LANG_KEY, l) }
+  const t = T[lang] ?? T.en
 
   const worlds = CONFIGS[difficulty] ?? MEDIUM
   const totalBattles = worlds.reduce((sum, w) => sum + w.battles, 0)
@@ -53,21 +58,21 @@ export default function App() {
       const newTrophies = [...run.trophies, trophy]
       const newWorldScore = worldScore + battleScore
       const newTotalScore = (run.totalScore ?? 0) + battleScore
-      const newRun = { ...run, trophies: newTrophies, totalScore: newTotalScore }
+      const isVictory = newTrophies.length >= totalBattles
+      const isLastBattleInWorld = run.battleIndex + 1 >= world.battles
+
+      const newWorldScores = [...(run.worldScores || [])]
+      if (isVictory || isLastBattleInWorld) newWorldScores[run.worldIndex] = newWorldScore
+
+      const newRun = { ...run, trophies: newTrophies, totalScore: newTotalScore, worldScores: newWorldScores }
       setRun(newRun)
       saveRun(newRun)
       setWorldScore(newWorldScore)
 
-      const isVictory = newTrophies.length >= totalBattles
-      const isLastBattleInWorld = run.battleIndex + 1 >= world.battles
-
-      if (isVictory) {
-        setPendingScore({ totalScore: newTotalScore, endWorld: world.name, cleared: true })
-        setScreen('leaderboard')
-      } else if (isLastBattleInWorld) {
+      if (isVictory || isLastBattleInWorld) {
         const offset = newTrophies.length - world.battles
         const worldTrophies = newTrophies.slice(offset)
-        setClearedData({ world, worldTrophies, worldScore: newWorldScore, totalScore: newTotalScore })
+        setClearedData({ world, worldTrophies, worldScore: newWorldScore, totalScore: newTotalScore, isVictory })
         setScreen('cleared')
       } else {
         setRun((r) => ({ ...r, battleIndex: run.battleIndex + 1 }))
@@ -75,19 +80,22 @@ export default function App() {
         setScreen('battle')
       }
     } else {
-      setPendingScore({ totalScore: run.totalScore ?? 0, endWorld: world.name, cleared: false })
+      setPendingScore({ totalScore: run.totalScore ?? 0, endWorld: world.name, endWorldId: world.id, cleared: false })
       setScreen('result')
     }
   }
 
   const handleClearContinue = () => {
     const nextWorldIndex = run.worldIndex + 1
-    setClearedData(null)
-    setWorldScore(0)
-    if (nextWorldIndex >= worlds.length) {
+    if (nextWorldIndex >= worlds.length || clearedData?.isVictory) {
+      setPendingScore({ totalScore: clearedData.totalScore, endWorld: clearedData.world.name, cleared: true })
+      setClearedData(null)
+      setWorldScore(0)
       setScreen('leaderboard')
       return
     }
+    setClearedData(null)
+    setWorldScore(0)
     setRun((r) => ({ ...r, worldIndex: nextWorldIndex, battleIndex: 0 }))
     setMapIsTransition(true)
     setScreen('map')
@@ -123,7 +131,7 @@ export default function App() {
           initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
           transition={{ duration: 0.25 }} className="w-full"
         >
-          <StartScreen onStart={handleStart} />
+          <StartScreen onStart={handleStart} lang={lang} onLangChange={handleLangChange} t={t} />
         </motion.div>
       )}
 
@@ -132,7 +140,7 @@ export default function App() {
           initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
           transition={{ duration: 0.25 }} className="w-full"
         >
-          <BattleScreen key={battleKey} world={world} battleIndex={run.battleIndex} onBattleEnd={handleBattleEnd} />
+          <BattleScreen key={battleKey} world={world} battleIndex={run.battleIndex} onBattleEnd={handleBattleEnd} lang={lang} t={t} />
         </motion.div>
       )}
 
@@ -147,6 +155,7 @@ export default function App() {
             worldScore={clearedData.worldScore}
             totalScore={clearedData.totalScore}
             onContinue={handleClearContinue}
+            lang={lang} t={t}
           />
         </motion.div>
       )}
@@ -158,8 +167,11 @@ export default function App() {
         >
           <ResultScreen
             worldName={pendingScore?.endWorld ?? ''}
+            worldId={pendingScore?.endWorldId ?? 'forest'}
+            totalScore={pendingScore?.totalScore ?? 0}
             onRestart={handleRestart}
             onViewScores={handleViewScores}
+            lang={lang} t={t}
           />
         </motion.div>
       )}
@@ -176,6 +188,7 @@ export default function App() {
             difficulty={difficulty}
             playerName={playerName}
             onPlayAgain={handleRestart}
+            lang={lang} t={t}
           />
         </motion.div>
       )}
@@ -189,10 +202,12 @@ export default function App() {
             worlds={worlds}
             currentWorldIndex={run.worldIndex}
             trophies={run.trophies}
+            worldScores={run.worldScores ?? []}
             isTransition={mapIsTransition}
             difficulty={difficulty}
             onFight={handleFight}
             onRestart={handleRestart}
+            lang={lang} t={t}
           />
         </motion.div>
       )}

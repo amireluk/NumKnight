@@ -17,28 +17,28 @@
 //  Small tables (×2-×5 max), no timers, generous HP — great for kids
 export const EASY = [
   {
-    id: 'forest', name: 'Forest', icon: '🌲', battles: 2, playerHP: 3,
-    enemy: { id: 'goblin', name: 'Goblin', hp: 2 },
+    id: 'forest', name: 'Forest', icon: '🌲', battles: 1, playerHP: 3,
+    enemy: { id: 'goblin', name: 'Goblin', hp: 1 },
     timer: null, multipliers: [2, 3], factorRange: [1, 10],
   },
   {
-    id: 'swamp', name: 'Swamp', icon: '🌿', battles: 2, playerHP: 3,
-    enemy: { id: 'skeleton', name: 'Skeleton', hp: 2 },
+    id: 'swamp', name: 'Swamp', icon: '🌿', battles: 1, playerHP: 3,
+    enemy: { id: 'skeleton', name: 'Skeleton', hp: 1 },
     timer: null, multipliers: [2, 3, 4], factorRange: [1, 10],
   },
   {
-    id: 'mountains', name: 'Mountains', icon: '⛰️', battles: 2, playerHP: 3,
-    enemy: { id: 'orc', name: 'Orc', hp: 2 },
+    id: 'mountains', name: 'Mountains', icon: '⛰️', battles: 1, playerHP: 3,
+    enemy: { id: 'orc', name: 'Orc', hp: 1 },
     timer: null, multipliers: [2, 3, 4, 5], factorRange: [1, 10],
   },
   {
-    id: 'castle', name: 'Castle', icon: '🏰', battles: 3, playerHP: 3,
-    enemy: { id: 'darkKnight', name: 'Dark Knight', hp: 2 },
+    id: 'castle', name: 'Castle', icon: '🏰', battles: 1, playerHP: 3,
+    enemy: { id: 'darkKnight', name: 'Dark Knight', hp: 1 },
     timer: null, multipliers: [2, 3, 4, 5, 6], factorRange: [1, 10],
   },
   {
-    id: 'dragonLair', name: 'Dragon Lair', icon: '🐉', battles: 3, playerHP: 3,
-    enemy: { id: 'dragon', name: 'Dragon', hp: 2 },
+    id: 'dragonLair', name: 'Dragon Lair', icon: '🐉', battles: 1, playerHP: 3,
+    enemy: { id: 'dragon', name: 'Dragon', hp: 1 },
     timer: null, multipliers: [2, 3, 4, 5, 6, 7, 8], factorRange: [1, 10],
   },
 ]

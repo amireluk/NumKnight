@@ -14,7 +14,7 @@ import { BattleIntro } from '../components/BattleIntro'
 
 const IDLE_BUTTON_STATES = ['idle', 'idle', 'idle', 'idle']
 
-const TROPHY_LABEL = { gold: 'PERFECT!', silver: 'GREAT!', bronze: 'SURVIVED!' }
+const TROPHY_LABEL_DEFAULT = { gold: 'PERFECT!', silver: 'GREAT!', bronze: 'SURVIVED!' }
 const TROPHY_COLOR = { gold: '#fbbf24', silver: '#c0c8d4', bronze: '#cd7c3a' }
 
 function TrophyCup({ trophy, size = 80 }) {
@@ -60,7 +60,8 @@ function TimerBar({ timeLeft, maxTime }) {
 }
 
 // In-scene overlay shown when the enemy is defeated
-function TrophyOverlay({ trophy, timeBonus, onContinue }) {
+function TrophyOverlay({ trophy, timeBonus, onContinue, t }) {
+  const TROPHY_LABEL = t?.trophyLabel ?? TROPHY_LABEL_DEFAULT
   const BASE_SCORE = { gold: 100, silver: 50, bronze: 25 }
   const baseScore = BASE_SCORE[trophy] ?? 0
   return (
@@ -107,11 +108,11 @@ function TrophyOverlay({ trophy, timeBonus, onContinue }) {
         transition={{ delay: 0.55 }}
         style={{
           fontSize: 22, fontWeight: 900, color: 'white', letterSpacing: '0.06em',
-          background: 'rgba(0,0,0,0.55)', borderRadius: 12,
+          background: 'rgba(255,255,255,0.15)', borderRadius: 12,
           padding: '4px 18px',
         }}
       >
-        +{baseScore.toLocaleString()} pts
+        +{baseScore.toLocaleString()} {t?.pts ?? 'pts'}
       </motion.p>
 
       {/* Time bonus */}
@@ -122,11 +123,11 @@ function TrophyOverlay({ trophy, timeBonus, onContinue }) {
           transition={{ delay: 0.72 }}
           style={{
             fontSize: 15, fontWeight: 800, color: '#fbbf24', letterSpacing: '0.05em',
-            background: 'rgba(0,0,0,0.55)', borderRadius: 10,
+            background: 'rgba(255,255,255,0.15)', borderRadius: 10,
             padding: '3px 14px',
           }}
         >
-          +{timeBonus.toLocaleString()} time bonus
+          +{timeBonus.toLocaleString()} {t?.timeBonus ?? 'time bonus'}
         </motion.p>
       )}
 
@@ -137,13 +138,13 @@ function TrophyOverlay({ trophy, timeBonus, onContinue }) {
         transition={{ delay: 0.85 }}
         style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)', letterSpacing: '0.12em' }}
       >
-        TAP TO CONTINUE
+        {t?.tapToContinue ?? 'TAP TO CONTINUE'}
       </motion.p>
     </motion.div>
   )
 }
 
-export function BattleScreen({ world, battleIndex, onBattleEnd }) {
+export function BattleScreen({ world, battleIndex, onBattleEnd, lang, t }) {
   const shakeControls = useAnimation()
 
   const [playerHP,  setPlayerHP]  = useState(world.playerHP)
@@ -304,7 +305,7 @@ export function BattleScreen({ world, battleIndex, onBattleEnd }) {
     <motion.div
       animate={shakeControls}
       className="flex flex-col min-h-dvh max-w-md mx-auto px-3 py-4 gap-4"
-      style={{ position: 'relative', overflow: 'hidden', background: 'linear-gradient(to bottom, #0d0d1e, #1a1040)' }}
+      style={{ position: 'relative', overflow: 'hidden', background: 'linear-gradient(to bottom, #1e3a70, #2d5aaa)' }}
     >
       <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', flex: 1, gap: 16 }}>
 
@@ -312,33 +313,29 @@ export function BattleScreen({ world, battleIndex, onBattleEnd }) {
         <div className="flex flex-1 min-h-0" style={{ position: 'relative' }}>
           <BattleBackground worldId={world.id} />
 
-          {/* Region + round overlay at top of arena */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={introPlaying ? { opacity: 0 } : { opacity: 1 }}
-            transition={{ duration: 0.3 }}
-            style={{
-              position: 'absolute', top: 8, left: 0, right: 0, zIndex: 2,
-              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-              paddingInline: 12, pointerEvents: 'none',
-            }}
-          >
-            <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.72)', fontWeight: 700, letterSpacing: '0.04em', textShadow: '0 1px 5px rgba(0,0,0,0.9)' }}>
-              {world.name}
-            </span>
-            <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.72)', fontWeight: 700, letterSpacing: '0.06em', textShadow: '0 1px 5px rgba(0,0,0,0.9)' }}>
-              Round {battleIndex + 1} / {world.battles}
-            </span>
-          </motion.div>
-
-          {/* Version label */}
+          {/* Version + region + round — stacked top-left */}
           <div style={{
             position: 'absolute', top: 8, left: 10, zIndex: 2,
             pointerEvents: 'none', userSelect: 'none',
+            display: 'flex', flexDirection: 'column', gap: 2,
           }}>
             <span style={{ fontSize: 11, fontFamily: 'monospace', color: 'rgba(255,255,255,0.28)' }}>
               v{APP_VERSION}
             </span>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={introPlaying ? { opacity: 0 } : { opacity: 1 }}
+              transition={{ duration: 0.3 }}
+              style={{ display: 'flex', alignItems: 'center', gap: 5 }}
+            >
+              <span style={{ fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.72)', letterSpacing: '0.04em', textShadow: '0 1px 5px rgba(0,0,0,0.9)' }}>
+                {t?.worldName?.[world.id] ?? world.name}
+              </span>
+              <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.30)' }}>·</span>
+              <span style={{ fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.55)', letterSpacing: '0.05em', textShadow: '0 1px 5px rgba(0,0,0,0.9)' }}>
+                {t?.roundLabel ? t.roundLabel(battleIndex + 1, world.battles) : `Round ${battleIndex + 1}/${world.battles}`}
+              </span>
+            </motion.div>
           </div>
 
           <div className="flex flex-1 items-end gap-3 px-2" style={{ position: 'relative', zIndex: 1 }}>
@@ -447,7 +444,7 @@ export function BattleScreen({ world, battleIndex, onBattleEnd }) {
       </div>
 
       {/* Intro overlay */}
-      {introPlaying && <BattleIntro onComplete={() => setIntroPlaying(false)} battleIndex={battleIndex} isFinal={battleIndex === world.battles - 1} />}
+      {introPlaying && <BattleIntro onComplete={() => setIntroPlaying(false)} battleIndex={battleIndex} isFinal={battleIndex === world.battles - 1} t={t} />}
 
       {/* In-scene trophy overlay — dims arena and shows trophy drop */}
       {showTrophy && (
@@ -455,6 +452,7 @@ export function BattleScreen({ world, battleIndex, onBattleEnd }) {
           trophy={getTrophy(wonMistakesRef.current)}
           timeBonus={wonTimeBonusRef.current}
           onContinue={() => onBattleEnd({ won: true, mistakes: wonMistakesRef.current, timeBonus: wonTimeBonusRef.current })}
+          t={t}
         />
       )}
     </motion.div>

@@ -127,6 +127,71 @@ function HitSplash({ color }) {
   )
 }
 
+// ─── Fallen scene (used on ResultScreen) ──────────────────────────────────────
+// Knight lies on its back via CSS rotate(-90deg) — exact same SVG parts as in battle
+export function FallenKnightScene() {
+  return (
+    <div style={{
+      width: 200, height: 140,
+      position: 'relative', borderRadius: 18, overflow: 'hidden',
+    }}>
+      {/* Sky */}
+      <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, #3a78b8, #88bce0)' }} />
+      {/* Sun */}
+      <div style={{ position: 'absolute', top: 14, right: 16, width: 24, height: 24, borderRadius: '50%', background: '#f0d060', opacity: 0.85 }} />
+      {/* Soft clouds */}
+      <svg style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '60%', pointerEvents: 'none' }}
+        viewBox="0 0 200 84" preserveAspectRatio="none">
+        <ellipse cx="52" cy="28" rx="24" ry="9" fill="white" opacity="0.28" />
+        <ellipse cx="70" cy="24" rx="15" ry="8" fill="white" opacity="0.22" />
+        <ellipse cx="38" cy="26" rx="14" ry="7" fill="white" opacity="0.18" />
+      </svg>
+      {/* Ground */}
+      <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 36, background: '#5aaa42' }} />
+      <svg style={{ position: 'absolute', bottom: 36, left: 0, width: '100%', height: 14, pointerEvents: 'none' }}
+        viewBox="0 0 200 14" preserveAspectRatio="none">
+        <path d="M0 10 Q50 0 100 8 Q150 14 200 4 L200 14 L0 14Z" fill="#5aaa42" />
+      </svg>
+      {/* Sword lying on ground */}
+      <svg style={{ position: 'absolute', bottom: 36, left: 0, width: '100%', pointerEvents: 'none' }}
+        viewBox="0 0 200 10" height="10" preserveAspectRatio="xMidYMax meet">
+        <rect x="48" y="4" width="68" height="3" rx="1.5" fill="#e0e0e0" stroke="#424242" strokeWidth="0.8" />
+        <polygon points="116,3.5 123,5 116,6.5" fill="#e0e0e0" stroke="#424242" strokeWidth="0.7" />
+        <rect x="60" y="3" width="12" height="4" rx="1.5" fill="#6d4c41" stroke="#3e2723" strokeWidth="0.7" />
+      </svg>
+      {/* Knight body rotated to lie on back */}
+      {/* center-x=100, center-y=104-42=62, so left=58, top=6 → rotate(-90deg) */}
+      <div style={{
+        position: 'absolute', left: 58, top: 6,
+        transformOrigin: 'center center',
+        transform: 'rotate(-90deg)',
+        pointerEvents: 'none',
+      }}>
+        <div style={{ position: 'relative', width: 84, height: 112, overflow: 'visible' }}>
+          <KnightBodySVG />
+          <div style={{ position: 'absolute', top: 0, left: 0, overflow: 'visible', transformOrigin: '73px 58px' }}>
+            <KnightSwordArmSVG />
+          </div>
+        </div>
+      </div>
+      {/* KO stars near head (head ends up around x=77, y=62 after rotation) */}
+      <svg style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }} width="200" height="140" viewBox="0 0 200 140">
+        <g transform="translate(60 46) rotate(15)">
+          <polygon points="0,-8 2.5,-2.5 8,-2.5 3.5,1.5 5.5,7 0,3.5 -5.5,7 -3.5,1.5 -8,-2.5 -2.5,-2.5" fill="#ffd54f" stroke="#424242" strokeWidth="0.8" />
+        </g>
+        <g transform="translate(76 33) rotate(-10)">
+          <polygon points="0,-6 2,-1.5 6,-1.5 3,1 4,6 0,3.5 -4,6 -3,1 -6,-1.5 -2,-1.5" fill="#ffd54f" stroke="#424242" strokeWidth="0.8" />
+        </g>
+        <g transform="translate(46 34) rotate(25)">
+          <polygon points="0,-5 1.5,-1.5 5,-1.5 2.5,1 3.5,5 0,3 -3.5,5 -2.5,1 -5,-1.5 -1.5,-1.5" fill="#fbbf24" stroke="#424242" strokeWidth="0.8" />
+        </g>
+        <circle cx="68" cy="52" r="2" fill="#ffd54f" stroke="#424242" strokeWidth="0.6" />
+        <circle cx="54" cy="42" r="1.5" fill="#ffd54f" stroke="#424242" strokeWidth="0.5" />
+      </svg>
+    </div>
+  )
+}
+
 export function KnightCharacter({ phase, hitKey }) {
   const moveControls = useAnimation()
   const swordControls = useAnimation()

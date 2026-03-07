@@ -2,8 +2,15 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { saveScore, loadScores } from '../game/scoreState'
 
-const DIFF_LABEL = { easy: 'Easy', medium: 'Medium', hard: 'Hard' }
+const DIFF_LABEL_DEFAULT = { easy: 'Easy', medium: 'Medium', hard: 'Hard' }
 const DIFF_COLOR = { easy: '#4ade80', medium: '#fbbf24', hard: '#ef4444' }
+
+// Map stored English world names → ids for translation
+const WORLD_ID_BY_NAME = {
+  'Forest': 'forest', 'Swamp': 'swamp', 'Mountains': 'mountains',
+  'Castle': 'castle', 'Dragon Lair': 'dragonLair',
+}
+const worldDisplayName = (name, t) => (t?.worldName?.[WORLD_ID_BY_NAME[name]]) ?? name
 
 const NAME_KEY = 'numknight_player_name'
 
@@ -18,7 +25,8 @@ const RANK_BORDER = [
   'rgba(180,83,9,0.22)',
 ]
 
-export function LeaderboardScreen({ totalScore, endWorld, cleared, difficulty, playerName, onPlayAgain }) {
+export function LeaderboardScreen({ totalScore, endWorld, cleared, difficulty, playerName, onPlayAgain, lang, t }) {
+  const isRtl = lang === 'he'
   const [[scores, newScoreIndex]] = useState(() => {
     const name = playerName || localStorage.getItem(NAME_KEY) || 'Knight'
     if (name) localStorage.setItem(NAME_KEY, name)
@@ -41,11 +49,12 @@ export function LeaderboardScreen({ totalScore, endWorld, cleared, difficulty, p
 
   return (
     <div
+      dir={isRtl ? 'rtl' : 'ltr'}
       className="flex flex-col min-h-dvh max-w-md mx-auto px-4 py-5 gap-4"
       style={{
         background:
           'radial-gradient(ellipse at 50% 30%, rgba(251,191,36,0.12) 0%, transparent 65%), ' +
-          'linear-gradient(to bottom, #0d0d1e, #1a1040)',
+          'linear-gradient(to bottom, #1e3a70, #2d5aaa)',
       }}
     >
       {/* Header */}
@@ -57,15 +66,15 @@ export function LeaderboardScreen({ totalScore, endWorld, cleared, difficulty, p
         style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}
       >
         <p className="text-white/40 text-xs font-black tracking-[0.35em] uppercase">
-          Kingdom Records
+          {t?.kingdomRecords ?? 'Kingdom Records'}
         </p>
-        <p className="text-white font-black text-3xl tracking-wide">Leaderboard</p>
+        <p className="text-white font-black text-3xl tracking-wide">{t?.leaderboard ?? 'Leaderboard'}</p>
         <span style={{
           background: DIFF_COLOR[difficulty], color: '#000',
           borderRadius: 99, padding: '2px 14px',
           fontSize: 11, fontWeight: 900, letterSpacing: '0.08em',
         }}>
-          {DIFF_LABEL[difficulty] ?? difficulty}
+          {(t?.diffLabel ?? DIFF_LABEL_DEFAULT)[difficulty] ?? difficulty}
         </span>
       </motion.div>
 
@@ -75,15 +84,15 @@ export function LeaderboardScreen({ totalScore, endWorld, cleared, difficulty, p
         animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: 0.15 }}
         style={{
-          background: 'rgba(255,255,255,0.05)',
-          border: '1px solid rgba(255,255,255,0.10)',
+          background: 'rgba(255,255,255,0.15)',
+          border: '1px solid rgba(255,255,255,0.30)',
           borderRadius: 18, padding: '12px 18px',
           display: 'flex', justifyContent: 'space-between', alignItems: 'center',
         }}
       >
         <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
           <span style={{ color: 'rgba(255,255,255,0.55)', fontSize: 12, fontWeight: 700, letterSpacing: '0.1em' }}>
-            YOUR SCORE
+            {t?.yourScore ?? 'YOUR SCORE'}
           </span>
           {endWorld && (
             <span style={{
@@ -91,7 +100,7 @@ export function LeaderboardScreen({ totalScore, endWorld, cleared, difficulty, p
               color: cleared ? '#fbbf24' : 'rgba(255,255,255,0.35)',
               letterSpacing: '0.06em',
             }}>
-              {cleared ? 'CONQUERED' : `Fell at ${endWorld}`}
+              {cleared ? (t?.conquered ?? 'CONQUERED') : (t?.fellAt ? t.fellAt(worldDisplayName(endWorld, t)) : `Fell at ${endWorld}`)}
             </span>
           )}
         </div>
@@ -109,7 +118,7 @@ export function LeaderboardScreen({ totalScore, endWorld, cleared, difficulty, p
       <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 6 }}>
         {scores.length === 0 ? (
           <p style={{ color: 'rgba(255,255,255,0.28)', textAlign: 'center', marginTop: 24, fontSize: 14 }}>
-            No scores yet — be the first!
+            {t?.noScores ?? 'No scores yet — be the first!'}
           </p>
         ) : scores.map((entry, i) => {
           const isNew = i === newScoreIndex
@@ -169,7 +178,7 @@ export function LeaderboardScreen({ totalScore, endWorld, cleared, difficulty, p
                 color: entry.cleared ? '#fbbf24' : 'rgba(255,255,255,0.28)',
                 flexShrink: 0, minWidth: 60, textAlign: 'center',
               }}>
-                {entry.cleared ? 'CONQUERED' : (entry.endWorld ?? '')}
+                {entry.cleared ? (t?.conquered ?? 'CONQUERED') : (t?.fellAtShort ? t.fellAtShort(worldDisplayName(entry.endWorld ?? '', t)) : (entry.endWorld ?? ''))}
               </span>
               {/* Score */}
               <span style={{
@@ -194,7 +203,7 @@ export function LeaderboardScreen({ totalScore, endWorld, cleared, difficulty, p
         onClick={onPlayAgain}
         className="w-full bg-yellow-400 border-b-4 border-yellow-600 text-black font-black text-xl rounded-2xl h-14 shadow-xl cursor-pointer tracking-widest"
       >
-        PLAY AGAIN
+        {t?.playAgain ?? 'PLAY AGAIN'}
       </motion.button>
     </div>
   )

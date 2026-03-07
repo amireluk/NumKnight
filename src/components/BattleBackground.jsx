@@ -4,7 +4,7 @@ function ForestBackground() {
     <div style={{ position: 'absolute', inset: 0, overflow: 'hidden' }}>
       <div style={{
         position: 'absolute', inset: 0,
-        background: 'linear-gradient(to bottom, #4a8ab8, #9ecce0)',
+        background: 'linear-gradient(to bottom, #4a9ed8, #89cef0)',
       }} />
       {/* Sun glow + core */}
       <div style={{
@@ -55,7 +55,7 @@ function SwampBackground() {
     <div style={{ position: 'absolute', inset: 0, overflow: 'hidden' }}>
       <div style={{
         position: 'absolute', inset: 0,
-        background: 'linear-gradient(to bottom, #1a2620, #324838)',
+        background: 'linear-gradient(to bottom, #182218, #2e4230)',
       }} />
       {/* Sickly moon — dim, upper-left */}
       <div style={{
@@ -122,7 +122,7 @@ function MountainsBackground() {
     <div style={{ position: 'absolute', inset: 0, overflow: 'hidden' }}>
       <div style={{
         position: 'absolute', inset: 0,
-        background: 'linear-gradient(to bottom, #26404e, #86b8cc)',
+        background: 'linear-gradient(to bottom, #223848, #72a8be)',
       }} />
       {/* Pale cold sun */}
       <div style={{
@@ -175,7 +175,7 @@ function CastleBackground() {
     <div style={{ position: 'absolute', inset: 0, overflow: 'hidden' }}>
       <div style={{
         position: 'absolute', inset: 0,
-        background: 'linear-gradient(to bottom, #05070f, #0e1726)',
+        background: 'linear-gradient(to bottom, #040710, #0c1628)',
       }} />
       {/* Distant lightning ambient glow */}
       <div style={{
@@ -242,7 +242,7 @@ function DragonLairBackground() {
     <div style={{ position: 'absolute', inset: 0, overflow: 'hidden' }}>
       <div style={{
         position: 'absolute', inset: 0,
-        background: 'linear-gradient(to bottom, #060100, #280600)',
+        background: 'linear-gradient(to bottom, #050100, #2a0600)',
       }} />
       {/* Lava up-glow */}
       <div style={{

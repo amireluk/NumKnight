@@ -1,21 +1,29 @@
 /* eslint-disable no-undef */
 const APP_VERSION = typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : 'dev'
 
-import { useState, useRef } from 'react'
 import { motion } from 'framer-motion'
 import { EnemyCharacter } from '../components/EnemyCharacter'
+import { KnightCharacter } from '../components/KnightCharacter'
 
-const TROPHY_COLOR = { gold: '#fbbf24', silver: '#c0c8d4', bronze: '#cd7c3a' }
-
-function TrophyCup({ trophy, size = 28 }) {
-  const color = TROPHY_COLOR[trophy]
+function MedalBadge({ trophy, size = 30 }) {
+  const c = {
+    gold:   { outer: '#fbbf24', inner: '#78350f', shine: '#fde68a', ribbon: '#d97706' },
+    silver: { outer: '#c0c8d4', inner: '#374151', shine: '#e5e7eb', ribbon: '#6b7280' },
+    bronze: { outer: '#cd7c3a', inner: '#7c2d12', shine: '#fca869', ribbon: '#b45309' },
+  }[trophy] ?? { outer: '#888', inner: '#333', shine: '#aaa', ribbon: '#666' }
   return (
-    <svg width={size} height={Math.round(size * 1.1)} viewBox="0 0 48 52" fill="none">
-      <path d="M10 4 L38 4 L34 28 Q32 36 24 38 Q16 36 14 28Z" fill={color} />
-      <path d="M10 8 Q2 8 2 17 Q2 26 10 26" stroke={color} strokeWidth="4.5" fill="none" strokeLinecap="round" />
-      <path d="M38 8 Q46 8 46 17 Q46 26 38 26" stroke={color} strokeWidth="4.5" fill="none" strokeLinecap="round" />
-      <rect x="20" y="38" width="8" height="7" fill={color} />
-      <rect x="12" y="45" width="24" height="5" rx="2.5" fill={color} />
+    <svg width={size} height={Math.round(size * 1.55)} viewBox="0 0 30 46" fill="none">
+      {/* Ribbon */}
+      <path d="M10 26 L10 44 L15 38 L15 26Z" fill={c.ribbon} />
+      <path d="M20 26 L20 44 L15 38 L15 26Z" fill={c.ribbon} opacity="0.72" />
+      {/* Outer ring */}
+      <circle cx="15" cy="15" r="13" fill={c.outer} />
+      {/* Inner circle */}
+      <circle cx="15" cy="15" r="9"  fill={c.inner} />
+      {/* Centre glow */}
+      <circle cx="15" cy="15" r="4.5" fill={c.outer} opacity="0.45" />
+      {/* Shine */}
+      <ellipse cx="11" cy="11" rx="3" ry="2" fill={c.shine} opacity="0.38" transform="rotate(-30 11 11)" />
     </svg>
   )
 }
@@ -250,8 +258,8 @@ const REGION_STRIPS = {
 
 // ── Region band ──────────────────────────────────────────────────────────────
 
-function RegionBand({ world, status, trophy, isSelected, onClick, onDoubleTap, delay }) {
-  const Strip    = REGION_STRIPS[world.id] ?? ForestStrip
+function RegionBand({ world, status, trophy, score, delay, t }) {
+  const Strip       = REGION_STRIPS[world.id] ?? ForestStrip
   const isLocked    = status === 'locked'
   const isCurrent   = status === 'current'
   const isCompleted = status === 'completed'
@@ -261,72 +269,68 @@ function RegionBand({ world, status, trophy, isSelected, onClick, onDoubleTap, d
       initial={{ opacity: 0, x: -28 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay, duration: 0.28 }}
-      onClick={onClick}
       style={{
         position: 'relative',
         flex: 1,
         overflow: 'hidden',
-        cursor: 'pointer',
         borderRadius: 10,
-        border: isSelected
-          ? isCurrent
-            ? '2px solid rgba(251,191,36,0.9)'
-            : '2px solid rgba(167,139,250,0.65)'
+        border: isCurrent
+          ? '2px solid rgba(251,191,36,0.9)'
           : '2px solid rgba(255,255,255,0.06)',
-        boxShadow: isSelected
-          ? isCurrent
-            ? '0 0 20px rgba(251,191,36,0.4), inset 0 0 14px rgba(251,191,36,0.07)'
-            : '0 0 14px rgba(167,139,250,0.25)'
-          : 'none',
-        transition: 'border-color 0.18s, box-shadow 0.18s',
       }}
     >
       {/* Scene background */}
       <Strip />
-
-      {/* Left gradient for text legibility */}
-      <div style={{
-        position: 'absolute', inset: 0, pointerEvents: 'none',
-        background: 'linear-gradient(to right, rgba(0,0,0,0.70) 0%, rgba(0,0,0,0.20) 55%, rgba(0,0,0,0) 100%)',
-      }} />
 
       {/* Locked overlay */}
       {isLocked && (
         <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.62)', pointerEvents: 'none' }} />
       )}
 
-      {/* Cleared X */}
-      {isCompleted && (
-        <svg
-          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', zIndex: 3, pointerEvents: 'none' }}
-          viewBox="0 0 100 100"
-          preserveAspectRatio="none"
-        >
-          <line x1="5" y1="8" x2="95" y2="92" stroke="#ef4444" strokeWidth="4.5" opacity="0.68" strokeLinecap="round" />
-          <line x1="95" y1="8" x2="5" y2="92" stroke="#ef4444" strokeWidth="4.5" opacity="0.68" strokeLinecap="round" />
-        </svg>
-      )}
-
-      {/* Monster preview on selected non-locked band */}
-      {isSelected && !isLocked && (
+      {/* Completed: medal + score centered */}
+      {isCompleted && trophy && (
         <div style={{
-          position: 'absolute',
-          left: '50%', bottom: 0,
-          transform: 'translateX(-50%) scale(0.48)',
-          transformOrigin: 'center bottom',
-          zIndex: 2, pointerEvents: 'none',
+          position: 'absolute', inset: 0, zIndex: 3, pointerEvents: 'none',
+          display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 3,
         }}>
-          <EnemyCharacter phase="idle" enemy={world.enemy} hitKey={0} />
+          <MedalBadge trophy={trophy} size={32} />
+          {score != null && (
+            <span style={{
+              fontSize: 12, fontWeight: 900, color: 'rgba(255,255,255,0.80)',
+              textShadow: '0 1px 6px rgba(0,0,0,0.95)',
+              letterSpacing: '0.06em',
+              background: 'rgba(0,0,0,0.30)', borderRadius: 6,
+              padding: '2px 8px',
+            }}>
+              {score.toLocaleString()}
+            </span>
+          )}
         </div>
       )}
-      {/* Lock icon on selected locked band */}
-      {isSelected && isLocked && (
+
+      {/* Active: knight + enemy centered */}
+      {isCurrent && (
+        <div style={{
+          position: 'absolute', inset: 0, zIndex: 2, pointerEvents: 'none',
+          display: 'flex', alignItems: 'flex-end', justifyContent: 'center', gap: 12,
+        }}>
+          <div style={{ transform: 'scale(0.46)', transformOrigin: 'center bottom' }}>
+            <KnightCharacter phase="idle" hitKey={0} />
+          </div>
+          <div style={{ transform: 'scale(0.46)', transformOrigin: 'center bottom' }}>
+            <EnemyCharacter phase="idle" enemy={world.enemy} hitKey={0} />
+          </div>
+        </div>
+      )}
+
+      {/* Locked: lock icon centered */}
+      {isLocked && (
         <div style={{
           position: 'absolute', left: '50%', top: '50%',
           transform: 'translate(-50%, -50%)',
           zIndex: 2, pointerEvents: 'none',
         }}>
-          <svg width="42" height="52" viewBox="0 0 42 52" fill="none">
+          <svg width="36" height="44" viewBox="0 0 42 52" fill="none">
             <path d="M9 22 L9 15 Q9 4 21 4 Q33 4 33 15 L33 22"
               stroke="rgba(255,255,255,0.28)" strokeWidth="6" fill="none" strokeLinecap="round" />
             <rect x="4" y="20" width="34" height="28" rx="6" fill="rgba(255,255,255,0.14)" />
@@ -336,39 +340,41 @@ function RegionBand({ world, status, trophy, isSelected, onClick, onDoubleTap, d
         </div>
       )}
 
-      {/* Current pulsing border */}
+      {/* Region name — top-left label */}
+      <div style={{
+        position: 'absolute', top: 5, left: 7, zIndex: 4,
+        pointerEvents: 'none',
+        background: 'rgba(0,0,0,0.35)', borderRadius: 5,
+        padding: '1px 7px',
+        fontSize: 10, fontWeight: 900, letterSpacing: '0.08em',
+        color: isLocked ? 'rgba(255,255,255,0.28)' : 'rgba(255,255,255,0.82)',
+        textTransform: 'uppercase',
+      }}>
+        {t?.worldName?.[world.id] ?? world.name}
+      </div>
+
+      {/* Active: glowing border animation */}
       {isCurrent && (
         <motion.div
-          style={{ position: 'absolute', inset: 0, pointerEvents: 'none', borderRadius: 8, border: '2px solid rgba(251,191,36,0.55)' }}
-          animate={{ opacity: [0.4, 1, 0.4] }}
-          transition={{ repeat: Infinity, duration: 2.2, ease: 'easeInOut' }}
+          style={{
+            position: 'absolute', inset: 0, pointerEvents: 'none', borderRadius: 8,
+            border: '2px solid rgba(251,191,36,0.7)',
+          }}
+          animate={{
+            boxShadow: [
+              '0 0 8px rgba(251,191,36,0.3), inset 0 0 8px rgba(251,191,36,0.05)',
+              '0 0 22px rgba(251,191,36,0.75), inset 0 0 16px rgba(251,191,36,0.12)',
+              '0 0 8px rgba(251,191,36,0.3), inset 0 0 8px rgba(251,191,36,0.05)',
+            ],
+            borderColor: [
+              'rgba(251,191,36,0.55)',
+              'rgba(251,191,36,1)',
+              'rgba(251,191,36,0.55)',
+            ],
+          }}
+          transition={{ repeat: Infinity, duration: 2.0, ease: 'easeInOut' }}
         />
       )}
-
-      {/* Left: region name */}
-      <div style={{
-        position: 'absolute', inset: 0, display: 'flex', alignItems: 'center',
-        paddingInline: 14, gap: 10, pointerEvents: 'none',
-      }}>
-        <span style={{
-          fontSize: 14, fontWeight: 900, letterSpacing: '0.07em',
-          color: isLocked ? 'rgba(255,255,255,0.22)' : isCurrent ? '#fbbf24' : 'rgba(255,255,255,0.88)',
-          textShadow: '0 1px 5px rgba(0,0,0,0.95)',
-          lineHeight: 1,
-        }}>
-          {world.name}
-        </span>
-      </div>
-
-      {/* Right: trophy or lock */}
-      <div style={{
-        position: 'absolute', right: 14, top: '50%', transform: 'translateY(-50%)',
-        display: 'flex', alignItems: 'center', zIndex: 4,
-      }}>
-        {trophy && (
-          <TrophyCup trophy={trophy} size={28} />
-        )}
-      </div>
     </motion.div>
   )
 }
@@ -376,37 +382,23 @@ function RegionBand({ world, status, trophy, isSelected, onClick, onDoubleTap, d
 // ── Screen ───────────────────────────────────────────────────────────────────
 
 export function WorldMapScreen({
-  worlds, currentWorldIndex, trophies,
-  isTransition, difficulty, onFight, onRestart,
+  worlds, currentWorldIndex, trophies, worldScores,
+  isTransition, difficulty, onFight, onRestart, lang, t,
 }) {
-  const initPos = isTransition ? Math.max(0, currentWorldIndex - 1) : currentWorldIndex
-  const [selectedIndex, setSelectedIndex] = useState(initPos)
-  const lastTapRef = useRef({ i: -1, time: 0 })
-
-  const handleBandClick = (i) => {
-    setSelectedIndex(i)
-    if (i === currentWorldIndex) {
-      const now = Date.now()
-      if (lastTapRef.current.i === i && now - lastTapRef.current.time < 350) {
-        onFight()
-        return
-      }
-      lastTapRef.current = { i, time: now }
-    }
-  }
-
-  const canFight = selectedIndex === currentWorldIndex
-  const selectedStatus =
-    selectedIndex < currentWorldIndex ? 'completed' :
-    selectedIndex === currentWorldIndex ? 'current' : 'locked'
-
+  const isRtl = lang === 'he'
   // Reversed display: Dragon Lair at top, Forest at bottom
   const displayWorlds = [...worlds].reverse()
 
   return (
     <div
+      dir={isRtl ? 'rtl' : 'ltr'}
       className="flex flex-col h-dvh max-w-md mx-auto select-none"
-      style={{ position: 'relative', background: '#04060c' }}
+      style={{
+        position: 'relative',
+        background:
+          'radial-gradient(ellipse at 50% 20%, rgba(251,191,36,0.10) 0%, transparent 55%), ' +
+          'linear-gradient(to bottom, #1e3a70, #2d5aaa)',
+      }}
     >
       {/* Restart button */}
       <motion.button
@@ -417,13 +409,13 @@ export function WorldMapScreen({
         style={{
           position: 'absolute', top: 14, left: 14, zIndex: 30,
           width: 34, height: 34, borderRadius: '50%',
-          background: 'rgba(0,0,0,0.35)', border: '1px solid rgba(255,255,255,0.14)',
+          background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.30)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           cursor: 'pointer', color: 'rgba(255,255,255,0.45)', fontSize: 16,
           backdropFilter: 'blur(4px)',
         }}
         whileTap={{ scale: 0.9 }}
-        whileHover={{ background: 'rgba(0,0,0,0.55)', color: 'rgba(255,255,255,0.75)' }}
+        whileHover={{ background: 'rgba(255,255,255,0.28)', color: 'rgba(255,255,255,0.90)' }}
         title="New Game"
       >
         ←
@@ -454,51 +446,33 @@ export function WorldMapScreen({
             i < currentWorldIndex  ? 'completed' :
             i === currentWorldIndex ? 'current'   : 'locked'
           const trophy = i < currentWorldIndex ? getBestTrophy(trophies, worlds, i) : null
+          const score  = worldScores?.[i] ?? null
           return (
             <RegionBand
               key={world.id}
               world={world}
               status={status}
               trophy={trophy}
-              isSelected={selectedIndex === i}
-              onClick={() => handleBandClick(i)}
+              score={score}
               delay={0.08 + di * 0.06}
+              t={t}
             />
           )
         })}
       </div>
 
-      {/* Info strip — only for cleared regions */}
-      <div className="px-6 pt-2" style={{ minHeight: 22, flexShrink: 0 }}>
-        {!canFight && selectedStatus === 'completed' && (
-          <motion.p
-            key={selectedIndex}
-            initial={{ opacity: 0, y: 4 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-center text-xs font-bold tracking-widest"
-            style={{ color: 'rgba(251,191,36,0.75)' }}
-          >
-            WORLD CLEARED
-          </motion.p>
-        )}
-      </div>
-
       {/* Footer */}
-      <div className="px-6 pb-6 pt-2" style={{ flexShrink: 0 }}>
+      <div className="px-6 pb-6 pt-4" style={{ flexShrink: 0 }}>
         <motion.button
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.65, type: 'spring', stiffness: 210, damping: 18 }}
-          whileTap={canFight ? { scale: 0.95 } : undefined}
-          whileHover={canFight ? { scale: 1.03 } : undefined}
-          onClick={canFight ? onFight : undefined}
-          className={`w-full font-black text-2xl rounded-2xl h-14 shadow-xl tracking-widest transition-colors duration-200 ${
-            canFight
-              ? 'bg-yellow-400 border-b-4 border-yellow-600 text-black cursor-pointer'
-              : 'bg-slate-800/80 border-b-4 border-slate-900 text-white/20 cursor-default'
-          }`}
+          whileTap={{ scale: 0.95 }}
+          whileHover={{ scale: 1.03 }}
+          onClick={onFight}
+          className="w-full font-black text-2xl rounded-2xl h-14 shadow-xl tracking-widest bg-yellow-400 border-b-4 border-yellow-600 text-black cursor-pointer"
         >
-          {canFight ? 'FIGHT !' : selectedStatus === 'locked' ? 'LOCKED' : 'CLEARED'}
+          {t?.fight ?? 'Go!'}
         </motion.button>
       </div>
     </div>

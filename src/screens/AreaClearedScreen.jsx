@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { motion } from 'framer-motion'
+import { motion, useAnimation } from 'framer-motion'
 
 const TROPHY_COLOR = { gold: '#fbbf24', silver: '#c0c8d4', bronze: '#cd7c3a' }
 
@@ -37,11 +37,11 @@ function animateCount(from, to, ms, onTick, onDone) {
 
 function ForestScene() {
   return (
-    <svg width="200" height="140" viewBox="0 0 200 140" fill="none">
+    <svg width="100%" viewBox="0 0 200 140" style={{ display: 'block' }} fill="none">
       <defs>
         <linearGradient id="ac-sky-f" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#3a78a8" />
-          <stop offset="100%" stopColor="#88c0d8" />
+          <stop offset="0%" stopColor="#4a9ed8" />
+          <stop offset="100%" stopColor="#89cef0" />
         </linearGradient>
       </defs>
       <rect width="200" height="140" rx="18" fill="url(#ac-sky-f)" />
@@ -70,7 +70,7 @@ function ForestScene() {
 
 function SwampScene() {
   return (
-    <svg width="200" height="140" viewBox="0 0 200 140" fill="none">
+    <svg width="100%" viewBox="0 0 200 140" style={{ display: 'block' }} fill="none">
       <defs>
         <linearGradient id="ac-sky-s" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stopColor="#182218" />
@@ -108,7 +108,7 @@ function SwampScene() {
 
 function MountainsScene() {
   return (
-    <svg width="200" height="140" viewBox="0 0 200 140" fill="none">
+    <svg width="100%" viewBox="0 0 200 140" style={{ display: 'block' }} fill="none">
       <defs>
         <linearGradient id="ac-sky-m" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stopColor="#223848" />
@@ -139,7 +139,7 @@ function MountainsScene() {
 
 function CastleScene() {
   return (
-    <svg width="200" height="140" viewBox="0 0 200 140" fill="none">
+    <svg width="100%" viewBox="0 0 200 140" style={{ display: 'block' }} fill="none">
       <defs>
         <linearGradient id="ac-sky-c" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stopColor="#040710" />
@@ -173,11 +173,11 @@ function CastleScene() {
 
 function DragonLairScene() {
   return (
-    <svg width="200" height="140" viewBox="0 0 200 140" fill="none">
+    <svg width="100%" viewBox="0 0 200 140" style={{ display: 'block' }} fill="none">
       <defs>
         <linearGradient id="ac-sky-d" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stopColor="#050100" />
-          <stop offset="100%" stopColor="#220500" />
+          <stop offset="100%" stopColor="#2a0600" />
         </linearGradient>
         <radialGradient id="ac-lava-glow" cx="50%" cy="100%" r="60%">
           <stop offset="0%" stopColor="rgba(220,60,0,0.5)" />
@@ -228,46 +228,51 @@ const WORLD_SCENES = {
 
 // ── Screen ────────────────────────────────────────────────────────────────────
 
-export function AreaClearedScreen({ world, worldTrophies, worldScore, totalScore, onContinue }) {
-  const Scene    = WORLD_SCENES[world.id] ?? ForestScene
+export function AreaClearedScreen({ world, worldTrophies, worldScore, totalScore, onContinue, lang, t }) {
+  const isRtl = lang === 'he'
+  const Scene     = WORLD_SCENES[world.id] ?? ForestScene
   const prevTotal = totalScore - worldScore
 
+  const [tapRevealed,   setTapRevealed]   = useState(worldScore === 0)
   const [battleDisplay, setBattleDisplay] = useState(0)
   const [totalDisplay,  setTotalDisplay]  = useState(prevTotal)
   const [showContinue,  setShowContinue]  = useState(worldScore === 0)
-  const cancelRef = useRef([])
+  const cancelRef     = useRef([])
+  const roundControls = useAnimation()
 
   useEffect(() => {
-    if (worldScore === 0) return
+    if (!tapRevealed || worldScore === 0) return
 
-    // Phase 1: count battle score up — start after trophies animate in
     const t1 = setTimeout(() => {
       const cancel1 = animateCount(0, worldScore, 700, setBattleDisplay, () => {
-        // Hold, then transfer
         const t2 = setTimeout(() => {
-          // Transfer: battle score down, total score up — simultaneously
-          animateCount(worldScore, 0, 650, setBattleDisplay)
+          roundControls.start({
+            scale: [1, 1.22, 1],
+            filter: ['brightness(1)', 'brightness(1.8)', 'brightness(1)'],
+            transition: { duration: 0.38, ease: 'easeInOut' },
+          })
           const cancel2 = animateCount(prevTotal, totalScore, 650, setTotalDisplay, () => {
             setShowContinue(true)
           })
           cancelRef.current.push(cancel2)
-        }, 500)
+        }, 350)
         cancelRef.current.push(() => clearTimeout(t2))
       })
       cancelRef.current.push(cancel1)
-    }, 850)
+    }, 320)
 
     cancelRef.current.push(() => clearTimeout(t1))
     return () => cancelRef.current.forEach((fn) => fn?.())
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [tapRevealed]) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div
-      className="flex flex-col items-center justify-center min-h-dvh max-w-md mx-auto px-6 gap-5"
+      dir={isRtl ? 'rtl' : 'ltr'}
+      className="flex flex-col items-center justify-center min-h-dvh max-w-md mx-auto px-4 gap-4"
       style={{
         background:
           'radial-gradient(ellipse at 50% 38%, rgba(251,191,36,0.11) 0%, transparent 65%), ' +
-          'linear-gradient(to bottom, #0d0d1e, #1a1040)',
+          'linear-gradient(to bottom, #1e3a70, #2d5aaa)',
       }}
     >
       {/* 1. Region name */}
@@ -278,73 +283,116 @@ export function AreaClearedScreen({ world, worldTrophies, worldScore, totalScore
         transition={{ duration: 0.32 }}
       >
         <p className="text-white font-black text-3xl tracking-wide">
-          {world.name}
+          {t?.worldName?.[world.id] ?? world.name}
         </p>
         <p className="text-white/40 text-xs font-black tracking-[0.35em] uppercase mt-1">
-          Area Cleared
+          {t?.areaCleared ?? 'Area Cleared'}
         </p>
       </motion.div>
 
-      {/* 2. Region illustration */}
+      {/* 2. Region illustration — full width */}
       <motion.div
         initial={{ scale: 0.7, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ type: 'spring', stiffness: 180, damping: 15, delay: 0.1 }}
-        style={{ borderRadius: 20, overflow: 'hidden', boxShadow: '0 0 32px rgba(0,0,0,0.6)' }}
+        style={{ width: '100%', borderRadius: 20, overflow: 'hidden', boxShadow: '0 0 32px rgba(0,0,0,0.6)' }}
       >
         <Scene />
       </motion.div>
 
-      {/* 3. Trophy row */}
-      <div style={{ display: 'flex', gap: 24, alignItems: 'center', justifyContent: 'center' }}>
-        {worldTrophies.map((trophy, i) => (
-          <motion.div
-            key={i}
-            initial={{ scale: 0, opacity: 0, y: 20 }}
-            animate={{ scale: 1, opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 + i * 0.15, type: 'spring', stiffness: 260, damping: 16 }}
-          >
-            <TrophyCup trophy={trophy} size={48} />
-          </motion.div>
-        ))}
-      </div>
-
-      {/* 4. Score transfer display */}
+      {/* 3. Combined trophy + score panel — same width as scene */}
       <motion.div
         initial={{ opacity: 0, scale: 0.85 }}
         animate={{ opacity: 1, scale: 1 }}
-        transition={{ delay: 0.7, type: 'spring', stiffness: 220, damping: 15 }}
+        transition={{ delay: 0.35, type: 'spring', stiffness: 220, damping: 15 }}
         style={{
           width: '100%',
-          background: 'rgba(255,255,255,0.05)',
-          border: '1px solid rgba(255,255,255,0.10)',
-          borderRadius: 16, padding: '12px 20px',
-          display: 'flex', flexDirection: 'column', gap: 10,
+          background: 'rgba(255,255,255,0.15)',
+          border: '1px solid rgba(255,255,255,0.30)',
+          borderRadius: 16, padding: '16px 20px',
+          display: 'flex', flexDirection: 'column', gap: 12,
         }}
       >
-        {/* Battle score row */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)', fontWeight: 700, letterSpacing: '0.15em' }}>
-            {world.name.toUpperCase()} SCORE
-          </span>
-          <span style={{ fontSize: 24, fontWeight: 900, color: '#fbbf24', minWidth: 60, textAlign: 'right' }}>
-            {battleDisplay.toLocaleString()}
-          </span>
+        {/* Trophy row */}
+        <div style={{ display: 'flex', gap: 24, alignItems: 'center', justifyContent: 'center', paddingBottom: 4 }}>
+          {worldTrophies.map((trophy, i) => (
+            <motion.div
+              key={i}
+              initial={{ scale: 0, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 + i * 0.15, type: 'spring', stiffness: 260, damping: 16 }}
+            >
+              <TrophyCup trophy={trophy} size={48} />
+            </motion.div>
+          ))}
         </div>
+
         {/* Divider */}
-        <div style={{ height: 1, background: 'rgba(255,255,255,0.08)' }} />
-        {/* Total score row */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)', fontWeight: 700, letterSpacing: '0.15em' }}>
-            TOTAL
-          </span>
-          <span style={{ fontSize: 24, fontWeight: 900, color: 'white', minWidth: 60, textAlign: 'right' }}>
-            {totalDisplay.toLocaleString()}
-          </span>
-        </div>
+        <div style={{ height: 1, background: 'rgba(255,255,255,0.22)' }} />
+
+        {/* Tap to reveal OR score rows */}
+        {!tapRevealed ? (
+          <motion.button
+            onClick={() => setTapRevealed(true)}
+            animate={{
+              boxShadow: [
+                '0 0 0px rgba(251,191,36,0)',
+                '0 0 20px rgba(251,191,36,0.50)',
+                '0 0 0px rgba(251,191,36,0)',
+              ],
+            }}
+            transition={{ duration: 1.6, repeat: Infinity, ease: 'easeInOut' }}
+            style={{
+              width: '100%', padding: '14px 20px', borderRadius: 10,
+              background: 'rgba(251,191,36,0.10)', border: '1px solid rgba(251,191,36,0.30)',
+              cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
+              color: '#fbbf24', fontWeight: 900, fontSize: 14, letterSpacing: '0.08em',
+            }}
+          >
+            <span style={{ fontSize: 20, lineHeight: 1 }}>★</span>
+            {t?.tapReveal ?? 'Tap to reveal score'}
+          </motion.button>
+        ) : (
+          <>
+            {/* Round score — counts up, pulses on transfer */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)', fontWeight: 700, letterSpacing: '0.15em' }}>
+                {t?.roundScore ?? 'ROUND SCORE'}
+              </span>
+              <motion.span
+                animate={roundControls}
+                style={{ fontSize: 22, fontWeight: 900, color: '#fbbf24', minWidth: 60, textAlign: 'right', display: 'inline-block' }}
+              >
+                +{battleDisplay.toLocaleString()}
+              </motion.span>
+            </div>
+            {/* Divider */}
+            <div style={{ height: 1, background: 'rgba(255,255,255,0.22)' }} />
+            {/* Previous total — static */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)', fontWeight: 700, letterSpacing: '0.15em' }}>
+                {t?.previous ?? 'PREVIOUS'}
+              </span>
+              <span style={{ fontSize: 18, fontWeight: 700, color: 'rgba(255,255,255,0.45)', minWidth: 60, textAlign: 'right' }}>
+                {prevTotal.toLocaleString()}
+              </span>
+            </div>
+            {/* Divider */}
+            <div style={{ height: 1, background: 'rgba(255,255,255,0.22)' }} />
+            {/* New total — counts up */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)', fontWeight: 700, letterSpacing: '0.15em' }}>
+                {t?.newTotal ?? 'NEW TOTAL'}
+              </span>
+              <span style={{ fontSize: 26, fontWeight: 900, color: 'white', minWidth: 60, textAlign: 'right' }}>
+                {totalDisplay.toLocaleString()}
+              </span>
+            </div>
+          </>
+        )}
       </motion.div>
 
-      {/* 5. Continue */}
+      {/* 4. Continue */}
       {showContinue ? (
         <motion.button
           initial={{ opacity: 0, y: 22 }}
@@ -355,7 +403,7 @@ export function AreaClearedScreen({ world, worldTrophies, worldScore, totalScore
           onClick={onContinue}
           className="w-full bg-yellow-400 border-b-4 border-yellow-600 text-black font-black text-xl rounded-2xl h-16 shadow-xl cursor-pointer tracking-widest"
         >
-          CONTINUE →
+          {t?.continueCta ?? 'CONTINUE'} {isRtl ? '←' : '→'}
         </motion.button>
       ) : (
         <div style={{ height: 64 }} />

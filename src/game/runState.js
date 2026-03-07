@@ -6,6 +6,7 @@ export function createNewRun() {
     battleIndex: 0,
     trophies: [], // 'gold' | 'silver' | 'bronze', one per completed battle
     totalScore: 0,
+    worldScores: [], // numeric score per completed world, indexed by worldIndex
   }
 }
 
