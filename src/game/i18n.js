@@ -59,7 +59,7 @@ export const T = {
 
   he: {
     // StartScreen
-    yourName: 'שמך',
+    yourName: 'שם',
     namePlaceholder: 'הכנס שם...',
     difficulty: 'רמת קושי',
     startAdventure: 'התחל הרפתקה',
@@ -71,11 +71,11 @@ export const T = {
     // BattleIntro
     round: 'סיבוב',
     finalRound: 'סיבוב אחרון',
-    go: 'קדימה!',
+    go: '!קדימה',
 
     // BattleScreen
     roundLabel: (n, total) => `סיבוב ${n}/${total}`,
-    trophyLabel: { gold: 'מושלם!', silver: 'כל הכבוד!', bronze: 'שרדת!' },
+    trophyLabel: { gold: '!מושלם', silver: '!כל הכבוד', bronze: '!שרדת' },
     pts: 'נק׳',
     timeBonus: 'בונוס זמן',
     tapToContinue: 'לחץ להמשך',
@@ -98,9 +98,9 @@ export const T = {
     kingdomRecords: 'שיאי הממלכה',
     leaderboard: 'טבלת שיאים',
     yourScore: 'הניקוד שלך',
-    conquered: 'כובש',
+    conquered: 'ניצחון',
     fellAtShort: (name) => `נפל ב${name}`,
-    noScores: 'אין שיאים עדיין — היה הראשון!',
+    noScores: '!אין שיאים עדיין — היה הראשון',
     playAgain: 'שחק שוב',
 
     // World names (by id)

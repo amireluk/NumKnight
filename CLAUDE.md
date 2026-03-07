@@ -8,6 +8,15 @@ If the user is only running `npm run dev`, update `package.json` manually.
 
 ---
 
+## Deploying
+When the user asks to deploy, run:
+```
+npm run deploy
+```
+This runs `npm run build` (bumps version + builds) then `gh-pages -d dist` to publish to GitHub Pages.
+
+---
+
 ## Stack
 - React 18 + Vite, Tailwind CSS, Framer Motion
 - `vite-plugin-singlefile` → entire app builds to a single self-contained HTML file

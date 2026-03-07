@@ -19,7 +19,7 @@ export const EASY = [
   {
     id: 'forest', name: 'Forest', icon: '🌲', battles: 1, playerHP: 3,
     enemy: { id: 'goblin', name: 'Goblin', hp: 1 },
-    timer: null, multipliers: [2, 3], factorRange: [1, 10],
+    timer: null, multipliers: [1, 2, 3], factorRange: [1, 10],
   },
   {
     id: 'swamp', name: 'Swamp', icon: '🌿', battles: 1, playerHP: 3,
@@ -74,7 +74,7 @@ export const MEDIUM = [
 ]
 
 // ── Hard ──────────────────────────────────────────────────────────────
-//  Full tables (×1-×10), timers from Mountains onwards, Dragon Lair is 2 HP
+//  Full tables (×1-×10), timers from Mountains onwards
 export const HARD = [
   {
     id: 'forest', name: 'Forest', icon: '🌲', battles: 3, playerHP: 3,
@@ -105,6 +105,6 @@ export const HARD = [
 
 // ── Active difficulty ─────────────────────────────────────────────────
 //  Change this to 'easy' | 'medium' | 'hard' to switch configs.
-export const DIFFICULTY = 'easy'
+export const DIFFICULTY = 'medium'
 
 export const CAMPAIGN = { easy: EASY, medium: MEDIUM, hard: HARD }[DIFFICULTY] ?? MEDIUM
