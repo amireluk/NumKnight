@@ -17,6 +17,11 @@ const NAME_KEY = 'numknight_player_name'
 const PEEK = 18  // px of adjacent card visible on each side
 const GAP = 10   // px gap between cards
 
+// Pill indicator dims — 3 fixed slots, content rotates
+const PILL_W = 84
+const PILL_PEEK = 46  // width of each side slot (enough to read text)
+const PILL_GAP = 8
+
 export function LeaderboardScreen({ totalScore, endWorld, cleared, difficulty, playerName, onBack, lang, t }) {
   const isRtl = lang === 'he'
 
@@ -59,7 +64,7 @@ export function LeaderboardScreen({ totalScore, endWorld, cleared, difficulty, p
   const [clearConfirm, setClearConfirm] = useState(false)
   useEffect(() => { setClearConfirm(false) }, [viewIndex])
 
-  // Circular navigation — jump without animation when wrapping
+  // Circular navigation — disable animation on wrap to avoid sliding through all panels
   const goTo = (next) => {
     const wrapping = (viewIndex === 0 && next === 2) || (viewIndex === 2 && next === 0)
     if (wrapping) {
@@ -72,7 +77,7 @@ export function LeaderboardScreen({ totalScore, endWorld, cleared, difficulty, p
     }
   }
 
-  // Touch swipe (circular)
+  // Touch swipe on outer div so whole screen is swipeable
   const touchStartX = useRef(null)
   const handleTouchStart = (e) => { touchStartX.current = e.touches[0].clientX }
   const handleTouchEnd = (e) => {
@@ -103,14 +108,16 @@ export function LeaderboardScreen({ totalScore, endWorld, cleared, difficulty, p
   const cardWidth = containerWidth - 2 * PEEK
   const trackX = PEEK - viewIndex * (cardWidth + GAP)
 
-  // Difficulty pill indicator carousel
-  const PILL_W = 82
-  const PILL_GAP = 8
-  const PILL_PEEK = 54  // how much of adjacent pill shows (enough to read text)
-  const IND_W = PILL_W + 2 * PILL_PEEK
-  const indTrackX = PILL_PEEK - viewIndex * (PILL_W + PILL_GAP)
-
+  // Rotating pill slots: always show prev/active/next regardless of wrap
+  const prevIdx = (viewIndex + 2) % 3
+  const nextIdx = (viewIndex + 1) % 3
   const diffLabels = t?.diffLabel ?? DIFF_LABEL_DEFAULT
+
+  const pillSlots = [
+    { diffIdx: prevIdx, isActive: false, onClick: () => goTo(prevIdx), width: PILL_PEEK },
+    { diffIdx: viewIndex, isActive: true,  onClick: null,               width: PILL_W   },
+    { diffIdx: nextIdx, isActive: false, onClick: () => goTo(nextIdx), width: PILL_PEEK },
+  ]
 
   return (
     <div
@@ -122,6 +129,8 @@ export function LeaderboardScreen({ totalScore, endWorld, cleared, difficulty, p
           'radial-gradient(ellipse at 50% 30%, rgba(251,191,36,0.12) 0%, transparent 65%), ' +
           'linear-gradient(to bottom, #1e3a70, #2d5aaa)',
       }}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
     >
       {/* Header */}
       <motion.div
@@ -132,66 +141,40 @@ export function LeaderboardScreen({ totalScore, endWorld, cleared, difficulty, p
       >
         <p className="text-white font-black text-3xl tracking-wide">{t?.kingdomRecords ?? 'Kingdom Records'}</p>
 
-        {/* Difficulty carousel indicator — peeks adjacent pills with gradient fade */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-          <button
-            onClick={() => goTo((viewIndex + 2) % 3)}
-            style={{
-              color: 'rgba(255,255,255,0.65)',
-              background: 'none', border: 'none', fontSize: 22, cursor: 'pointer',
-              padding: '0 4px', lineHeight: 1, fontWeight: 900,
-            }}
-          >‹</button>
-
-          <div style={{
-            width: IND_W,
-            overflow: 'hidden',
-            position: 'relative',
-            maskImage: 'linear-gradient(to right, transparent 0%, black 22%, black 78%, transparent 100%)',
-            WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 22%, black 78%, transparent 100%)',
-          }}>
-            <div style={{
-              display: 'flex',
-              gap: PILL_GAP,
-              transform: `translateX(${indTrackX}px)`,
-              transition: animated ? 'transform 0.3s ease' : 'none',
-            }}>
-              {DIFFS.map((d, i) => (
-                <button
-                  key={d}
-                  onClick={() => goTo(i)}
-                  style={{
-                    width: PILL_W,
-                    flexShrink: 0,
-                    background: DIFF_COLOR[d],
-                    color: '#000',
-                    borderRadius: 99,
-                    padding: '4px 0',
-                    fontSize: 11,
-                    fontWeight: 900,
-                    letterSpacing: '0.08em',
-                    opacity: i === viewIndex ? 1 : 0.72,
-                    transform: `scale(${i === viewIndex ? 1 : 0.88})`,
-                    transition: 'opacity 0.25s, transform 0.25s',
-                    cursor: 'pointer',
-                    border: 'none',
-                    textAlign: 'center',
-                  }}
-                >
-                  {diffLabels[d] ?? d}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <button
-            onClick={() => goTo((viewIndex + 1) % 3)}
-            style={{
-              color: 'rgba(255,255,255,0.65)',
-              background: 'none', border: 'none', fontSize: 22, cursor: 'pointer',
-              padding: '0 4px', lineHeight: 1, fontWeight: 900,
-            }}
-          >›</button>
+        {/* Pill indicator — 3 fixed slots, content rotates so side pills always show */}
+        <div style={{
+          display: 'flex',
+          gap: PILL_GAP,
+          alignItems: 'center',
+          maskImage: 'linear-gradient(to right, transparent 0%, black 18%, black 82%, transparent 100%)',
+          WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 18%, black 82%, transparent 100%)',
+        }}>
+          {pillSlots.map(({ diffIdx, isActive, onClick, width }, si) => (
+            <button
+              key={`${si}-${diffIdx}`}
+              onClick={onClick ?? undefined}
+              style={{
+                width,
+                overflow: 'hidden',
+                flexShrink: 0,
+                background: DIFF_COLOR[DIFFS[diffIdx]],
+                color: '#000',
+                borderRadius: 99,
+                padding: '4px 0',
+                fontSize: 11,
+                fontWeight: 900,
+                letterSpacing: '0.08em',
+                opacity: isActive ? 1 : 0.68,
+                transform: `scale(${isActive ? 1 : 0.88})`,
+                cursor: isActive ? 'default' : 'pointer',
+                border: 'none',
+                textAlign: 'center',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {diffLabels[DIFFS[diffIdx]] ?? DIFFS[diffIdx]}
+            </button>
+          ))}
         </div>
 
         {/* Dot indicators */}
@@ -208,12 +191,10 @@ export function LeaderboardScreen({ totalScore, endWorld, cleared, difficulty, p
         </div>
       </motion.div>
 
-      {/* Carousel track */}
+      {/* Carousel — flex:1 so back button stays pinned at bottom */}
       <div
         ref={containerRef}
-        style={{ overflow: 'hidden', position: 'relative' }}
-        onTouchStart={handleTouchStart}
-        onTouchEnd={handleTouchEnd}
+        style={{ flex: 1, overflow: 'hidden', position: 'relative' }}
       >
         <div style={{
           display: 'flex',
@@ -225,7 +206,8 @@ export function LeaderboardScreen({ totalScore, endWorld, cleared, difficulty, p
           {DIFFS.map((d) => {
             const scores = displayScores[d]
             return (
-              <div key={d} style={{ width: cardWidth, flexShrink: 0, display: 'flex', flexDirection: 'column', gap: 6 }}>
+              <div key={d} style={{ width: cardWidth, flexShrink: 0, display: 'flex', flexDirection: 'column' }}>
+                {/* Score rows */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                   {Array.from({ length: 3 }, (_, i) => {
                     const entry = scores[i] ?? null
@@ -305,14 +287,14 @@ export function LeaderboardScreen({ totalScore, endWorld, cleared, difficulty, p
                   })}
                 </div>
 
-                {/* Clear button — only rendered for the visible card to avoid layout jank */}
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'stretch', gap: 4 }}>
+                {/* Clear button — more top margin, shorter padding */}
+                <div style={{ marginTop: 12, display: 'flex', flexDirection: 'column', alignItems: 'stretch', gap: 4 }}>
                   <motion.button
                     onClick={d === viewDiff ? handleClear : undefined}
                     onBlur={() => setClearConfirm(false)}
                     whileTap={{ scale: 0.97 }}
                     style={{
-                      padding: '9px 14px', borderRadius: 10, cursor: 'pointer',
+                      padding: '5px 14px', borderRadius: 10, cursor: 'pointer',
                       fontSize: 11, fontWeight: 900, letterSpacing: '0.06em',
                       border: `1.5px solid ${clearConfirm && d === viewDiff ? 'rgba(239,68,68,0.8)' : 'rgba(255,255,255,0.14)'}`,
                       background: clearConfirm && d === viewDiff ? 'rgba(239,68,68,0.18)' : 'rgba(255,255,255,0.06)',
@@ -338,7 +320,7 @@ export function LeaderboardScreen({ totalScore, endWorld, cleared, difficulty, p
         </div>
       </div>
 
-      {/* Back button */}
+      {/* Back button — pinned at bottom by the flex:1 carousel above */}
       <motion.button
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
