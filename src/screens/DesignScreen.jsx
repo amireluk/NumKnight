@@ -211,7 +211,7 @@ const SLIDES = [
   // ── Full screens ──────────────────────────────────────────────────
   {
     id: 'screen-start', category: 'screen', label: 'Start Screen',
-    render: () => <StartScreen onStart={NOOP} onLangChange={NOOP} lang="en" t={EN} />,
+    render: () => <StartScreen onNewGame={NOOP} onViewLeaderboard={NOOP} onLangChange={NOOP} lang="en" t={EN} />,
   },
   {
     id: 'screen-map-start', category: 'screen', label: 'World Map · Fresh',
@@ -251,7 +251,7 @@ const SLIDES = [
       <LeaderboardScreen
         totalScore={9400} endWorld="Dragon Lair" cleared
         difficulty="medium" playerName="Knight"
-        onPlayAgain={NOOP} lang="en" t={EN}
+        onBack={NOOP} lang="en" t={EN}
       />
     ),
   },

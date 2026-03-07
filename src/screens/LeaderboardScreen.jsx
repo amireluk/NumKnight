@@ -1,11 +1,10 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { saveScore, loadScores, clearScores } from '../game/scoreState'
 
 const DIFF_LABEL_DEFAULT = { easy: 'Easy', medium: 'Medium', hard: 'Hard' }
 const DIFF_COLOR = { easy: '#4ade80', medium: '#fbbf24', hard: '#ef4444' }
 
-// Map stored English world names → ids for translation
 const WORLD_ID_BY_NAME = {
   'Forest': 'forest', 'Swamp': 'swamp', 'Mountains': 'mountains',
   'Castle': 'castle', 'Dragon Lair': 'dragonLair',
@@ -14,18 +13,7 @@ const worldDisplayName = (name, t) => (t?.worldName?.[WORLD_ID_BY_NAME[name]]) ?
 
 const NAME_KEY = 'numknight_player_name'
 
-const RANK_ROW_BG = [
-  'rgba(251,191,36,0.13)',
-  'rgba(203,213,225,0.09)',
-  'rgba(180,83,9,0.10)',
-]
-const RANK_BORDER = [
-  'rgba(251,191,36,0.30)',
-  'rgba(203,213,225,0.20)',
-  'rgba(180,83,9,0.22)',
-]
-
-export function LeaderboardScreen({ totalScore, endWorld, cleared, difficulty, playerName, onPlayAgain, lang, t }) {
+export function LeaderboardScreen({ totalScore, endWorld, cleared, difficulty, playerName, onBack, lang, t }) {
   const isRtl = lang === 'he'
   const [[scores, newScoreIndex]] = useState(() => {
     const name = playerName || localStorage.getItem(NAME_KEY) || 'Knight'
@@ -50,6 +38,14 @@ export function LeaderboardScreen({ totalScore, endWorld, cleared, difficulty, p
   const [clearConfirm, setClearConfirm] = useState(false)
   const [displayScores, setDisplayScores] = useState(scores)
 
+  // Android hardware back button support
+  useEffect(() => {
+    window.history.pushState(null, '', window.location.href)
+    const onPop = () => { onBack() }
+    window.addEventListener('popstate', onPop)
+    return () => window.removeEventListener('popstate', onPop)
+  }, [onBack])
+
   const handleClear = () => {
     if (!clearConfirm) { setClearConfirm(true); return }
     clearScores(difficulty)
@@ -68,7 +64,7 @@ export function LeaderboardScreen({ totalScore, endWorld, cleared, difficulty, p
           'linear-gradient(to bottom, #1e3a70, #2d5aaa)',
       }}
     >
-      {/* Header — centered */}
+      {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -14 }}
         animate={{ opacity: 1, y: 0 }}
@@ -86,7 +82,7 @@ export function LeaderboardScreen({ totalScore, endWorld, cleared, difficulty, p
         </span>
       </motion.div>
 
-      {/* Scores list — always 10 rows */}
+      {/* Scores list */}
       <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 6 }}>
         {Array.from({ length: 3 }, (_, i) => {
           const entry = displayScores[i] ?? null
@@ -108,7 +104,6 @@ export function LeaderboardScreen({ totalScore, endWorld, cleared, difficulty, p
                 boxShadow: isNew ? '0 0 18px rgba(251,191,36,0.22)' : 'none',
               }}
             >
-              {/* Rank */}
               <span style={{
                 fontSize: isNew ? 15 : 13,
                 width: 26, textAlign: 'center',
@@ -117,7 +112,6 @@ export function LeaderboardScreen({ totalScore, endWorld, cleared, difficulty, p
               }}>
                 {i + 1}
               </span>
-              {/* Name + version */}
               <span style={{ flex: 1, minWidth: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column', gap: 1 }}>
                 {entry ? (
                   <>
@@ -147,7 +141,6 @@ export function LeaderboardScreen({ totalScore, endWorld, cleared, difficulty, p
                   <span style={{ color: 'rgba(255,255,255,0.12)', fontSize: 13, fontWeight: 700 }}>—</span>
                 )}
               </span>
-              {/* Region / conquered */}
               <span style={{
                 fontSize: 10, fontWeight: 700, letterSpacing: '0.05em',
                 color: entry?.cleared ? '#fbbf24' : 'rgba(255,255,255,0.18)',
@@ -157,7 +150,6 @@ export function LeaderboardScreen({ totalScore, endWorld, cleared, difficulty, p
                   ? (entry.cleared ? (t?.conquered ?? 'CONQUERED') : (t?.fellAtShort ? t.fellAtShort(worldDisplayName(entry.endWorld ?? '', t)) : (entry.endWorld ?? '')))
                   : '—'}
               </span>
-              {/* Score */}
               <span style={{
                 color: isNew ? '#fbbf24' : entry ? 'rgba(251,191,36,0.85)' : 'rgba(255,255,255,0.12)',
                 fontWeight: 900, fontSize: isNew ? 18 : 16,
@@ -170,7 +162,7 @@ export function LeaderboardScreen({ totalScore, endWorld, cleared, difficulty, p
         })}
       </div>
 
-      {/* Clear button — below list */}
+      {/* Clear button — right after the table */}
       <div style={{ flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'stretch', gap: 4 }}>
         <motion.button
           onClick={handleClear}
@@ -198,17 +190,21 @@ export function LeaderboardScreen({ totalScore, endWorld, cleared, difficulty, p
         )}
       </div>
 
-      {/* Play again */}
+      {/* Spacer so back button is visually separated */}
+      <div style={{ flexShrink: 0, height: 8 }} />
+
+      {/* Back button */}
       <motion.button
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.4 }}
         whileTap={{ scale: 0.95 }}
         whileHover={{ scale: 1.03 }}
-        onClick={onPlayAgain}
+        onClick={onBack}
         className="w-full bg-yellow-400 border-b-4 border-yellow-600 text-black font-black text-xl rounded-2xl h-14 shadow-xl cursor-pointer tracking-widest"
+        style={{ flexShrink: 0 }}
       >
-        {t?.playAgain ?? 'PLAY AGAIN'}
+        {t?.back ?? 'BACK'}
       </motion.button>
     </div>
   )

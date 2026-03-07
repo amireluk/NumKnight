@@ -51,6 +51,8 @@ export const T = {
     confirmClear: '⚠ YES, ERASE ALL',
     clearWarning: '! This will permanently erase all scores',
     playAgain: 'PLAY AGAIN',
+    back: 'BACK',
+    newGame: 'NEW GAME',
 
     // World names (by id)
     worldName: {
@@ -112,6 +114,8 @@ export const T = {
     confirmClear: '⚠ כן, מחק הכל',
     clearWarning: '! זה ימחק לצמיתות את כל השיאים',
     playAgain: 'שחק שוב',
+    back: 'חזור',
+    newGame: 'משחק חדש',
 
     // World names (by id)
     worldName: {
