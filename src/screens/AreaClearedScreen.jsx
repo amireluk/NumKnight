@@ -245,19 +245,37 @@ export function AreaClearedScreen({ world, worldTrophies, worldScore, totalScore
   const [battleDisplay, setBattleDisplay] = useState(0)
   const [totalDisplay,  setTotalDisplay]  = useState(prevTotal)
   const [showContinue,  setShowContinue]  = useState(worldScore === 0)
-  const [showBurst,     setShowBurst]     = useState(false)
+  const [bursts,        setBursts]        = useState([])
   const cancelRef     = useRef([])
   const roundControls = useAnimation()
+  const burstIntervalRef = useRef(null)
 
   // Derive best trophy for burst sizing
   const bestTrophy = worldTrophies.reduce((best, tr) =>
     (TROPHY_RANK[tr] ?? 2) < (TROPHY_RANK[best] ?? 2) ? tr : best, 'bronze')
 
+  // Random origin positions so each firework fires from a different spot
+  const BURST_ORIGINS = [
+    { x: '50%', y: '50%' }, { x: '30%', y: '40%' }, { x: '70%', y: '60%' },
+    { x: '20%', y: '55%' }, { x: '80%', y: '45%' }, { x: '60%', y: '35%' },
+    { x: '40%', y: '65%' }, { x: '55%', y: '30%' },
+  ]
+
   useEffect(() => {
     if (worldScore === 0) return
 
+    const addBurst = () => {
+      setBursts(prev => {
+        const idx = prev.length % BURST_ORIGINS.length
+        return [...prev, { id: Date.now(), origin: BURST_ORIGINS[idx] }]
+      })
+    }
+
     const t1 = setTimeout(() => {
-      setShowBurst(true)
+      addBurst()
+      // Keep firing bursts every 1.2s while screen is visible
+      burstIntervalRef.current = setInterval(addBurst, 1200)
+
       const cancel1 = animateCount(0, worldScore, 700, setBattleDisplay, () => {
         const t2 = setTimeout(() => {
           roundControls.start({
@@ -276,7 +294,10 @@ export function AreaClearedScreen({ world, worldTrophies, worldScore, totalScore
     }, 600)
 
     cancelRef.current.push(() => clearTimeout(t1))
-    return () => cancelRef.current.forEach((fn) => fn?.())
+    return () => {
+      cancelRef.current.forEach((fn) => fn?.())
+      clearInterval(burstIntervalRef.current)
+    }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
@@ -340,15 +361,16 @@ export function AreaClearedScreen({ world, worldTrophies, worldScore, totalScore
               <TrophyCup trophy={trophy} size={48} />
             </motion.div>
           ))}
-          {showBurst && (
+          {bursts.map(b => (
             <ParticleBurst
+              key={b.id}
               count={BURST_COUNT[bestTrophy]}
               colors={BURST_COLORS[bestTrophy]}
-              originX='50%' originY='50%'
+              originX={b.origin.x} originY={b.origin.y}
               spread={bestTrophy === 'gold' ? 200 : bestTrophy === 'silver' ? 150 : 100}
               gravity={bestTrophy === 'gold' ? 80 : 50}
             />
-          )}
+          ))}
         </div>
 
         {/* Divider */}
@@ -401,7 +423,7 @@ export function AreaClearedScreen({ world, worldTrophies, worldScore, totalScore
           onClick={onContinue}
           className="w-full bg-yellow-400 border-b-4 border-yellow-600 text-black font-black text-xl rounded-2xl h-16 shadow-xl cursor-pointer tracking-widest"
         >
-          {t?.continueCta ?? 'CONTINUE'} {isRtl ? '←' : '→'}
+          {t?.continueCta ?? 'CONTINUE'}
         </motion.button>
       ) : (
         <div style={{ height: 64 }} />

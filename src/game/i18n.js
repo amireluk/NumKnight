@@ -34,6 +34,12 @@ export const T = {
     newTotal: 'NEW TOTAL',
     continueCta: 'CONTINUE',
 
+    // VictoryScreen
+    victoryLine1: 'REALM',
+    victoryLine2: 'CONQUERED',
+    victorySubtitle: (name) => name ? `${name} — your legend is written` : 'Your legend is written',
+    hallOfFame: 'ENTER THE HALL OF FAME',
+
     // ResultScreen
     defeated: 'DEFEATED',
     fellAt: (name) => `Fell at ${name}`,
@@ -96,6 +102,12 @@ export const T = {
     previous: 'קודם',
     newTotal: 'סך הכל',
     continueCta: 'המשך',
+
+    // VictoryScreen
+    victoryLine1: 'ממלכה',
+    victoryLine2: 'נכבשה',
+    victorySubtitle: (name) => name ? `${name} — האגדה שלך נכתבה` : 'האגדה שלך נכתבה',
+    hallOfFame: 'היכנס להיכל התהילה',
 
     // ResultScreen
     defeated: 'הובסת',

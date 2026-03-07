@@ -57,31 +57,31 @@ function animateCount(from, to, ms, onTick, onDone) {
   return () => cancelAnimationFrame(raf)
 }
 
-const LINE1 = 'REALM'
-const LINE2 = 'CONQUERED'
-
 export function VictoryScreen({ playerName, totalScore, onContinue, lang, t }) {
   const isRtl = lang === 'he'
   const [scoreDisplay, setScoreDisplay] = useState(0)
   const [showScore, setShowScore] = useState(false)
   const [showButton, setShowButton] = useState(false)
 
+  const line1 = t?.victoryLine1 ?? 'REALM'
+  const line2 = t?.victoryLine2 ?? 'CONQUERED'
+
+  // Letter delays: line1 then line2
+  const line1Delays = line1.split('').map((_, i) => 0.5 + i * 0.07)
+  const line2Delays = line2.split('').map((_, i) => 0.5 + line1.length * 0.07 + 0.12 + i * 0.07)
+  const titleDone = 0.5 + (line1.length + line2.length) * 0.07 + 0.12
+
   useEffect(() => {
-    // After title animates in (~1.7s), start score counter
     const t1 = setTimeout(() => {
       setShowScore(true)
       const cancel = animateCount(0, totalScore, 1400, setScoreDisplay, () => {
-        const t2 = setTimeout(() => setShowButton(true), 500)
+        const t2 = setTimeout(() => setShowButton(true), 400)
         return () => clearTimeout(t2)
       })
       return cancel
-    }, 1700)
+    }, titleDone * 1000 + 400)
     return () => clearTimeout(t1)
-  }, [totalScore])
-
-  // Letter delays: LINE1 then LINE2 sequentially
-  const line1Delays = LINE1.split('').map((_, i) => 0.5 + i * 0.07)
-  const line2Delays = LINE2.split('').map((_, i) => 0.5 + LINE1.length * 0.07 + 0.12 + i * 0.07)
+  }, [totalScore]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const letterStyle = {
     fontSize: 32,
@@ -105,7 +105,6 @@ export function VictoryScreen({ playerName, totalScore, onContinue, lang, t }) {
         maxWidth: 448,
         margin: '0 auto',
         overflow: 'hidden',
-        gap: 0,
         background:
           'radial-gradient(ellipse at 50% 55%, rgba(251,191,36,0.2) 0%, transparent 58%), ' +
           'linear-gradient(to bottom, #050810, #0d1424)',
@@ -113,7 +112,7 @@ export function VictoryScreen({ playerName, totalScore, onContinue, lang, t }) {
     >
       <ConfettiRain />
 
-      {/* Gold glow behind knight */}
+      {/* Gold glow — absolute, never affects layout */}
       <div style={{
         position: 'absolute',
         top: '30%', left: '50%',
@@ -125,7 +124,7 @@ export function VictoryScreen({ playerName, totalScore, onContinue, lang, t }) {
         zIndex: 3,
       }} />
 
-      {/* Knight — scaled up, gold glow */}
+      {/* Knight */}
       <motion.div
         initial={{ opacity: 0, y: 40, scale: 0.75 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -135,6 +134,8 @@ export function VictoryScreen({ playerName, totalScore, onContinue, lang, t }) {
           zIndex: 4,
           filter: 'drop-shadow(0 0 22px rgba(251,191,36,0.55))',
           marginBottom: 6,
+          height: 116, // fixed height — never shifts
+          display: 'flex', alignItems: 'flex-end',
         }}
       >
         <div style={{
@@ -151,10 +152,10 @@ export function VictoryScreen({ playerName, totalScore, onContinue, lang, t }) {
         </div>
       </motion.div>
 
-      {/* Title — two lines, letter by letter */}
+      {/* Title — always in DOM, letters animate in */}
       <div style={{ zIndex: 4, textAlign: 'center', lineHeight: 1.1, marginTop: 8 }}>
         <div style={{ display: 'flex', justifyContent: 'center' }}>
-          {LINE1.split('').map((ch, i) => (
+          {line1.split('').map((ch, i) => (
             <motion.span
               key={i}
               initial={{ opacity: 0, y: -22 }}
@@ -167,7 +168,7 @@ export function VictoryScreen({ playerName, totalScore, onContinue, lang, t }) {
           ))}
         </div>
         <div style={{ display: 'flex', justifyContent: 'center' }}>
-          {LINE2.split('').map((ch, i) => (
+          {line2.split('').map((ch, i) => (
             <motion.span
               key={i}
               initial={{ opacity: 0, y: -22 }}
@@ -181,11 +182,11 @@ export function VictoryScreen({ playerName, totalScore, onContinue, lang, t }) {
         </div>
       </div>
 
-      {/* Player name */}
+      {/* Subtitle — always in DOM */}
       <motion.p
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 1.6 }}
+        transition={{ delay: titleDone + 0.1 }}
         style={{
           zIndex: 4,
           fontSize: 13,
@@ -196,69 +197,64 @@ export function VictoryScreen({ playerName, totalScore, onContinue, lang, t }) {
           textAlign: 'center',
           paddingLeft: 24,
           paddingRight: 24,
+          height: 20, // fixed height
         }}
       >
-        {playerName
-          ? `${playerName} — your legend is written`
-          : 'Your legend is written'}
+        {t?.victorySubtitle ? t.victorySubtitle(playerName) : (playerName ? `${playerName} — your legend is written` : 'Your legend is written')}
       </motion.p>
 
-      {/* Final score */}
-      {showScore && (
-        <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ type: 'spring', stiffness: 220, damping: 16 }}
-          style={{
-            zIndex: 4,
-            marginTop: 28,
-            background: 'rgba(255,255,255,0.07)',
-            border: '1px solid rgba(251,191,36,0.28)',
-            borderRadius: 16,
-            padding: '12px 40px',
-            textAlign: 'center',
-          }}
-        >
-          <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.35)', fontWeight: 700, letterSpacing: '0.22em', marginBottom: 4 }}>
-            {t?.finalScore ?? 'FINAL SCORE'}
-          </div>
-          <div style={{ fontSize: 38, fontWeight: 900, color: '#fbbf24', lineHeight: 1 }}>
-            {scoreDisplay.toLocaleString()}
-          </div>
-        </motion.div>
-      )}
+      {/* Score box — always in DOM, fades in */}
+      <motion.div
+        animate={{ opacity: showScore ? 1 : 0 }}
+        transition={{ duration: 0.35 }}
+        style={{
+          zIndex: 4,
+          marginTop: 28,
+          background: 'rgba(255,255,255,0.07)',
+          border: '1px solid rgba(251,191,36,0.28)',
+          borderRadius: 16,
+          padding: '12px 40px',
+          textAlign: 'center',
+          minWidth: 180,
+        }}
+      >
+        <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.35)', fontWeight: 700, letterSpacing: '0.22em', marginBottom: 4 }}>
+          {t?.finalScore ?? 'FINAL SCORE'}
+        </div>
+        <div style={{ fontSize: 38, fontWeight: 900, color: '#fbbf24', lineHeight: 1 }}>
+          {scoreDisplay.toLocaleString()}
+        </div>
+      </motion.div>
 
-      {/* CTA */}
-      {showButton && (
-        <motion.button
-          initial={{ opacity: 0, y: 28 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ type: 'spring', stiffness: 200, damping: 18 }}
-          whileTap={{ scale: 0.95 }}
-          whileHover={{ scale: 1.04 }}
-          onClick={onContinue}
-          style={{
-            zIndex: 4,
-            marginTop: 28,
-            padding: '0 28px',
-            height: 56,
-            borderRadius: 18,
-            background: '#fbbf24',
-            borderTop: 'none',
-            borderLeft: 'none',
-            borderRight: 'none',
-            borderBottom: '4px solid #b45309',
-            color: '#000',
-            fontWeight: 900,
-            fontSize: 17,
-            letterSpacing: '0.08em',
-            cursor: 'pointer',
-            boxShadow: '0 0 28px rgba(251,191,36,0.35)',
-          }}
-        >
-          {isRtl ? '← ' : ''}{t?.hallOfFame ?? 'ENTER THE HALL OF FAME'}{isRtl ? '' : ' →'}
-        </motion.button>
-      )}
+      {/* CTA button — always in DOM, fades in */}
+      <motion.button
+        animate={{ opacity: showButton ? 1 : 0 }}
+        transition={{ duration: 0.35 }}
+        whileTap={showButton ? { scale: 0.95 } : {}}
+        whileHover={showButton ? { scale: 1.04 } : {}}
+        onClick={showButton ? onContinue : undefined}
+        style={{
+          zIndex: 4,
+          marginTop: 28,
+          padding: '0 28px',
+          height: 56,
+          borderRadius: 18,
+          background: '#fbbf24',
+          borderTop: 'none',
+          borderLeft: 'none',
+          borderRight: 'none',
+          borderBottom: '4px solid #b45309',
+          color: '#000',
+          fontWeight: 900,
+          fontSize: 17,
+          letterSpacing: '0.08em',
+          cursor: showButton ? 'pointer' : 'default',
+          boxShadow: '0 0 28px rgba(251,191,36,0.35)',
+          pointerEvents: showButton ? 'auto' : 'none',
+        }}
+      >
+        {t?.hallOfFame ?? 'ENTER THE HALL OF FAME'}
+      </motion.button>
     </div>
   )
 }
