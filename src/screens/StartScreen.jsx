@@ -354,14 +354,8 @@ export function StartScreen({ onStart, onViewLeaderboard, lang, onLangChange, t 
         whileTap={{ scale: 0.95 }}
         whileHover={{ scale: 1.03 }}
         onClick={onViewLeaderboard}
-        style={{
-          position: 'relative', zIndex: 1,
-          width: '100%', height: 48, borderRadius: 16, cursor: 'pointer',
-          background: 'rgba(255,255,255,0.10)',
-          border: '1.5px solid rgba(255,255,255,0.22)',
-          color: 'rgba(255,255,255,0.65)',
-          fontWeight: 900, fontSize: 15, letterSpacing: '0.12em',
-        }}
+        style={{ position: 'relative', zIndex: 1 }}
+        className="w-full bg-yellow-400 border-b-4 border-yellow-600 text-black font-black text-2xl rounded-2xl h-16 shadow-xl cursor-pointer tracking-widest"
       >
         {t?.kingdomRecords ?? 'KINGDOM RECORDS'}
       </motion.button>

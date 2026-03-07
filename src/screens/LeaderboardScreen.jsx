@@ -88,7 +88,7 @@ export function LeaderboardScreen({ totalScore, endWorld, cleared, difficulty, p
 
       {/* Scores list — always 10 rows */}
       <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 6 }}>
-        {Array.from({ length: 10 }, (_, i) => {
+        {Array.from({ length: 3 }, (_, i) => {
           const entry = displayScores[i] ?? null
           const isNew = entry && i === newScoreIndex
           return (
