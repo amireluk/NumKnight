@@ -12,6 +12,7 @@ export const T = {
 
     // WorldMapScreen
     fight: 'Go!',
+    tapToFight: '⚔ TAP TO FIGHT',
 
     // BattleIntro
     round: 'ROUND',
@@ -69,6 +70,7 @@ export const T = {
 
     // WorldMapScreen
     fight: 'קדימה!',
+    tapToFight: '⚔ לחץ להילחם',
 
     // BattleIntro
     round: 'סיבוב',

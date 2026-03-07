@@ -406,8 +406,8 @@ export function WorldMapScreen({
   isTransition, difficulty, onFight, onRestart, lang, t,
 }) {
   const isRtl = lang === 'he'
-  // Reversed display: Dragon Lair at top, Forest at bottom
-  const displayWorlds = [...worlds].reverse()
+  // Natural order: Forest at top, Dragon Lair at bottom
+  const displayWorlds = worlds
 
   return (
     <div
@@ -458,10 +458,10 @@ export function WorldMapScreen({
         </p>
       </motion.div>
 
-      {/* Region bands — Dragon Lair at top, Forest at bottom */}
+      {/* Region bands — Forest at top, Dragon Lair at bottom */}
       <div className="flex-1 min-h-0 flex flex-col px-4" style={{ gap: 4 }}>
         {displayWorlds.map((world, di) => {
-          const i = worlds.length - 1 - di  // real world index
+          const i = di  // display index = real world index
           const status =
             i < currentWorldIndex  ? 'completed' :
             i === currentWorldIndex ? 'current'   : 'locked'
