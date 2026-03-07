@@ -18,8 +18,8 @@
 
 // ── Easy ──────────────────────────────────────────────────────────────
 //  Easy-pattern tables only (1s, 2s, 5s, 10s). No timers.
-//  One battle per world — a quick confidence-building tour.
-//  Total: 11 questions on a perfect run.
+//  Multiple battles from Mountains onward.
+//  Total: 22 questions on a perfect run.
 export const EASY = [
   {
     id: 'forest', name: 'Forest', battles: 1,
@@ -32,17 +32,17 @@ export const EASY = [
     timer: null, multipliers: [1, 2, 5, 10], factorRange: [1, 10],
   },
   {
-    id: 'mountains', name: 'Mountains', battles: 1,
-    enemy: { id: 'orc', name: 'Orc', hp: 2 },
+    id: 'mountains', name: 'Mountains', battles: 2,
+    enemy: { id: 'orc', name: 'Orc', hp: 3 },
     timer: null, multipliers: [2, 3, 5, 10], factorRange: [1, 10],
   },
   {
-    id: 'castle', name: 'Castle', battles: 1,
-    enemy: { id: 'darkKnight', name: 'Dark Knight', hp: 2 },
+    id: 'castle', name: 'Castle', battles: 2,
+    enemy: { id: 'darkKnight', name: 'Dark Knight', hp: 3 },
     timer: null, multipliers: [2, 3, 4, 5, 10], factorRange: [1, 10],
   },
   {
-    id: 'dragonLair', name: 'Dragon Lair', battles: 1,
+    id: 'dragonLair', name: 'Dragon Lair', battles: 2,
     enemy: { id: 'dragon', name: 'Dragon', hp: 3 },
     timer: null, multipliers: [2, 3, 4, 5, 10], factorRange: [1, 10],
   },
@@ -50,10 +50,10 @@ export const EASY = [
 
 // ── Medium ────────────────────────────────────────────────────────────
 //  No 2s. Multipliers expand world by world toward the full 10×10 board.
-//  Battle count ramps: 1 → 1 → 2 → 2 → 3.
+//  Battle count ramps: 1 → 2 → 2 → 3 → 3.
 //  Timers appear in Castle and Dragon Lair.
 //  Dragon deals 2 damage — one mistake = dead.
-//  Total: 32 questions on a perfect run.
+//  Total: 41 questions on a perfect run.
 export const MEDIUM = [
   {
     id: 'forest', name: 'Forest', battles: 1,
@@ -61,17 +61,17 @@ export const MEDIUM = [
     timer: null, multipliers: [3, 4], factorRange: [1, 10],
   },
   {
-    id: 'swamp', name: 'Swamp', battles: 1,
+    id: 'swamp', name: 'Swamp', battles: 2,
     enemy: { id: 'skeleton', name: 'Skeleton', hp: 3 },
     timer: null, multipliers: [3, 4, 5, 6], factorRange: [1, 10],
   },
   {
     id: 'mountains', name: 'Mountains', battles: 2,
-    enemy: { id: 'orc', name: 'Orc', hp: 3 },
+    enemy: { id: 'orc', name: 'Orc', hp: 4 },
     timer: null, multipliers: [3, 4, 5, 6, 7], factorRange: [1, 10],
   },
   {
-    id: 'castle', name: 'Castle', battles: 2,
+    id: 'castle', name: 'Castle', battles: 3,
     enemy: { id: 'darkKnight', name: 'Dark Knight', hp: 4 },
     timer: 10, multipliers: [4, 5, 6, 7, 8, 9], factorRange: [1, 10],
   },
@@ -85,12 +85,12 @@ export const MEDIUM = [
 
 // ── Hard ──────────────────────────────────────────────────────────────
 //  1s, 2s, and 10s stripped from Swamp onward — focus on the hard middle (4–9).
-//  Timers from Swamp onward. Battle count ramps: 1 → 2 → 2 → 3 → 3.
+//  Timers from Swamp onward. Battle count ramps: 2 → 2 → 3 → 3 → 3.
 //  Castle enemy deals 2 damage; Dragon deals 3 (instant death).
-//  Total: 46 questions on a perfect run.
+//  Total: 56 questions on a perfect run.
 export const HARD = [
   {
-    id: 'forest', name: 'Forest', battles: 1,
+    id: 'forest', name: 'Forest', battles: 2,
     enemy: { id: 'goblin', name: 'Goblin', hp: 3 },
     timer: null, multipliers: [3, 4, 5, 6], factorRange: [1, 10],
   },
@@ -100,13 +100,13 @@ export const HARD = [
     timer: 10, multipliers: [4, 5, 6, 7], factorRange: [1, 10],
   },
   {
-    id: 'mountains', name: 'Mountains', battles: 2,
+    id: 'mountains', name: 'Mountains', battles: 3,
     enemy: { id: 'orc', name: 'Orc', hp: 4 },
     timer: 8, multipliers: [4, 5, 6, 7, 8], factorRange: [1, 10],
   },
   {
     id: 'castle', name: 'Castle', battles: 3,
-    enemy: { id: 'darkKnight', name: 'Dark Knight', hp: 4 },
+    enemy: { id: 'darkKnight', name: 'Dark Knight', hp: 5 },
     timer: 7, multipliers: [5, 6, 7, 8, 9], factorRange: [1, 10],
     enemyDamage: 2,
   },
