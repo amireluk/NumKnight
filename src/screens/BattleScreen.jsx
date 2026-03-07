@@ -13,7 +13,7 @@ import { AnswerButton } from '../components/AnswerButton'
 import { BattleBackground } from '../components/BattleBackground'
 import { BattleIntro } from '../components/BattleIntro'
 
-const PLAYER_HP = 3
+const DEFAULT_PLAYER_HP = 3
 const IDLE_BUTTON_STATES = ['idle', 'idle', 'idle', 'idle']
 
 const TROPHY_LABEL_DEFAULT = { gold: 'PERFECT!', silver: 'GREAT!', bronze: 'SURVIVED!' }
@@ -165,6 +165,7 @@ function TrophyOverlay({ trophy, timeBonus, onContinue, t }) {
 export function BattleScreen({ world, battleIndex, onBattleEnd, lang, t }) {
   const shakeControls = useAnimation()
 
+  const PLAYER_HP = world.playerHP ?? DEFAULT_PLAYER_HP
   const [playerHP,  setPlayerHP]  = useState(PLAYER_HP)
   const [enemyHP,   setEnemyHP]   = useState(world.enemy.hp)
   const [round,     setRound]     = useState(() => makeRound(world.multipliers, world.factorRange))
@@ -337,6 +338,14 @@ export function BattleScreen({ world, battleIndex, onBattleEnd, lang, t }) {
             pointerEvents: 'none', userSelect: 'none',
             display: 'flex', flexDirection: 'column', gap: 2,
           }}>
+            {world.playerHP != null && (
+              <span style={{
+                fontSize: 9, fontWeight: 900, letterSpacing: '0.12em',
+                background: '#ef4444', color: '#fff',
+                borderRadius: 4, padding: '1px 5px',
+                alignSelf: 'flex-start',
+              }}>DEV</span>
+            )}
             <motion.div
               initial={{ opacity: 0 }}
               animate={introPlaying ? { opacity: 0 } : { opacity: 1 }}

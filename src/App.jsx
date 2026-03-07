@@ -9,12 +9,13 @@ import { VictoryScreen } from './screens/VictoryScreen'
 import { StartScreen } from './screens/StartScreen'
 import { NewGameScreen } from './screens/NewGameScreen'
 import { DesignScreen } from './screens/DesignScreen'
-import { EASY, MEDIUM, HARD } from './game/campaign.config'
+import { EASY, MEDIUM, HARD, DEV } from './game/campaign.config'
 import { createNewRun, loadRun, saveRun, clearRun } from './game/runState'
 import { getTrophy, calcBattleScore } from './game/battleLogic'
 import { LANG_KEY, T } from './game/i18n'
 
 const CONFIGS = { easy: EASY, medium: MEDIUM, hard: HARD }
+const IS_DEV_MODE = new URLSearchParams(window.location.search).has('dev')
 
 export default function App() {
   const [difficulty, setDifficulty] = useState('medium')
@@ -24,7 +25,7 @@ export default function App() {
   const handleLangChange = (l) => { setLang(l); localStorage.setItem(LANG_KEY, l) }
   const t = T[lang] ?? T.en
 
-  const worlds = CONFIGS[difficulty] ?? MEDIUM
+  const worlds = IS_DEV_MODE ? DEV : (CONFIGS[difficulty] ?? MEDIUM)
   const totalBattles = worlds.reduce((sum, w) => sum + w.battles, 0)
 
   const [run, setRun] = useState(() => loadRun() ?? createNewRun())
