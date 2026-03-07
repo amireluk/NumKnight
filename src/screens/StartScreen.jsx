@@ -258,11 +258,11 @@ export function StartScreen({ onStart, lang, onLangChange, t }) {
         }}>
           NumKnight
         </p>
-        <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.28)', fontWeight: 700, letterSpacing: '0.18em', marginTop: 6 }}>
-          v{__APP_VERSION__}
+        <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.22)', fontWeight: 600, marginTop: 6, letterSpacing: '0.05em' }}>
+          {isRtl ? 'נוצר על ידי אמיר אלוק' : 'Created by Amir Eluk'}
         </p>
-        <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.22)', fontWeight: 600, marginTop: 4, letterSpacing: '0.05em' }}>
-          Created by Amir Eluk &nbsp;·&nbsp; נוצר על ידי אמיר אלוק
+        <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.20)', fontWeight: 600, marginTop: 2, letterSpacing: '0.12em' }}>
+          v{__APP_VERSION__}
         </p>
       </motion.div>
 

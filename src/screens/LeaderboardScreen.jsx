@@ -79,42 +79,6 @@ export function LeaderboardScreen({ totalScore, endWorld, cleared, difficulty, p
         </span>
       </motion.div>
 
-      {/* Your score summary */}
-      <motion.div
-        initial={{ opacity: 0, scale: 0.93 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ delay: 0.15 }}
-        style={{
-          background: 'rgba(255,255,255,0.15)',
-          border: '1px solid rgba(255,255,255,0.30)',
-          borderRadius: 18, padding: '12px 18px',
-          display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-        }}
-      >
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-          <span style={{ color: 'rgba(255,255,255,0.55)', fontSize: 12, fontWeight: 700, letterSpacing: '0.1em' }}>
-            {t?.yourScore ?? 'YOUR SCORE'}
-          </span>
-          {endWorld && (
-            <span style={{
-              fontSize: 11, fontWeight: 700,
-              color: cleared ? '#fbbf24' : 'rgba(255,255,255,0.35)',
-              letterSpacing: '0.06em',
-            }}>
-              {cleared ? (t?.conquered ?? 'CONQUERED') : (t?.fellAt ? t.fellAt(worldDisplayName(endWorld, t)) : `Fell at ${endWorld}`)}
-            </span>
-          )}
-        </div>
-        <motion.span
-          initial={{ opacity: 0, scale: 0.6 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ type: 'spring', stiffness: 200, damping: 12, delay: 0.25 }}
-          style={{ color: '#fbbf24', fontSize: 28, fontWeight: 900 }}
-        >
-          {totalScore.toLocaleString()}
-        </motion.span>
-      </motion.div>
-
       {/* Scores list */}
       <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 6 }}>
         {scores.length === 0 ? (
