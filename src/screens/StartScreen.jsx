@@ -221,27 +221,22 @@ export function StartScreen({ onStart, lang, onLangChange, t }) {
           'linear-gradient(to bottom, #1e3a70, #2d5aaa)',
       }}
     >
-      {/* Language toggle — top of flow, right-aligned, always LTR */}
-      <div dir="ltr" style={{
-        width: '100%', display: 'flex', justifyContent: 'flex-end',
-        position: 'relative', zIndex: 1,
-      }}>
-        {['en', 'he'].map((l) => (
-          <button
-            key={l}
-            onClick={() => onLangChange(l)}
-            style={{
-              padding: '4px 10px', borderRadius: 8, cursor: 'pointer',
-              fontSize: 11, fontWeight: 900, letterSpacing: '0.06em',
-              border: lang === l ? '1.5px solid rgba(251,191,36,0.8)' : '1.5px solid rgba(255,255,255,0.18)',
-              background: lang === l ? 'rgba(251,191,36,0.18)' : 'rgba(255,255,255,0.08)',
-              color: lang === l ? '#fbbf24' : 'rgba(255,255,255,0.4)',
-              transition: 'all 0.15s',
-            }}
-          >
-            {l === 'en' ? 'EN' : 'עב'}
-          </button>
-        ))}
+      {/* Language toggle — single cycling globe button */}
+      <div dir="ltr" style={{ width: '100%', display: 'flex', justifyContent: 'flex-end', position: 'relative', zIndex: 1 }}>
+        <button
+          onClick={() => onLangChange(lang === 'en' ? 'he' : 'en')}
+          style={{
+            display: 'flex', alignItems: 'center', gap: 5,
+            padding: '5px 11px', borderRadius: 20, cursor: 'pointer',
+            fontSize: 12, fontWeight: 900, letterSpacing: '0.06em',
+            border: '1.5px solid rgba(255,255,255,0.22)',
+            background: 'rgba(255,255,255,0.10)',
+            color: 'rgba(255,255,255,0.70)',
+            transition: 'all 0.15s',
+          }}
+        >
+          🌐 {lang === 'en' ? 'EN' : 'עב'}
+        </button>
       </div>
 
       {/* Title */}
