@@ -66,10 +66,7 @@ export function LeaderboardScreen({ totalScore, endWorld, cleared, difficulty, p
         className="text-center"
         style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}
       >
-        <p className="text-white/40 text-xs font-black tracking-[0.35em] uppercase">
-          {t?.kingdomRecords ?? 'Kingdom Records'}
-        </p>
-        <p className="text-white font-black text-3xl tracking-wide">{t?.leaderboard ?? 'Leaderboard'}</p>
+        <p className="text-white font-black text-3xl tracking-wide">{t?.kingdomRecords ?? 'Kingdom Records'}</p>
         <span style={{
           background: DIFF_COLOR[difficulty], color: '#000',
           borderRadius: 99, padding: '2px 14px',
