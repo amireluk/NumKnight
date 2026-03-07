@@ -69,9 +69,9 @@
 
 | Section | Description | Status |
 |---------|-------------|--------|
-| A | World Map redesign (reverse order, X overlay, bigger icons, remove KnightHelmet) | ⚠️ Partially done — WorldMapScreen exists; individual tweaks unclear |
-| B | Leaderboard (endWorld column, comma-format, high-score pulse) | ⚠️ Partially done — LeaderboardScreen exists; individual tweaks unclear |
-| C | Start Screen (name + difficulty picker) | ✅ Done — `StartScreen.jsx` ships with name input + Easy/Medium/Hard |
-| D | Battle Intro "FINAL ROUND" text for last battle | ⚠️ Unclear — check `BattleIntro.jsx` |
-| E | Battle bug fixes (stop timer on death, score formula, overlay round text) | ⚠️ Unclear — check `BattleScreen.jsx` |
-| F | Area Cleared animated score transfer | ✅ Done — `AreaClearedScreen.jsx` has animated transfer |
+| A | World Map redesign (reverse order, X overlay, bigger icons) | ✅ Done |
+| B | Leaderboard (endWorld column, comma-format, per-difficulty carousel) | ✅ Done |
+| C | Start Screen (split into StartScreen + NewGameScreen with difficulty picker) | ✅ Done |
+| D | Battle Intro "FINAL ROUND" text for last battle | ⚠️ Not implemented — low priority |
+| E | Battle bug fixes (stop timer on death, score formula) | ✅ Done |
+| F | Area Cleared animated score transfer | ✅ Done |

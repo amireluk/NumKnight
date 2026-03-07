@@ -50,16 +50,18 @@ timeBonus        = floor((timeLeft / world.timer) × 50)  [timed worlds only]
 
 ## Phase 4 — Local Leaderboard ✅ COMPLETE
 
-Top 10 runs stored in `localStorage` (`numknight_scores`).
+Top 3 runs per difficulty stored in `localStorage` (keys: `numknight_scores_easy/medium/hard`).
 
 ```js
-{ name, score, date, endWorld, cleared }
+{ name, score, date, endWorld, cleared, version }
 ```
 
 - Victory → LeaderboardScreen with name entry
 - Death → ResultScreen → LeaderboardScreen
 - `cleared: true` shows "CONQUERED" for full-campaign wins
 - Scores persist across sessions
+- **Per-difficulty carousel** — swipe left/right (or tap arrows) to browse Easy / Medium / Hard ladders; adjacent panels peek from each side; circular (Easy ↔ Hard wraps); gradient fade on indicator edges
+- Newly submitted score highlighted with gold border + "NEW" badge
 
 ---
 
@@ -110,6 +112,12 @@ CREATE TABLE scores (
 ## Suggested implementation order
 
 ```
-Phase 5 (Polish)    ← do incrementally, highest perceived value per effort
-Phase 6 (Backend)   ← biggest lift, needs Phase 3+4 (done) as prereqs
+P5-E  Answer button shake       ← 30 min, big feel improvement
+P5-C  Screen flash on hit       ← 30 min, visceral damage feedback
+P5-A  Enemy death animation     ← 1–2 hrs, biggest wow moment
+P5-B  Player death animation    ← 30 min (reuses P5-A pattern)
+P5-F  HP bar smooth lerp        ← 30 min, easy win
+P5-D  Victory particle burst    ← 1 hr, great on gold trophy
+P5-G  Idle enemy variety        ← 1 hr, world feels alive
+Phase 6 (Backend)               ← biggest lift, do after all Phase 5
 ```

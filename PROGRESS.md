@@ -1,7 +1,7 @@
 # NumKnight — Progress Tracker
 
 > Update this file at the end of each session.
-> Last updated: 2026-03-07 | Version: 1.3.34
+> Last updated: 2026-03-07 | Version: 1.3.76
 
 ---
 
@@ -33,12 +33,13 @@ The core game is feature-complete through Phase 4 of the roadmap. Phases 5–6 (
 - [x] Sound effects — correct, wrong, sword swing, impact, victory, defeat
 
 ### Screens
-- [x] `StartScreen` — name input + Easy / Medium / Hard difficulty picker
+- [x] `StartScreen` — main menu (play + leaderboard buttons, lang toggle)
+- [x] `NewGameScreen` — name input + Easy / Medium / Hard difficulty picker
 - [x] `WorldMapScreen` — vertical map with 5 world bands, trophy indicators, knight position
 - [x] `BattleScreen` — full battle UI with countdown timer, HP bars, encounter dots
 - [x] `ResultScreen` — trophy result (win) or game over (loss)
 - [x] `AreaClearedScreen` — world score + trophy grid, animated score transfer to total
-- [x] `LeaderboardScreen` — top 10 local runs, name entry, score display
+- [x] `LeaderboardScreen` — per-difficulty carousel (swipe/peek/circular), top 3 per difficulty, name entry
 
 ### Scoring
 - [x] Per-battle score: base points × trophy multiplier + time bonus
@@ -61,8 +62,19 @@ The core game is feature-complete through Phase 4 of the roadmap. Phases 5–6 (
 
 ### Difficulty System
 - [x] 3 difficulty configs in `campaign.config.js`: `EASY`, `MEDIUM`, `HARD`
-- [x] Difficulty selected on StartScreen, drives all world/enemy/timer parameters
+- [x] Difficulty selected on NewGameScreen, drives all world/enemy/timer parameters
 - [x] Player name persisted to `localStorage`
+- [x] Scores stored separately per difficulty (`numknight_scores_easy/medium/hard`)
+
+### UX & Polish
+- [x] Android hardware back button support (all screens)
+- [x] Design mode — phone frame, bottom nav, swipe between screens (`?design` URL param)
+- [x] Castle spikes / battlements added to world map
+- [x] Difficulty-reactive castle appearance on world map
+- [x] Knight strolls castle fields, layered behind trees and castle
+- [x] Version label in battle screen skybox
+
+---
 
 ---
 
@@ -82,6 +94,21 @@ The core game is feature-complete through Phase 4 of the roadmap. Phases 5–6 (
 - [ ] `src/game/api.js` — `submitScore` / `fetchLeaderboard`
 - [ ] Global leaderboard with offline fallback to local
 - [ ] Player name persisted across devices
+
+---
+
+## Suggested Next Steps
+
+In priority order (highest impact / lowest effort first):
+
+1. **Answer button shake** (P5-E) — 30 min, very satisfying wrong-answer feedback. Just a Framer Motion keyframe on `AnswerButton.jsx`.
+2. **Screen flash on hit** (P5-C) — 30 min, visceral damage feel. Absolute overlay in `BattleScreen`.
+3. **Enemy death animation** (P5-A) — 1–2 hrs, biggest "wow" moment. Add `'dying'` phase + Framer Motion exit.
+4. **Player death animation** (P5-B) — 30 min once P5-A is done, reuses same pattern.
+5. **HP bar smooth lerp** (P5-F) — 30 min, easy win. Spring animation on bar width.
+6. **Victory particle burst** (P5-D) — 1 hr, great feel on gold. Hand-rolled SVG burst like `HitSplash`.
+7. **Idle enemy variety** (P5-G) — 1 hr, brings the world alive.
+8. **Backend leaderboard** (Phase 6) — biggest lift (~1 day). Do after all Phase 5 items.
 
 ---
 
