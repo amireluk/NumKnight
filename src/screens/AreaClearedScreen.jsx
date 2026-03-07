@@ -339,7 +339,7 @@ export function AreaClearedScreen({ world, worldTrophies, worldScore, totalScore
             animate={roundControls}
             style={{ fontSize: 22, fontWeight: 900, color: '#fbbf24', minWidth: 60, textAlign: 'right', display: 'inline-block' }}
           >
-            +{battleDisplay.toLocaleString()}
+            {battleDisplay.toLocaleString()}
           </motion.span>
         </div>
         {/* Divider */}
