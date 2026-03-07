@@ -23,22 +23,22 @@
 export const EASY = [
   {
     id: 'forest', name: 'Forest', battles: 3,
-    enemy: { id: 'goblin', name: 'Goblin', hp: 5 },
+    enemy: { id: 'goblin', name: 'Goblin', hp: 4 },
     timer: null, multipliers: [0, 1, 2], factorRange: [1, 10],
   },
   {
     id: 'swamp', name: 'Swamp', battles: 3,
-    enemy: { id: 'skeleton', name: 'Skeleton', hp: 5 },
+    enemy: { id: 'skeleton', name: 'Skeleton', hp: 4 },
     timer: null, multipliers: [2, 5, 10], factorRange: [1, 10],
   },
   {
     id: 'mountains', name: 'Mountains', battles: 3,
-    enemy: { id: 'orc', name: 'Orc', hp: 5 },
+    enemy: { id: 'orc', name: 'Orc', hp: 4 },
     timer: null, multipliers: [3, 4, 6], factorRange: [1, 10],
   },
   {
     id: 'castle', name: 'Castle', battles: 3,
-    enemy: { id: 'darkKnight', name: 'Dark Knight', hp: 5 },
+    enemy: { id: 'darkKnight', name: 'Dark Knight', hp: 4 },
     timer: null, multipliers: [7, 8, 9], factorRange: [1, 10],
   },
   {
@@ -56,7 +56,7 @@ export const EASY = [
 export const MEDIUM = [
   {
     id: 'forest', name: 'Forest', battles: 3,
-    enemy: { id: 'goblin', name: 'Goblin', hp: 5 },
+    enemy: { id: 'goblin', name: 'Goblin', hp: 4 },
     timer: null, multipliers: [0, 1, 2, 3], factorRange: [1, 10],
   },
   {
@@ -76,7 +76,7 @@ export const MEDIUM = [
   },
   {
     id: 'dragonLair', name: 'Dragon Lair', battles: 3,
-    enemy: { id: 'dragon', name: 'Dragon', hp: 5 },
+    enemy: { id: 'dragon', name: 'Dragon', hp: 6 },
     timer: 8, multipliers: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], factorRange: [1, 10],
     enemyDamage: 2,
   },
