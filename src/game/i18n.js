@@ -47,6 +47,8 @@ export const T = {
     conquered: 'CONQUERED',
     fellAtShort: (name) => `Fell at ${name}`,
     noScores: 'No scores yet — be the first!',
+    clearBoard: 'Clear',
+    confirmClear: 'Sure?',
     playAgain: 'PLAY AGAIN',
 
     // World names (by id)
@@ -105,6 +107,8 @@ export const T = {
     conquered: 'ניצחון',
     fellAtShort: (name) => `נפל ב${name}`,
     noScores: 'אין שיאים עדיין — היה הראשון!',
+    clearBoard: 'נקה',
+    confirmClear: 'בטוח?',
     playAgain: 'שחק שוב',
 
     // World names (by id)

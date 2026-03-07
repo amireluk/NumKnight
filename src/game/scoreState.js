@@ -19,3 +19,11 @@ export function loadScores(difficulty) {
     return []
   }
 }
+
+export function clearScores(difficulty) {
+  try {
+    localStorage.removeItem(KEY_PREFIX + difficulty)
+  } catch {
+    // ignore
+  }
+}

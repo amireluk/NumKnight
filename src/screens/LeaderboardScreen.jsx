@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { saveScore, loadScores } from '../game/scoreState'
+import { saveScore, loadScores, clearScores } from '../game/scoreState'
 
 const DIFF_LABEL_DEFAULT = { easy: 'Easy', medium: 'Medium', hard: 'Hard' }
 const DIFF_COLOR = { easy: '#4ade80', medium: '#fbbf24', hard: '#ef4444' }
@@ -37,15 +37,25 @@ export function LeaderboardScreen({ totalScore, endWorld, cleared, difficulty, p
         date: new Date().toLocaleDateString(),
         endWorld,
         cleared,
+        version: typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : '',
       })
     }
     const list = loadScores(difficulty)
-    // Find the index of the run we just added (first entry matching score+world)
     const idx = totalScore > 0
       ? list.findIndex(e => e.score === totalScore && e.endWorld === endWorld && e.cleared === cleared)
       : -1
     return [list, idx]
   })
+
+  const [clearConfirm, setClearConfirm] = useState(false)
+  const [displayScores, setDisplayScores] = useState(scores)
+
+  const handleClear = () => {
+    if (!clearConfirm) { setClearConfirm(true); return }
+    clearScores(difficulty)
+    setDisplayScores([])
+    setClearConfirm(false)
+  }
 
   return (
     <div
@@ -63,26 +73,42 @@ export function LeaderboardScreen({ totalScore, endWorld, cleared, difficulty, p
         initial={{ opacity: 0, y: -14 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
-        className="text-center"
-        style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}
+        style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}
       >
-        <p className="text-white font-black text-3xl tracking-wide">{t?.kingdomRecords ?? 'Kingdom Records'}</p>
-        <span style={{
-          background: DIFF_COLOR[difficulty], color: '#000',
-          borderRadius: 99, padding: '2px 14px',
-          fontSize: 11, fontWeight: 900, letterSpacing: '0.08em',
-        }}>
-          {(t?.diffLabel ?? DIFF_LABEL_DEFAULT)[difficulty] ?? difficulty}
-        </span>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: isRtl ? 'flex-end' : 'flex-start', gap: 6 }}>
+          <p className="text-white font-black text-3xl tracking-wide">{t?.kingdomRecords ?? 'Kingdom Records'}</p>
+          <span style={{
+            background: DIFF_COLOR[difficulty], color: '#000',
+            borderRadius: 99, padding: '2px 14px',
+            fontSize: 11, fontWeight: 900, letterSpacing: '0.08em',
+          }}>
+            {(t?.diffLabel ?? DIFF_LABEL_DEFAULT)[difficulty] ?? difficulty}
+          </span>
+        </div>
+        <motion.button
+          onClick={handleClear}
+          onBlur={() => setClearConfirm(false)}
+          whileTap={{ scale: 0.92 }}
+          style={{
+            padding: '7px 14px', borderRadius: 10, cursor: 'pointer',
+            fontSize: 11, fontWeight: 900, letterSpacing: '0.06em',
+            border: `1.5px solid ${clearConfirm ? 'rgba(239,68,68,0.8)' : 'rgba(255,255,255,0.18)'}`,
+            background: clearConfirm ? 'rgba(239,68,68,0.22)' : 'rgba(255,255,255,0.08)',
+            color: clearConfirm ? '#ef4444' : 'rgba(255,255,255,0.4)',
+            transition: 'all 0.18s', flexShrink: 0,
+          }}
+        >
+          {clearConfirm ? (t?.confirmClear ?? 'Sure?') : (t?.clearBoard ?? 'Clear')}
+        </motion.button>
       </motion.div>
 
       {/* Scores list */}
       <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 6 }}>
-        {scores.length === 0 ? (
+        {displayScores.length === 0 ? (
           <p style={{ color: 'rgba(255,255,255,0.28)', textAlign: 'center', marginTop: 24, fontSize: 14 }}>
             {t?.noScores ?? 'No scores yet — be the first!'}
           </p>
-        ) : scores.map((entry, i) => {
+        ) : displayScores.map((entry, i) => {
           const isNew = i === newScoreIndex
           const isTop3 = i < 3
           return (
@@ -111,21 +137,31 @@ export function LeaderboardScreen({ totalScore, endWorld, cleared, difficulty, p
               }}>
                 {i + 1}
               </span>
-              {/* Name */}
+              {/* Name + version */}
               <span style={{
-                flex: 1, color: isNew ? '#fff' : 'rgba(255,255,255,0.85)',
-                fontWeight: isNew ? 900 : 700,
-                fontSize: isNew ? 15 : 14,
-                minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                flex: 1, minWidth: 0, overflow: 'hidden',
+                display: 'flex', flexDirection: 'column', gap: 1,
               }}>
-                {entry.name}
-                {isNew && (
-                  <span style={{
-                    marginLeft: 8, fontSize: 9, fontWeight: 900, letterSpacing: '0.12em',
-                    background: '#fbbf24', color: '#000',
-                    borderRadius: 4, padding: '1px 5px', verticalAlign: 'middle',
-                  }}>
-                    NEW
+                <span style={{
+                  color: isNew ? '#fff' : 'rgba(255,255,255,0.85)',
+                  fontWeight: isNew ? 900 : 700,
+                  fontSize: isNew ? 15 : 14,
+                  overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                }}>
+                  {entry.name}
+                  {isNew && (
+                    <span style={{
+                      marginLeft: 8, fontSize: 9, fontWeight: 900, letterSpacing: '0.12em',
+                      background: '#fbbf24', color: '#000',
+                      borderRadius: 4, padding: '1px 5px', verticalAlign: 'middle',
+                    }}>
+                      NEW
+                    </span>
+                  )}
+                </span>
+                {entry.version && (
+                  <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.22)', fontWeight: 600, letterSpacing: '0.08em' }}>
+                    v{entry.version}
                   </span>
                 )}
               </span>
