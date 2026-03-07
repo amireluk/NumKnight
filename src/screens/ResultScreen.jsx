@@ -48,41 +48,51 @@ export function ResultScreen({ worldName, worldId, enemy, totalScore, onRestart,
         {/* Dim overlay for drama */}
         <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.25)', zIndex: 1 }} />
 
-        {/* Fallen knight — lies on back at bottom-left */}
+        {/* Fallen knight — large, centered at the bottom */}
         <div style={{
-          position: 'absolute', left: 10, bottom: 10, zIndex: 2,
+          position: 'absolute', bottom: 18, left: 0, right: 0, zIndex: 2,
+          display: 'flex', justifyContent: 'center', alignItems: 'flex-end',
           pointerEvents: 'none', overflow: 'visible',
-          width: 84, height: 112,
-          transform: 'rotate(-90deg) scale(0.42)',
-          transformOrigin: 'center bottom',
         }}>
-          <KnightBodySVG />
-          <div style={{ position: 'absolute', top: 0, left: 0, overflow: 'visible', transformOrigin: '73px 58px' }}>
-            <KnightSwordArmSVG />
+          <div style={{
+            position: 'relative', width: 84, height: 112, overflow: 'visible',
+            transform: 'rotate(-90deg) scale(0.75)',
+            transformOrigin: 'center center',
+          }}>
+            <KnightBodySVG />
+            <div style={{ position: 'absolute', top: 0, left: 0, overflow: 'visible', transformOrigin: '73px 58px' }}>
+              <KnightSwordArmSVG />
+            </div>
           </div>
         </div>
 
-        {/* Sword stuck in ground next to the fallen knight */}
+        {/* Sword planted pommel-up in the ground, right of knight */}
         <svg
-          style={{ position: 'absolute', left: 54, bottom: 0, zIndex: 2, pointerEvents: 'none' }}
-          width="14" height="52" viewBox="0 0 14 52" fill="none"
+          style={{ position: 'absolute', left: '55%', bottom: 0, zIndex: 2, pointerEvents: 'none' }}
+          width="30" height="88" viewBox="0 0 30 88" fill="none"
         >
-          {/* Blade going into ground */}
-          <rect x="5.5" y="14" width="3" height="34" rx="1" fill="#c8d0da" stroke="#424242" strokeWidth="0.7" />
-          {/* Crossguard */}
-          <rect x="0" y="10" width="14" height="4" rx="2" fill="#6d4c41" stroke="#3e2723" strokeWidth="0.8" />
-          {/* Handle */}
-          <rect x="5" y="2" width="4" height="10" rx="2" fill="#8d6050" stroke="#3e2723" strokeWidth="0.7" />
           {/* Pommel */}
-          <ellipse cx="7" cy="1.5" rx="4" ry="3" fill="#7c5040" stroke="#4e342e" strokeWidth="0.8" />
+          <ellipse cx="15" cy="7" rx="8.5" ry="6.5" fill="#8d6e63" stroke="#4e342e" strokeWidth="1.5" />
+          <ellipse cx="15" cy="6" rx="5.5" ry="3.5" fill="#b08070" opacity="0.55" />
+          {/* Handle / grip wrap */}
+          <rect x="12" y="12" width="6" height="20" rx="3" fill="#7c5040" stroke="#4e342e" strokeWidth="1.2" />
+          <line x1="12" y1="16" x2="18" y2="16" stroke="#5a3828" strokeWidth="1.2" opacity="0.5" />
+          <line x1="12" y1="20" x2="18" y2="20" stroke="#5a3828" strokeWidth="1.2" opacity="0.5" />
+          <line x1="12" y1="24" x2="18" y2="24" stroke="#5a3828" strokeWidth="1.2" opacity="0.5" />
+          {/* Crossguard */}
+          <rect x="1" y="30" width="28" height="6" rx="3" fill="#6d4c41" stroke="#3e2723" strokeWidth="1.5" />
+          {/* Blade (lower half buried in ground) */}
+          <path d="M13 36 L17 36 L16 82 L15 88 L14 82Z" fill="#c8d0da" stroke="#424242" strokeWidth="0.9" />
+          {/* Blade shine */}
+          <line x1="14.5" y1="38" x2="14" y2="78" stroke="#e8eef4" strokeWidth="1.2" opacity="0.55" strokeLinecap="round" />
         </svg>
 
-        {/* Enemy standing victorious — shifted right */}
+        {/* Enemy standing victorious — right side */}
         {enemy && (
           <div style={{
             position: 'absolute', inset: 0, zIndex: 3,
             display: 'flex', alignItems: 'flex-end', justifyContent: 'flex-end',
-            paddingBottom: 20, paddingRight: 24,
+            paddingBottom: 20, paddingRight: 16,
           }}>
             <EnemyCharacter phase="idle" enemy={enemy} hitKey={0} />
           </div>
