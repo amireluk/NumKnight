@@ -125,14 +125,15 @@ function groundBottom(screenX, containerW) {
 }
 
 function StrollingKnight() {
-  const wrapRef  = useRef(null)
-  const motionX  = useMotionValue(20)
+  const wrapRef   = useRef(null)
+  const motionX   = useMotionValue(20)
   const cancelled = useRef(false)
   const [facingRight, setFacingRight] = useState(true)
+  const [visible, setVisible] = useState(false)
 
   // Derive bottom offset from motionX so feet track the ground curve
   const motionBottom = useTransform(motionX, (x) => {
-    const w = wrapRef.current?.offsetWidth ?? 360
+    const w = wrapRef.current?.offsetWidth ?? 390
     return groundBottom(x, w)
   })
 
@@ -140,10 +141,14 @@ function StrollingKnight() {
     cancelled.current = false
 
     async function stroll() {
-      await new Promise(r => setTimeout(r, 900))
+      // Wait one rAF so wrapRef is measured, then snap to correct position and show
+      await new Promise(r => requestAnimationFrame(r))
+      motionX.set(20)
+      setVisible(true)
+      await new Promise(r => setTimeout(r, 700))
       let goRight = true
       while (!cancelled.current) {
-        const w       = wrapRef.current?.offsetWidth ?? 360
+        const w       = wrapRef.current?.offsetWidth ?? 390
         const targetX = goRight ? w - 84 : 20
         const dist    = Math.abs(targetX - motionX.get())
         setFacingRight(goRight)
@@ -161,8 +166,13 @@ function StrollingKnight() {
   }, [motionX])
 
   return (
-    <div ref={wrapRef} style={{ position: 'absolute', inset: 0, zIndex: 2, pointerEvents: 'none' }}>
-      <motion.div style={{ x: motionX, bottom: motionBottom, position: 'absolute', display: 'inline-block' }}>
+    // dir="ltr" prevents RTL inheritance from parent from flipping absolute positioning
+    <div ref={wrapRef} dir="ltr" style={{ position: 'absolute', inset: 0, zIndex: 2, pointerEvents: 'none' }}>
+      <motion.div style={{
+        x: motionX, bottom: motionBottom,
+        position: 'absolute', left: 0, display: 'inline-block',
+        opacity: visible ? 1 : 0,
+      }}>
         <div style={{
           transform: `scale(0.72) scaleX(${facingRight ? 1 : -1})`,
           transformOrigin: 'center bottom',

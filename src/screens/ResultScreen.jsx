@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion'
 import { FallenKnightScene } from '../components/KnightCharacter'
 
-export function ResultScreen({ worldName, totalScore, onRestart, onViewScores, lang, t }) {
+export function ResultScreen({ worldName, worldId, totalScore, onRestart, onViewScores, lang, t }) {
   const isRtl = lang === 'he'
   return (
     <div
@@ -23,7 +23,7 @@ export function ResultScreen({ worldName, totalScore, onRestart, onViewScores, l
         <p className="text-white font-black text-3xl tracking-wide">{t?.defeated ?? 'DEFEATED'}</p>
         {worldName && (
           <p className="text-white/40 text-xs font-black tracking-[0.35em] uppercase mt-1">
-            {t?.fellAt ? t.fellAt(worldName) : `Fell at ${worldName}`}
+            {t?.fellAt ? t.fellAt(t.worldName?.[worldId] ?? worldName) : `Fell at ${worldName}`}
           </p>
         )}
       </motion.div>
