@@ -95,13 +95,8 @@ export function LeaderboardScreen({ totalScore, endWorld, cleared, difficulty, p
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.22 + i * 0.05 }}
               style={{
-                background: isNew
-                  ? 'rgba(251,191,36,0.18)'
-                  : isTop3 ? RANK_ROW_BG[i] : 'rgba(255,255,255,0.04)',
-                border: `${isNew ? 2 : 1}px solid ${
-                  isNew ? 'rgba(251,191,36,0.75)'
-                  : isTop3 ? RANK_BORDER[i] : 'rgba(255,255,255,0.08)'
-                }`,
+                background: isNew ? 'rgba(251,191,36,0.18)' : 'rgba(255,255,255,0.04)',
+                border: `${isNew ? 2 : 1}px solid ${isNew ? 'rgba(251,191,36,0.75)' : 'rgba(255,255,255,0.08)'}`,
                 borderRadius: 12,
                 padding: isNew ? '13px 14px' : '10px 14px',
                 display: 'flex', alignItems: 'center', gap: 10,
