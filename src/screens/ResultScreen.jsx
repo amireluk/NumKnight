@@ -1,13 +1,15 @@
 import { motion } from 'framer-motion'
-import { FallenKnightScene } from '../components/KnightCharacter'
+import { EnemyCharacter } from '../components/EnemyCharacter'
+import { BattleBackground } from '../components/BattleBackground'
 
-export function ResultScreen({ worldName, worldId, totalScore, onRestart, onViewScores, lang, t }) {
+export function ResultScreen({ worldName, worldId, enemy, totalScore, onRestart, onViewScores, lang, t }) {
   const isRtl = lang === 'he'
   return (
     <div
       dir={isRtl ? 'rtl' : 'ltr'}
-      className="flex flex-col items-center justify-center min-h-dvh max-w-md mx-auto px-6 gap-5"
+      className="flex flex-col h-dvh max-w-md mx-auto px-6 py-5 gap-4"
       style={{
+        overflow: 'hidden',
         background:
           'radial-gradient(ellipse at 50% 40%, rgba(239,68,68,0.07) 0%, transparent 65%), ' +
           'linear-gradient(to bottom, #1e3a70, #2d5aaa)',
@@ -19,6 +21,7 @@ export function ResultScreen({ worldName, worldId, totalScore, onRestart, onView
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.32 }}
         className="text-center"
+        style={{ flexShrink: 0 }}
       >
         <p className="text-white font-black text-3xl tracking-wide">{t?.defeated ?? 'DEFEATED'}</p>
         {worldName && (
@@ -28,23 +31,41 @@ export function ResultScreen({ worldName, worldId, totalScore, onRestart, onView
         )}
       </motion.div>
 
-      {/* Fallen knight illustration */}
+      {/* Enemy victory arena — fills remaining space */}
       <motion.div
-        initial={{ scale: 0.7, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ type: 'spring', stiffness: 180, damping: 15, delay: 0.1 }}
-        style={{ borderRadius: 20, overflow: 'hidden', boxShadow: '0 0 32px rgba(0,0,0,0.5)' }}
+        initial={{ opacity: 0, scale: 0.96 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.35, delay: 0.1 }}
+        style={{
+          flex: 1, minHeight: 0,
+          position: 'relative', overflow: 'hidden',
+          borderRadius: 16, border: '1px solid rgba(255,255,255,0.08)',
+        }}
       >
-        <FallenKnightScene />
+        <BattleBackground worldId={worldId} />
+
+        {/* Dim overlay for drama */}
+        <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.25)', zIndex: 1 }} />
+
+        {/* Enemy standing victorious */}
+        {enemy && (
+          <div style={{
+            position: 'absolute', inset: 0, zIndex: 2,
+            display: 'flex', alignItems: 'flex-end', justifyContent: 'center',
+            paddingBottom: 20,
+          }}>
+            <EnemyCharacter phase="idle" enemy={enemy} hitKey={0} />
+          </div>
+        )}
       </motion.div>
 
       {/* Score panel */}
       <motion.div
         initial={{ opacity: 0, scale: 0.88 }}
         animate={{ opacity: 1, scale: 1 }}
-        transition={{ delay: 0.38, type: 'spring', stiffness: 220, damping: 15 }}
+        transition={{ delay: 0.35, type: 'spring', stiffness: 220, damping: 15 }}
         style={{
-          width: '100%',
+          flexShrink: 0,
           background: 'rgba(255,255,255,0.15)',
           border: '1px solid rgba(255,255,255,0.30)',
           borderRadius: 16, padding: '14px 20px',
@@ -63,11 +84,12 @@ export function ResultScreen({ worldName, worldId, totalScore, onRestart, onView
       <motion.button
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.58 }}
+        transition={{ delay: 0.5 }}
         whileTap={{ scale: 0.95 }}
         whileHover={{ scale: 1.04 }}
         onClick={onViewScores}
-        className="w-full bg-yellow-400 border-b-4 border-yellow-600 text-black font-black text-xl rounded-2xl h-16 shadow-xl cursor-pointer tracking-widest"
+        style={{ flexShrink: 0 }}
+        className="w-full bg-yellow-400 border-b-4 border-yellow-600 text-black font-black text-xl rounded-2xl h-14 shadow-xl cursor-pointer tracking-widest"
       >
         {t?.seeScores ?? 'SEE SCORES'}
       </motion.button>

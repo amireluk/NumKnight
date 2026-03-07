@@ -83,7 +83,7 @@ export default function App() {
         setScreen('battle')
       }
     } else {
-      setPendingScore({ totalScore: run.totalScore ?? 0, endWorld: world.name, endWorldId: world.id, cleared: false })
+      setPendingScore({ totalScore: run.totalScore ?? 0, endWorld: world.name, endWorldId: world.id, endEnemy: world.enemy, cleared: false })
       setScreen('result')
     }
   }
@@ -180,6 +180,7 @@ export default function App() {
           <ResultScreen
             worldName={pendingScore?.endWorld ?? ''}
             worldId={pendingScore?.endWorldId ?? 'forest'}
+            enemy={pendingScore?.endEnemy ?? null}
             totalScore={pendingScore?.totalScore ?? 0}
             onRestart={handleRestart}
             onViewScores={handleViewScores}

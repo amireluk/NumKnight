@@ -258,7 +258,7 @@ export const REGION_STRIPS = {
 
 // ── Region band ──────────────────────────────────────────────────────────────
 
-function RegionBand({ world, status, trophy, score, delay, t }) {
+function RegionBand({ world, status, trophy, score, delay, onTap, t }) {
   const Strip       = REGION_STRIPS[world.id] ?? ForestStrip
   const isLocked    = status === 'locked'
   const isCurrent   = status === 'current'
@@ -269,6 +269,8 @@ function RegionBand({ world, status, trophy, score, delay, t }) {
       initial={{ opacity: 0, x: -28 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay, duration: 0.28 }}
+      onClick={isCurrent ? onTap : undefined}
+      whileTap={isCurrent ? { scale: 0.97 } : undefined}
       style={{
         position: 'relative',
         flex: 1,
@@ -277,6 +279,7 @@ function RegionBand({ world, status, trophy, score, delay, t }) {
         border: isCurrent
           ? '2px solid rgba(251,191,36,0.9)'
           : '2px solid rgba(255,255,255,0.06)',
+        cursor: isCurrent ? 'pointer' : 'default',
       }}
     >
       {/* Scene background */}
@@ -375,6 +378,23 @@ function RegionBand({ world, status, trophy, score, delay, t }) {
           transition={{ repeat: Infinity, duration: 2.0, ease: 'easeInOut' }}
         />
       )}
+
+      {/* Active: tap-to-fight hint */}
+      {isCurrent && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: [0, 1, 1, 0] }}
+          transition={{ delay: 1.2, duration: 2.4, repeat: Infinity, repeatDelay: 1.0 }}
+          style={{
+            position: 'absolute', bottom: 6, right: 8, zIndex: 5, pointerEvents: 'none',
+            fontSize: 9, fontWeight: 900, letterSpacing: '0.14em',
+            color: 'rgba(251,191,36,0.9)',
+            textShadow: '0 1px 4px rgba(0,0,0,0.9)',
+          }}
+        >
+          {t?.tapToFight ?? '⚔ TAP TO FIGHT'}
+        </motion.div>
+      )}
     </motion.div>
   )
 }
@@ -455,26 +475,15 @@ export function WorldMapScreen({
               trophy={trophy}
               score={score}
               delay={0.08 + di * 0.06}
+              onTap={onFight}
               t={t}
             />
           )
         })}
       </div>
 
-      {/* Footer */}
-      <div className="px-6 pb-6 pt-4" style={{ flexShrink: 0 }}>
-        <motion.button
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.65, type: 'spring', stiffness: 210, damping: 18 }}
-          whileTap={{ scale: 0.95 }}
-          whileHover={{ scale: 1.03 }}
-          onClick={onFight}
-          className="w-full font-black text-2xl rounded-2xl h-14 shadow-xl tracking-widest bg-yellow-400 border-b-4 border-yellow-600 text-black cursor-pointer"
-        >
-          {t?.fight ?? 'Go!'}
-        </motion.button>
-      </div>
+      {/* Bottom padding */}
+      <div style={{ flexShrink: 0, height: 12 }} />
     </div>
   )
 }
