@@ -5,6 +5,7 @@ import { ResultScreen } from './screens/ResultScreen'
 import { WorldMapScreen } from './screens/WorldMapScreen'
 import { AreaClearedScreen } from './screens/AreaClearedScreen'
 import { LeaderboardScreen } from './screens/LeaderboardScreen'
+import { VictoryScreen } from './screens/VictoryScreen'
 import { StartScreen } from './screens/StartScreen'
 import { NewGameScreen } from './screens/NewGameScreen'
 import { DesignScreen } from './screens/DesignScreen'
@@ -95,7 +96,7 @@ export default function App() {
       setPendingScore({ totalScore: clearedData.totalScore, endWorld: clearedData.world.name, cleared: true })
       setClearedData(null)
       setWorldScore(0)
-      setScreen('leaderboard')
+      setScreen('victory')
       return
     }
     setClearedData(null)
@@ -109,6 +110,10 @@ export default function App() {
     setMapIsTransition(false)
     setBattleKey((k) => k + 1)
     setScreen('battle')
+  }
+
+  const handleVictoryContinue = () => {
+    setScreen('leaderboard')
   }
 
   const handleViewScores = () => {
@@ -199,6 +204,20 @@ export default function App() {
             totalScore={pendingScore?.totalScore ?? 0}
             onRestart={handleRestart}
             onViewScores={handleViewScores}
+            lang={lang} t={t}
+          />
+        </motion.div>
+      )}
+
+      {screen === 'victory' && (
+        <motion.div key="victory"
+          initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+          transition={{ duration: 0.5 }} className="w-full"
+        >
+          <VictoryScreen
+            playerName={playerName}
+            totalScore={pendingScore?.totalScore ?? 0}
+            onContinue={handleVictoryContinue}
             lang={lang} t={t}
           />
         </motion.div>

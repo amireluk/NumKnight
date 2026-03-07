@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { motion, useAnimation } from 'framer-motion'
+import { ParticleBurst } from '../components/ParticleBurst'
 
 const TROPHY_COLOR = { gold: '#fbbf24', silver: '#c0c8d4', bronze: '#cd7c3a' }
 
@@ -228,6 +229,14 @@ export const WORLD_SCENES = {
 
 // ── Screen ────────────────────────────────────────────────────────────────────
 
+const TROPHY_RANK = { gold: 0, silver: 1, bronze: 2 }
+const BURST_COUNT  = { gold: 58, silver: 32, bronze: 14 }
+const BURST_COLORS = {
+  gold:   ['#fbbf24', '#fde68a', '#fff', '#f59e0b', '#86efac'],
+  silver: ['#c0c8d4', '#e2e8f0', '#fff', '#94a3b8', '#93c5fd'],
+  bronze: ['#cd7c3a', '#e9a96a', '#fff', '#b45309', '#fde68a'],
+}
+
 export function AreaClearedScreen({ world, worldTrophies, worldScore, totalScore, onContinue, lang, t }) {
   const isRtl = lang === 'he'
   const Scene     = WORLD_SCENES[world.id] ?? ForestScene
@@ -236,13 +245,19 @@ export function AreaClearedScreen({ world, worldTrophies, worldScore, totalScore
   const [battleDisplay, setBattleDisplay] = useState(0)
   const [totalDisplay,  setTotalDisplay]  = useState(prevTotal)
   const [showContinue,  setShowContinue]  = useState(worldScore === 0)
+  const [showBurst,     setShowBurst]     = useState(false)
   const cancelRef     = useRef([])
   const roundControls = useAnimation()
+
+  // Derive best trophy for burst sizing
+  const bestTrophy = worldTrophies.reduce((best, tr) =>
+    (TROPHY_RANK[tr] ?? 2) < (TROPHY_RANK[best] ?? 2) ? tr : best, 'bronze')
 
   useEffect(() => {
     if (worldScore === 0) return
 
     const t1 = setTimeout(() => {
+      setShowBurst(true)
       const cancel1 = animateCount(0, worldScore, 700, setBattleDisplay, () => {
         const t2 = setTimeout(() => {
           roundControls.start({
@@ -314,7 +329,7 @@ export function AreaClearedScreen({ world, worldTrophies, worldScore, totalScore
         }}
       >
         {/* Trophy row */}
-        <div style={{ display: 'flex', gap: 24, alignItems: 'center', justifyContent: 'center', paddingBottom: 4 }}>
+        <div style={{ display: 'flex', gap: 24, alignItems: 'center', justifyContent: 'center', paddingBottom: 4, position: 'relative' }}>
           {worldTrophies.map((trophy, i) => (
             <motion.div
               key={i}
@@ -325,6 +340,15 @@ export function AreaClearedScreen({ world, worldTrophies, worldScore, totalScore
               <TrophyCup trophy={trophy} size={48} />
             </motion.div>
           ))}
+          {showBurst && (
+            <ParticleBurst
+              count={BURST_COUNT[bestTrophy]}
+              colors={BURST_COLORS[bestTrophy]}
+              originX='50%' originY='50%'
+              spread={bestTrophy === 'gold' ? 200 : bestTrophy === 'silver' ? 150 : 100}
+              gravity={bestTrophy === 'gold' ? 80 : 50}
+            />
+          )}
         </div>
 
         {/* Divider */}

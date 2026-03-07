@@ -8,6 +8,7 @@ import { playCorrect, playWrong, playSwordSwing, playImpact, playVictory, playDe
 import { HPBar } from '../components/HPBar'
 import { KnightCharacter } from '../components/KnightCharacter'
 import { EnemyCharacter } from '../components/EnemyCharacter'
+import { ParticleBurst } from '../components/ParticleBurst'
 import { AnswerButton } from '../components/AnswerButton'
 import { BattleBackground } from '../components/BattleBackground'
 import { BattleIntro } from '../components/BattleIntro'
@@ -60,6 +61,13 @@ function TimerBar({ timeLeft, maxTime }) {
   )
 }
 
+const BURST_COUNT  = { gold: 26, silver: 14, bronze: 7 }
+const BURST_COLORS = {
+  gold:   ['#fbbf24', '#fde68a', '#fff', '#f59e0b'],
+  silver: ['#c0c8d4', '#e2e8f0', '#fff', '#94a3b8'],
+  bronze: ['#cd7c3a', '#e9a96a', '#fff', '#b45309'],
+}
+
 // In-scene overlay shown when the enemy is defeated
 function TrophyOverlay({ trophy, timeBonus, onContinue, t }) {
   const TROPHY_LABEL = t?.trophyLabel ?? TROPHY_LABEL_DEFAULT
@@ -79,6 +87,15 @@ function TrophyOverlay({ trophy, timeBonus, onContinue, t }) {
         cursor: 'pointer', gap: 14,
       }}
     >
+      {/* Sparkle burst — fires when trophy lands (~0.55s after mount) */}
+      <ParticleBurst
+        count={BURST_COUNT[trophy] ?? 14}
+        colors={BURST_COLORS[trophy] ?? BURST_COLORS.silver}
+        originX='50%' originY='38%'
+        spread={130} gravity={40}
+        baseDelay={0.52}
+      />
+
       {/* Trophy drops in from above */}
       <motion.div
         initial={{ y: -180, scale: 0.4, rotate: -8 }}
