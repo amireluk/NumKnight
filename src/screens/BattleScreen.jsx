@@ -12,6 +12,7 @@ import { AnswerButton } from '../components/AnswerButton'
 import { BattleBackground } from '../components/BattleBackground'
 import { BattleIntro } from '../components/BattleIntro'
 
+const PLAYER_HP = 3
 const IDLE_BUTTON_STATES = ['idle', 'idle', 'idle', 'idle']
 
 const TROPHY_LABEL_DEFAULT = { gold: 'PERFECT!', silver: 'GREAT!', bronze: 'SURVIVED!' }
@@ -147,7 +148,7 @@ function TrophyOverlay({ trophy, timeBonus, onContinue, t }) {
 export function BattleScreen({ world, battleIndex, onBattleEnd, lang, t }) {
   const shakeControls = useAnimation()
 
-  const [playerHP,  setPlayerHP]  = useState(world.playerHP)
+  const [playerHP,  setPlayerHP]  = useState(PLAYER_HP)
   const [enemyHP,   setEnemyHP]   = useState(world.enemy.hp)
   const [round,     setRound]     = useState(() => makeRound(world.multipliers, world.factorRange))
   const [phase,     setPhase]     = useState('idle')
@@ -214,7 +215,7 @@ export function BattleScreen({ world, battleIndex, onBattleEnd, lang, t }) {
       playImpact()
       setPlayerHitKey((k) => k + 1)
       shakeControls.start({ x: [0, -12, 11, -8, 7, -4, 3, 0], transition: { duration: 0.5 } })
-      const newPlayerHP = Math.max(0, playerHPRef.current - 1)
+      const newPlayerHP = Math.max(0, playerHPRef.current - (world.enemyDamage ?? 1))
       setPlayerHP(newPlayerHP)
 
       if (newPlayerHP <= 0) {
@@ -284,7 +285,7 @@ export function BattleScreen({ world, battleIndex, onBattleEnd, lang, t }) {
         playImpact()
         setPlayerHitKey((k) => k + 1)
         shakeControls.start({ x: [0, -12, 11, -8, 7, -4, 3, 0], transition: { duration: 0.5 } })
-        const newPlayerHP = Math.max(0, playerHP - 1)
+        const newPlayerHP = Math.max(0, playerHP - (world.enemyDamage ?? 1))
         setPlayerHP(newPlayerHP)
 
         if (newPlayerHP <= 0) {
@@ -346,7 +347,7 @@ export function BattleScreen({ world, battleIndex, onBattleEnd, lang, t }) {
               transition={{ duration: 0.35 }}
               className="mb-6"
             >
-              <HPBar current={playerHP} max={world.playerHP} color="green" />
+              <HPBar current={playerHP} max={PLAYER_HP} color="green" />
             </motion.div>
 
             {/* Characters */}

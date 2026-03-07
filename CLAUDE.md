@@ -54,6 +54,20 @@ This runs `npm run build` (bumps version + builds) then `gh-pages -d dist` to pu
 
 ---
 
+## Campaign design principles
+
+- **Player HP is always 3** across all difficulties — hardcoded constant, not in config.
+  Difficulty is expressed through `enemyDamage` (how much each wrong answer costs), not by giving the player fewer HP.
+- **Enemy HP stays low** (max 5) — individual fights should feel snappy. Challenge comes from question difficulty, timers, and damage, not grinding.
+- **Battle count ramps up** within each difficulty as the campaign progresses. Early worlds are quick introductions; late worlds feel like sieges.
+- **Easy** uses only the easy-pattern tables (1s, 2s, 5s, 10s). No timers. One battle per world — a confidence-building tour.
+- **Medium** strips 2s from the multiplier pool, expands world by world toward the full 10×10 board, and introduces timers in the last two worlds. The final enemy deals 2 damage (one mistake = death).
+- **Hard** strips 1s, 2s, and 10s quickly (gone from Swamp onward). Timers from Swamp onward. Damage escalates — Castle enemy deals 2, Dragon deals 3 (instant death on any mistake).
+- **factorRange is always [1, 10]** — the right-hand factor is never restricted. Difficulty comes entirely from which left-hand `multipliers` are active.
+- `enemyDamage` defaults to 1 if omitted. Only set it explicitly when it's > 1.
+
+---
+
 ## Campaign config (`campaign.config.js`)
 
 Three named configs — `EASY`, `MEDIUM`, `HARD` — are exported. The active config is determined at runtime by the difficulty the player picks on `StartScreen`. Each world entry shape:
