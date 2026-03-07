@@ -248,7 +248,7 @@ function DragonLairStrip() {
   )
 }
 
-const REGION_STRIPS = {
+export const REGION_STRIPS = {
   forest:     ForestStrip,
   swamp:      SwampStrip,
   mountains:  MountainsStrip,

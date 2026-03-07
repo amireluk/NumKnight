@@ -218,7 +218,7 @@ function DragonLairScene() {
   )
 }
 
-const WORLD_SCENES = {
+export const WORLD_SCENES = {
   forest:     ForestScene,
   swamp:      SwampScene,
   mountains:  MountainsScene,

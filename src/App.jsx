@@ -6,6 +6,7 @@ import { WorldMapScreen } from './screens/WorldMapScreen'
 import { AreaClearedScreen } from './screens/AreaClearedScreen'
 import { LeaderboardScreen } from './screens/LeaderboardScreen'
 import { StartScreen } from './screens/StartScreen'
+import { DesignScreen } from './screens/DesignScreen'
 import { EASY, MEDIUM, HARD } from './game/campaign.config'
 import { createNewRun, loadRun, saveRun, clearRun } from './game/runState'
 import { getTrophy, calcBattleScore } from './game/battleLogic'
@@ -25,7 +26,9 @@ export default function App() {
   const totalBattles = worlds.reduce((sum, w) => sum + w.battles, 0)
 
   const [run, setRun] = useState(() => loadRun() ?? createNewRun())
-  const [screen, setScreen] = useState('start')
+  const [screen, setScreen] = useState(
+    () => window.location.search.includes('design') ? 'design' : 'start'
+  )
   const [clearedData, setClearedData] = useState(null)
   const [battleKey, setBattleKey] = useState(0)
   const [mapIsTransition, setMapIsTransition] = useState(false)
@@ -126,6 +129,15 @@ export default function App() {
 
   return (
     <AnimatePresence mode="wait">
+      {screen === 'design' && (
+        <motion.div key="design"
+          initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }} className="w-full"
+        >
+          <DesignScreen onExit={() => setScreen('start')} />
+        </motion.div>
+      )}
+
       {screen === 'start' && (
         <motion.div key="start"
           initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}

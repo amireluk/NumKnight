@@ -34,13 +34,13 @@ function ForestBackground() {
         <path d="M-5 34 Q18 10 36 18 Q56 26 72 10 Q87 -3 105 12 L105 55 L-5 55Z" fill="#4e7044" />
         {/* Near hill */}
         <path d="M-5 48 Q22 34 46 41 Q66 48 83 36 Q94 28 105 38 L105 55 L-5 55Z" fill="#5a7e4e" />
-        {/* Trees on far hill crests */}
-        <path d="M6  -2 L10 -13 L14 -2Z"  fill="#1e3e14" />
-        <path d="M13 -1 L17 -12 L21 -1Z"  fill="#264c1a" />
-        <path d="M20  0 L24 -11 L28  0Z"  fill="#1e3e14" />
-        <path d="M60 -3 L64 -14 L68 -3Z"  fill="#1e3e14" />
-        <path d="M67 -4 L71 -15 L75 -4Z"  fill="#264c1a" />
-        <path d="M74 -2 L78 -13 L82 -2Z"  fill="#1e3e14" />
+        {/* Trees — bases matched to far hill surface via bezier evaluation */}
+        <path d="M6  8 L10  -3 L14  8Z"  fill="#1e3e14" />
+        <path d="M13 4 L17  -7 L21  4Z"  fill="#264c1a" />
+        <path d="M20 3 L24  -8 L28  3Z"  fill="#1e3e14" />
+        <path d="M60  0 L64 -11 L68  0Z"  fill="#1e3e14" />
+        <path d="M67 -6 L71 -17 L75 -6Z"  fill="#264c1a" />
+        <path d="M74 -9 L78 -20 L82 -9Z"  fill="#1e3e14" />
         {/* Ground */}
         <rect x="-5" y="46" width="115" height="12" fill="#3a5830" />
         {/* Grass tufts */}
