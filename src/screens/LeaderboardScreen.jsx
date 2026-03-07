@@ -68,66 +68,35 @@ export function LeaderboardScreen({ totalScore, endWorld, cleared, difficulty, p
           'linear-gradient(to bottom, #1e3a70, #2d5aaa)',
       }}
     >
-      {/* Header */}
+      {/* Header — centered */}
       <motion.div
         initial={{ opacity: 0, y: -14 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
-        style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}
+        className="text-center"
+        style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, flexShrink: 0 }}
       >
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: isRtl ? 'flex-end' : 'flex-start', gap: 6 }}>
-          <p className="text-white font-black text-3xl tracking-wide">{t?.kingdomRecords ?? 'Kingdom Records'}</p>
-          <span style={{
-            background: DIFF_COLOR[difficulty], color: '#000',
-            borderRadius: 99, padding: '2px 14px',
-            fontSize: 11, fontWeight: 900, letterSpacing: '0.08em',
-          }}>
-            {(t?.diffLabel ?? DIFF_LABEL_DEFAULT)[difficulty] ?? difficulty}
-          </span>
-        </div>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
-          <motion.button
-            onClick={handleClear}
-            onBlur={() => setClearConfirm(false)}
-            whileTap={{ scale: 0.92 }}
-            style={{
-              padding: '7px 14px', borderRadius: 10, cursor: 'pointer',
-              fontSize: 11, fontWeight: 900, letterSpacing: '0.06em',
-              border: `1.5px solid ${clearConfirm ? 'rgba(239,68,68,0.8)' : 'rgba(255,255,255,0.18)'}`,
-              background: clearConfirm ? 'rgba(239,68,68,0.22)' : 'rgba(255,255,255,0.08)',
-              color: clearConfirm ? '#ef4444' : 'rgba(255,255,255,0.4)',
-              transition: 'all 0.18s', flexShrink: 0,
-            }}
-          >
-            {clearConfirm ? (t?.confirmClear ?? '⚠ YES, ERASE ALL') : (t?.clearBoard ?? 'Clear')}
-          </motion.button>
-          {clearConfirm && (
-            <motion.p
-              initial={{ opacity: 0, y: -4 }}
-              animate={{ opacity: 1, y: 0 }}
-              style={{ fontSize: 9, color: '#ef4444', fontWeight: 700, letterSpacing: '0.05em', textAlign: 'right', maxWidth: 120 }}
-            >
-              {t?.clearWarning ?? '! This will permanently erase all scores'}
-            </motion.p>
-          )}
-        </div>
+        <p className="text-white font-black text-3xl tracking-wide">{t?.kingdomRecords ?? 'Kingdom Records'}</p>
+        <span style={{
+          background: DIFF_COLOR[difficulty], color: '#000',
+          borderRadius: 99, padding: '2px 14px',
+          fontSize: 11, fontWeight: 900, letterSpacing: '0.08em',
+        }}>
+          {(t?.diffLabel ?? DIFF_LABEL_DEFAULT)[difficulty] ?? difficulty}
+        </span>
       </motion.div>
 
-      {/* Scores list */}
+      {/* Scores list — always 10 rows */}
       <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 6 }}>
-        {displayScores.length === 0 ? (
-          <p style={{ color: 'rgba(255,255,255,0.28)', textAlign: 'center', marginTop: 24, fontSize: 14 }}>
-            {t?.noScores ?? 'No scores yet — be the first!'}
-          </p>
-        ) : displayScores.map((entry, i) => {
-          const isNew = i === newScoreIndex
-          const isTop3 = i < 3
+        {Array.from({ length: 10 }, (_, i) => {
+          const entry = displayScores[i] ?? null
+          const isNew = entry && i === newScoreIndex
           return (
             <motion.div
               key={i}
               initial={{ opacity: 0, x: -18 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.22 + i * 0.05 }}
+              transition={{ delay: 0.18 + i * 0.04 }}
               style={{
                 background: isNew ? 'rgba(251,191,36,0.18)' : 'rgba(255,255,255,0.04)',
                 border: `${isNew ? 2 : 1}px solid ${isNew ? 'rgba(251,191,36,0.75)' : 'rgba(255,255,255,0.08)'}`,
@@ -141,60 +110,92 @@ export function LeaderboardScreen({ totalScore, endWorld, cleared, difficulty, p
             >
               {/* Rank */}
               <span style={{
-                fontSize: isNew ? 15 : (isTop3 ? 18 : 13),
+                fontSize: isNew ? 15 : 13,
                 width: 26, textAlign: 'center',
-                color: isNew ? '#fbbf24' : 'rgba(255,255,255,0.4)',
+                color: isNew ? '#fbbf24' : 'rgba(255,255,255,0.25)',
                 fontWeight: 900, flexShrink: 0,
               }}>
                 {i + 1}
               </span>
               {/* Name + version */}
-              <span style={{
-                flex: 1, minWidth: 0, overflow: 'hidden',
-                display: 'flex', flexDirection: 'column', gap: 1,
-              }}>
-                <span style={{
-                  color: isNew ? '#fff' : 'rgba(255,255,255,0.85)',
-                  fontWeight: isNew ? 900 : 700,
-                  fontSize: isNew ? 15 : 14,
-                  overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-                }}>
-                  {entry.name}
-                  {isNew && (
+              <span style={{ flex: 1, minWidth: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column', gap: 1 }}>
+                {entry ? (
+                  <>
                     <span style={{
-                      marginLeft: 8, fontSize: 9, fontWeight: 900, letterSpacing: '0.12em',
-                      background: '#fbbf24', color: '#000',
-                      borderRadius: 4, padding: '1px 5px', verticalAlign: 'middle',
+                      color: isNew ? '#fff' : 'rgba(255,255,255,0.85)',
+                      fontWeight: isNew ? 900 : 700, fontSize: isNew ? 15 : 14,
+                      overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                     }}>
-                      NEW
+                      {entry.name}
+                      {isNew && (
+                        <span style={{
+                          marginLeft: 8, fontSize: 9, fontWeight: 900, letterSpacing: '0.12em',
+                          background: '#fbbf24', color: '#000',
+                          borderRadius: 4, padding: '1px 5px', verticalAlign: 'middle',
+                        }}>
+                          NEW
+                        </span>
+                      )}
                     </span>
-                  )}
-                </span>
-                {entry.version && (
-                  <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.22)', fontWeight: 600, letterSpacing: '0.08em' }}>
-                    v{entry.version}
-                  </span>
+                    {entry.version && (
+                      <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.22)', fontWeight: 600, letterSpacing: '0.08em' }}>
+                        v{entry.version}
+                      </span>
+                    )}
+                  </>
+                ) : (
+                  <span style={{ color: 'rgba(255,255,255,0.12)', fontSize: 13, fontWeight: 700 }}>—</span>
                 )}
               </span>
               {/* Region / conquered */}
               <span style={{
                 fontSize: 10, fontWeight: 700, letterSpacing: '0.05em',
-                color: entry.cleared ? '#fbbf24' : 'rgba(255,255,255,0.28)',
+                color: entry?.cleared ? '#fbbf24' : 'rgba(255,255,255,0.18)',
                 flexShrink: 0, minWidth: 60, textAlign: 'center',
               }}>
-                {entry.cleared ? (t?.conquered ?? 'CONQUERED') : (t?.fellAtShort ? t.fellAtShort(worldDisplayName(entry.endWorld ?? '', t)) : (entry.endWorld ?? ''))}
+                {entry
+                  ? (entry.cleared ? (t?.conquered ?? 'CONQUERED') : (t?.fellAtShort ? t.fellAtShort(worldDisplayName(entry.endWorld ?? '', t)) : (entry.endWorld ?? '')))
+                  : '—'}
               </span>
               {/* Score */}
               <span style={{
-                color: isNew ? '#fbbf24' : 'rgba(251,191,36,0.85)',
+                color: isNew ? '#fbbf24' : entry ? 'rgba(251,191,36,0.85)' : 'rgba(255,255,255,0.12)',
                 fontWeight: 900, fontSize: isNew ? 18 : 16,
                 flexShrink: 0, minWidth: 40, textAlign: 'right',
               }}>
-                {entry.score.toLocaleString()}
+                {entry ? entry.score.toLocaleString() : '—'}
               </span>
             </motion.div>
           )
         })}
+      </div>
+
+      {/* Clear button — below list */}
+      <div style={{ flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'stretch', gap: 4 }}>
+        <motion.button
+          onClick={handleClear}
+          onBlur={() => setClearConfirm(false)}
+          whileTap={{ scale: 0.97 }}
+          style={{
+            padding: '9px 14px', borderRadius: 10, cursor: 'pointer',
+            fontSize: 11, fontWeight: 900, letterSpacing: '0.06em',
+            border: `1.5px solid ${clearConfirm ? 'rgba(239,68,68,0.8)' : 'rgba(255,255,255,0.14)'}`,
+            background: clearConfirm ? 'rgba(239,68,68,0.18)' : 'rgba(255,255,255,0.06)',
+            color: clearConfirm ? '#ef4444' : 'rgba(255,255,255,0.30)',
+            transition: 'all 0.18s',
+          }}
+        >
+          {clearConfirm ? (t?.confirmClear ?? '⚠ YES, ERASE ALL') : (t?.clearBoard ?? 'Clear all scores')}
+        </motion.button>
+        {clearConfirm && (
+          <motion.p
+            initial={{ opacity: 0, y: -4 }}
+            animate={{ opacity: 1, y: 0 }}
+            style={{ fontSize: 10, color: '#ef4444', fontWeight: 700, textAlign: 'center' }}
+          >
+            {t?.clearWarning ?? '⚠ This will permanently erase all scores'}
+          </motion.p>
+        )}
       </div>
 
       {/* Play again */}
