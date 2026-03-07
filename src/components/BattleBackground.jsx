@@ -34,13 +34,13 @@ function ForestBackground() {
         <path d="M-5 34 Q18 10 36 18 Q56 26 72 10 Q87 -3 105 12 L105 55 L-5 55Z" fill="#4e7044" />
         {/* Near hill */}
         <path d="M-5 48 Q22 34 46 41 Q66 48 83 36 Q94 28 105 38 L105 55 L-5 55Z" fill="#5a7e4e" />
-        {/* Trees — bases matched to far hill surface via bezier evaluation */}
-        <path d="M6  8 L10  -3 L14  8Z"  fill="#1e3e14" />
-        <path d="M13 4 L17  -7 L21  4Z"  fill="#264c1a" />
-        <path d="M20 3 L24  -8 L28  3Z"  fill="#1e3e14" />
-        <path d="M60  0 L64 -11 L68  0Z"  fill="#1e3e14" />
-        <path d="M67 -6 L71 -17 L75 -6Z"  fill="#264c1a" />
-        <path d="M74 -9 L78 -20 L82 -9Z"  fill="#1e3e14" />
+        {/* Trees — bases 3+ units below hill surface for clear grounding */}
+        <path d="M6  11 L10  -2 L14  11Z"  fill="#1e3e14" />
+        <path d="M13  7 L17  -6 L21   7Z"  fill="#264c1a" />
+        <path d="M20  6 L24  -7 L28   6Z"  fill="#1e3e14" />
+        <path d="M60  3 L64 -10 L68   3Z"  fill="#1e3e14" />
+        <path d="M67 -3 L71 -16 L75  -3Z"  fill="#264c1a" />
+        <path d="M74 -6 L78 -19 L82  -6Z"  fill="#1e3e14" />
         {/* Ground */}
         <rect x="-5" y="46" width="115" height="12" fill="#3a5830" />
         {/* Grass tufts */}
@@ -182,61 +182,82 @@ function CastleBackground() {
     <div style={{ position: 'absolute', inset: 0, overflow: 'hidden' }}>
       <div style={{
         position: 'absolute', inset: 0,
-        background: 'linear-gradient(to bottom, #040710, #0c1628)',
+        background: 'linear-gradient(to bottom, #0a1428, #1a2e52)',
       }} />
-      {/* Distant lightning ambient glow */}
+      {/* Stars */}
+      <svg style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '55%', pointerEvents: 'none' }}
+        viewBox="0 0 100 55" preserveAspectRatio="none">
+        {[[12,8],[28,4],[44,11],[58,5],[76,9],[88,3],[18,22],[68,18],[92,25],[6,30],[48,28],[82,32]].map(([x,y],i) => (
+          <circle key={i} cx={x} cy={y} r={i%3===0?0.7:0.45} fill="white" opacity={i%3===0?0.55:0.35} />
+        ))}
+      </svg>
+      {/* Moon glow */}
       <div style={{
-        position: 'absolute', top: '10%', left: '15%',
-        width: '60%', height: '35%',
-        background: 'radial-gradient(ellipse, rgba(120,140,200,0.06) 0%, transparent 70%)',
-        pointerEvents: 'none',
+        position: 'absolute', top: 10, right: 14,
+        width: 60, height: 60, borderRadius: '50%',
+        background: 'radial-gradient(circle, rgba(210,225,244,0.50) 0%, rgba(180,205,230,0.18) 55%, transparent 75%)',
+        boxShadow: '0 0 36px 18px rgba(180,210,240,0.20)',
       }} />
-      {/* Moon */}
       <div style={{
-        position: 'absolute', top: 14, right: 18,
+        position: 'absolute', top: 19, right: 22,
         width: 42, height: 42, borderRadius: '50%',
-        background: 'radial-gradient(circle, rgba(196,208,222,0.72) 0%, rgba(176,192,210,0.26) 56%, transparent 76%)',
-        boxShadow: '0 0 22px 10px rgba(176,196,218,0.22)',
-      }} />
-      <div style={{
-        position: 'absolute', top: 22, right: 25,
-        width: 28, height: 28, borderRadius: '50%',
-        background: '#c4d0de', opacity: 0.52,
+        background: '#ccd8e8', opacity: 0.68,
       }} />
       {/* Cloud partly covering moon */}
       <svg style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '35%', pointerEvents: 'none' }}
         viewBox="0 0 100 35" preserveAspectRatio="none">
         <path d="M62 4 Q72 -4 84 0 Q92 -4 94 4 Q98 2 99 8 Q98 13 90 11 Q84 16 72 12 Q62 16 60 10 Q57 4 62 4Z"
-          fill="#121e30" opacity="0.88" />
+          fill="#162236" opacity="0.85" />
         <path d="M4 6 Q12 -2 22 2 Q28 -2 30 5 Q34 3 35 9 Q34 14 26 12 Q20 17 10 13 Q2 15 0 9 Q-2 4 4 6Z"
-          fill="#0e1828" opacity="0.82" />
+          fill="#121e34" opacity="0.78" />
       </svg>
       {/* Castle scene */}
       <svg style={{ position: 'absolute', bottom: 0, left: 0, width: '100%', height: '62%' }}
         viewBox="0 0 100 62" preserveAspectRatio="none" overflow="visible">
         {/* Distant wall left */}
         <path d="M-5 38 L-5 26 L2 26 L2 20 L6 20 L6 26 L12 26 L12 20 L16 20 L16 26 L22 26 L22 20 L26 20 L26 26 L34 26 L34 38Z"
-          fill="#0b1320" />
+          fill="#1e2e4a" />
+        {/* Wall highlight (moonlit edge) */}
+        <line x1="34" y1="26" x2="34" y2="38" stroke="#3a5070" strokeWidth="0.5" opacity="0.7" />
         {/* Distant wall right */}
         <path d="M66 38 L66 26 L74 26 L74 20 L78 20 L78 26 L85 26 L85 20 L89 20 L89 26 L96 26 L96 20 L100 20 L100 26 L105 26 L105 38Z"
-          fill="#0b1320" />
+          fill="#1e2e4a" />
+        <line x1="66" y1="26" x2="66" y2="38" stroke="#3a5070" strokeWidth="0.5" opacity="0.7" />
+        {/* Torch glow left wall */}
+        <ellipse cx="18" cy="28" rx="4" ry="3" fill="#f59e1a" opacity="0.18" />
+        <rect x="17.5" y="27" width="1.2" height="2" fill="#f59e1a" opacity="0.55" rx="0.3" />
+        {/* Torch glow right wall */}
+        <ellipse cx="82" cy="28" rx="4" ry="3" fill="#f59e1a" opacity="0.18" />
+        <rect x="81.5" y="27" width="1.2" height="2" fill="#f59e1a" opacity="0.55" rx="0.3" />
         {/* Central tower */}
-        <rect x="40" y="2" width="20" height="50" fill="#090e18" />
+        <rect x="40" y="2" width="20" height="50" fill="#182238" />
+        {/* Tower moonlit face */}
+        <rect x="40" y="2" width="3" height="50" fill="#243452" opacity="0.6" />
         {/* Tower battlements */}
         <path d="M38 2 L40 2 L40 -2 L44 -2 L44 2 L48 2 L48 -2 L52 -2 L52 2 L56 2 L56 -2 L60 -2 L60 2 L62 2 L62 6 L38 6Z"
-          fill="#090e18" />
+          fill="#182238" />
+        {/* Tower window — glowing amber */}
+        <rect x="47" y="14" width="6" height="9" rx="3" fill="#f59e1a" opacity="0.55" />
+        <rect x="48" y="15" width="4" height="7" rx="2" fill="#fbbf5a" opacity="0.45" />
+        {/* Window glow halo */}
+        <ellipse cx="50" cy="18.5" rx="7" ry="6" fill="#f59e1a" opacity="0.10" />
+        {/* Arrow slits */}
+        <rect x="43" y="22" width="1.5" height="5" rx="0.6" fill="#0d1828" opacity="0.8" />
+        <rect x="55.5" y="22" width="1.5" height="5" rx="0.6" fill="#0d1828" opacity="0.8" />
         {/* Side wall battlements */}
         <path d="M-5 52 L-5 40 L4 40 L4 34 L8 34 L8 40 L16 40 L16 34 L20 34 L20 40 L28 40 L28 34 L32 34 L32 40 L40 40 L40 52Z"
-          fill="#080e1a" />
+          fill="#162032" />
         <path d="M60 52 L60 40 L68 40 L68 34 L72 34 L72 40 L80 40 L80 34 L84 34 L84 40 L92 40 L92 34 L96 34 L96 40 L105 40 L105 52Z"
-          fill="#080e1a" />
-        {/* Ground — stone */}
-        <rect x="-5" y="50" width="115" height="15" fill="#070c16" />
-        {/* Stone joint lines */}
-        <line x1="-5" y1="54" x2="105" y2="54" stroke="#0d1522" strokeWidth="0.7" />
-        <line x1="-5" y1="58" x2="105" y2="58" stroke="#0d1522" strokeWidth="0.7" />
+          fill="#162032" />
+        {/* Ground — flagstone */}
+        <rect x="-5" y="50" width="115" height="15" fill="#121c2e" />
+        {/* Moonlit ground highlight */}
+        <rect x="-5" y="50" width="115" height="1.5" fill="#2a3e58" opacity="0.5" />
+        {/* Stone joints */}
+        <line x1="-5" y1="54" x2="105" y2="54" stroke="#1a2840" strokeWidth="0.8" />
+        <line x1="-5" y1="58" x2="105" y2="58" stroke="#1a2840" strokeWidth="0.8" />
         {[8,24,40,56,72,88].map((x, i) => (
-          <line key={i} x1={x} y1="50" x2={x} y2="62" stroke="#0d1522" strokeWidth="0.6" />
+          <line key={i} x1={x} y1="50" x2={x} y2="62" stroke="#1a2840" strokeWidth="0.7" />
         ))}
       </svg>
     </div>
@@ -249,59 +270,98 @@ function DragonLairBackground() {
     <div style={{ position: 'absolute', inset: 0, overflow: 'hidden' }}>
       <div style={{
         position: 'absolute', inset: 0,
-        background: 'linear-gradient(to bottom, #050100, #2a0600)',
+        background: 'linear-gradient(to bottom, #0d0200, #320800)',
       }} />
-      {/* Lava up-glow */}
+      {/* Strong lava up-glow */}
       <div style={{
-        position: 'absolute', bottom: 0, left: 0, right: 0, height: '55%',
-        background: 'radial-gradient(ellipse at 50% 100%, rgba(240,70,0,0.32) 0%, rgba(180,30,0,0.14) 48%, transparent 78%)',
+        position: 'absolute', bottom: 0, left: 0, right: 0, height: '65%',
+        background: 'radial-gradient(ellipse at 50% 100%, rgba(255,90,0,0.42) 0%, rgba(200,40,0,0.20) 45%, transparent 75%)',
         pointerEvents: 'none',
       }} />
-      {/* Secondary hot-spot */}
+      {/* Side hot-spots */}
       <div style={{
-        position: 'absolute', bottom: '22%', left: '20%',
-        width: '60%', height: '30%',
-        background: 'radial-gradient(ellipse, rgba(255,100,0,0.16) 0%, transparent 70%)',
+        position: 'absolute', bottom: '18%', left: '-5%',
+        width: '40%', height: '40%',
+        background: 'radial-gradient(ellipse, rgba(255,100,0,0.22) 0%, transparent 70%)',
         pointerEvents: 'none',
       }} />
-      {/* Stalactites — hang from ceiling */}
-      <svg style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '32%', pointerEvents: 'none' }}
-        viewBox="0 0 100 28" preserveAspectRatio="none">
-        <path d="M0 0 L5 0 L2.5 16Z"    fill="#0e0400" />
-        <path d="M11 0 L17 0 L14 22Z"   fill="#140500" />
-        <path d="M23 0 L28 0 L25.5 13Z" fill="#0e0400" />
-        <path d="M34 0 L40 0 L37 20Z"   fill="#140500" />
-        <path d="M47 0 L53 0 L50 17Z"   fill="#0e0400" />
-        <path d="M60 0 L65 0 L62.5 12Z" fill="#140500" />
-        <path d="M71 0 L77 0 L74 21Z"   fill="#0e0400" />
-        <path d="M83 0 L88 0 L85.5 14Z" fill="#140500" />
-        <path d="M94 0 L100 0 L97 18Z"  fill="#0e0400" />
+      <div style={{
+        position: 'absolute', bottom: '18%', right: '-5%',
+        width: '40%', height: '40%',
+        background: 'radial-gradient(ellipse, rgba(255,100,0,0.22) 0%, transparent 70%)',
+        pointerEvents: 'none',
+      }} />
+      {/* Stalactites — hang from ceiling, with lava-lit tips */}
+      <svg style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '36%', pointerEvents: 'none' }}
+        viewBox="0 0 100 32" preserveAspectRatio="none">
+        <path d="M0 0 L5 0 L2.5 18Z"    fill="#200600" />
+        <path d="M11 0 L17 0 L14 24Z"   fill="#280800" />
+        <path d="M23 0 L28 0 L25.5 15Z" fill="#200600" />
+        <path d="M34 0 L40 0 L37 22Z"   fill="#280800" />
+        <path d="M47 0 L53 0 L50 19Z"   fill="#200600" />
+        <path d="M60 0 L65 0 L62.5 14Z" fill="#280800" />
+        <path d="M71 0 L77 0 L74 23Z"   fill="#200600" />
+        <path d="M83 0 L88 0 L85.5 16Z" fill="#280800" />
+        <path d="M94 0 L100 0 L97 20Z"  fill="#200600" />
+        {/* Glowing tips */}
+        <circle cx="2.5" cy="18" r="1.2" fill="#ff6600" opacity="0.55" />
+        <circle cx="14"  cy="24" r="1.5" fill="#ff4400" opacity="0.60" />
+        <circle cx="37"  cy="22" r="1.4" fill="#ff6600" opacity="0.55" />
+        <circle cx="50"  cy="19" r="1.2" fill="#ff4400" opacity="0.50" />
+        <circle cx="74"  cy="23" r="1.5" fill="#ff6600" opacity="0.60" />
+        <circle cx="97"  cy="20" r="1.3" fill="#ff4400" opacity="0.55" />
       </svg>
-      {/* Ground and lava */}
-      <svg style={{ position: 'absolute', bottom: 0, left: 0, width: '100%', height: '58%' }}
-        viewBox="0 0 100 56" preserveAspectRatio="none" overflow="visible">
-        {/* Rock back wall */}
-        <path d="M-5 28 Q10 20 18 24 Q28 16 40 22 Q50 14 62 20 Q72 12 84 18 Q94 10 105 16 L105 56 L-5 56Z"
-          fill="#180600" />
-        {/* Rock ground */}
-        <path d="M-5 42 Q14 36 26 40 Q40 44 54 38 Q68 32 80 38 Q92 44 105 38 L105 56 L-5 56Z"
-          fill="#100400" />
-        {/* Lava cracks — bright */}
-        <path d="M8  44 Q16 40 22 46 Q27 43 34 48" stroke="#ff4500" strokeWidth="1.8" fill="none" strokeLinecap="round" opacity="0.9" />
-        <path d="M8  44 Q16 40 22 46 Q27 43 34 48" stroke="#ffaa00" strokeWidth="0.7" fill="none" strokeLinecap="round" opacity="0.7" />
-        <path d="M52 42 Q60 38 67 44 Q72 41 80 46" stroke="#ff4500" strokeWidth="1.8" fill="none" strokeLinecap="round" opacity="0.9" />
-        <path d="M52 42 Q60 38 67 44 Q72 41 80 46" stroke="#ffaa00" strokeWidth="0.7" fill="none" strokeLinecap="round" opacity="0.7" />
-        <path d="M28 50 Q38 46 44 52 Q50 49 58 54" stroke="#ff4500" strokeWidth="1.4" fill="none" strokeLinecap="round" opacity="0.8" />
-        <path d="M28 50 Q38 46 44 52 Q50 49 58 54" stroke="#ffaa00" strokeWidth="0.5" fill="none" strokeLinecap="round" opacity="0.6" />
+      {/* Ground, pillars, and lava */}
+      <svg style={{ position: 'absolute', bottom: 0, left: 0, width: '100%', height: '65%' }}
+        viewBox="0 0 100 62" preserveAspectRatio="none" overflow="visible">
+        {/* Rock back wall with jagged silhouette */}
+        <path d="M-5 30 Q8 18 16 24 Q24 14 36 20 Q46 10 58 18 Q68 8 80 16 Q92 6 105 14 L105 62 L-5 62Z"
+          fill="#1e0600" />
+        {/* Far spires */}
+        <path d="M10 24 L13 6  L16 24Z" fill="#2a0800" />
+        <path d="M28 20 L31 5  L34 20Z" fill="#240600" />
+        <path d="M62 18 L65 4  L68 18Z" fill="#2a0800" />
+        <path d="M80 16 L84 2  L88 16Z" fill="#240600" />
+        {/* Left fire pillar — bright column of light */}
+        <rect x="-5" y="20" width="8" height="42" fill="#1a0500" />
+        <rect x="-3" y="14" width="4" height="10" rx="1" fill="#ff5500" opacity="0.70" />
+        <rect x="-2" y="14" width="2" height="7"  rx="0.5" fill="#ffaa00" opacity="0.60" />
+        <ellipse cx="0" cy="14" rx="5" ry="8" fill="#ff4400" opacity="0.22" />
+        {/* Right fire pillar */}
+        <rect x="97" y="20" width="8" height="42" fill="#1a0500" />
+        <rect x="99" y="14" width="4" height="10" rx="1" fill="#ff5500" opacity="0.70" />
+        <rect x="100" y="14" width="2" height="7"  rx="0.5" fill="#ffaa00" opacity="0.60" />
+        <ellipse cx="101" cy="14" rx="5" ry="8" fill="#ff4400" opacity="0.22" />
+        {/* Rocky ground */}
+        <path d="M-5 44 Q12 38 24 42 Q38 46 52 40 Q66 34 80 40 Q92 46 105 40 L105 62 L-5 62Z"
+          fill="#120400" />
+        {/* Lava rivers — wide glowing cracks */}
+        <path d="M6 46 Q14 42 22 48 Q28 44 36 50" stroke="#cc3300" strokeWidth="2.5" fill="none" strokeLinecap="round" />
+        <path d="M6 46 Q14 42 22 48 Q28 44 36 50" stroke="#ff6600" strokeWidth="1.0" fill="none" strokeLinecap="round" opacity="0.85" />
+        <path d="M6 46 Q14 42 22 48 Q28 44 36 50" stroke="#ffcc44" strokeWidth="0.35" fill="none" strokeLinecap="round" opacity="0.65" />
+        <path d="M50 44 Q58 40 66 46 Q72 42 82 48" stroke="#cc3300" strokeWidth="2.5" fill="none" strokeLinecap="round" />
+        <path d="M50 44 Q58 40 66 46 Q72 42 82 48" stroke="#ff6600" strokeWidth="1.0" fill="none" strokeLinecap="round" opacity="0.85" />
+        <path d="M50 44 Q58 40 66 46 Q72 42 82 48" stroke="#ffcc44" strokeWidth="0.35" fill="none" strokeLinecap="round" opacity="0.65" />
+        <path d="M26 52 Q36 48 42 54 Q50 50 60 56" stroke="#cc3300" strokeWidth="2.0" fill="none" strokeLinecap="round" />
+        <path d="M26 52 Q36 48 42 54 Q50 50 60 56" stroke="#ff6600" strokeWidth="0.8" fill="none" strokeLinecap="round" opacity="0.80" />
         {/* Lava pools */}
-        <ellipse cx="19" cy="50" rx="9"  ry="3.5" fill="#8b1a00" opacity="0.7" />
-        <ellipse cx="19" cy="50" rx="5.5" ry="2"  fill="#ff5500" opacity="0.55" />
-        <ellipse cx="74" cy="51" rx="8"  ry="3"   fill="#8b1a00" opacity="0.7" />
-        <ellipse cx="74" cy="51" rx="5"  ry="1.8" fill="#ff5500" opacity="0.55" />
-        {/* Rock chunks */}
-        <path d="M-5 52 Q6 46 14 50 Q20 54 28 48 L28 56 L-5 56Z"  fill="#0a0200" />
-        <path d="M76 50 Q84 44 92 49 Q98 53 105 48 L105 56 L76 56Z" fill="#0a0200" />
-        <rect x="-5" y="53" width="115" height="6" fill="#080100" />
+        <ellipse cx="20" cy="52" rx="10" ry="4"   fill="#7a1400" />
+        <ellipse cx="20" cy="52" rx="6.5" ry="2.4" fill="#ff5500" opacity="0.65" />
+        <ellipse cx="20" cy="52" rx="3.5" ry="1.2" fill="#ffaa22" opacity="0.50" />
+        <ellipse cx="76" cy="53" rx="9"  ry="3.5"  fill="#7a1400" />
+        <ellipse cx="76" cy="53" rx="6"  ry="2.2"  fill="#ff5500" opacity="0.65" />
+        <ellipse cx="76" cy="53" rx="3"  ry="1.1"  fill="#ffaa22" opacity="0.50" />
+        {/* Skull on a rock — left side */}
+        <ellipse cx="43" cy="44.5" rx="3.5" ry="3" fill="#2e0800" />
+        <ellipse cx="43" cy="43.5" rx="3.2" ry="2.8" fill="#c8a882" opacity="0.80" />
+        <ellipse cx="43" cy="44.8" rx="2"   ry="1.2" fill="#b89870" opacity="0.80" />
+        <circle cx="41.5" cy="43.2" r="0.9" fill="#2e0800" opacity="0.90" />
+        <circle cx="44.5" cy="43.2" r="0.9" fill="#2e0800" opacity="0.90" />
+        <path d="M41.8 45.5 L42.3 45.5 M43.3 45.5 L43.8 45.5 M44.3 45.5 L44.8 45.5" stroke="#2e0800" strokeWidth="0.5" opacity="0.85" />
+        {/* Rock foreground edges */}
+        <path d="M-5 56 Q8 50 16 54 Q22 58 30 52 L30 62 L-5 62Z"  fill="#0e0200" />
+        <path d="M74 52 Q82 46 90 50 Q97 54 105 50 L105 62 L74 62Z" fill="#0e0200" />
+        <rect x="-5" y="58" width="115" height="6" fill="#0a0100" />
       </svg>
     </div>
   )
