@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { motion, useMotionValue, useTransform, animate } from 'framer-motion'
+import { motion, useMotionValue, useTransform, animate, useAnimation } from 'framer-motion'
 import { KnightCharacter } from '../components/KnightCharacter'
 
 const NAME_KEY = 'numknight_player_name'
@@ -188,14 +188,21 @@ function StrollingKnight() {
 
 export function StartScreen({ onStart, lang, onLangChange, t }) {
   const [name, setName] = useState(() => localStorage.getItem(NAME_KEY) ?? '')
+  const [nameError, setNameError] = useState(false)
   const [difficulty, setDifficulty] = useState('medium')
+  const nameShake = useAnimation()
 
   const isRtl = lang === 'he'
 
   const handleStart = () => {
     const trimmed = name.trim().slice(0, 16)
-    if (trimmed) localStorage.setItem(NAME_KEY, trimmed)
-    onStart({ name: trimmed || 'Knight', diff: difficulty })
+    if (!trimmed) {
+      setNameError(true)
+      nameShake.start({ x: [0, -10, 10, -8, 8, -4, 4, 0], transition: { duration: 0.4 } })
+      return
+    }
+    localStorage.setItem(NAME_KEY, trimmed)
+    onStart({ name: trimmed, diff: difficulty })
   }
 
   return (
@@ -254,27 +261,32 @@ export function StartScreen({ onStart, lang, onLangChange, t }) {
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.18 }}
-        style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 7, position: 'relative', zIndex: 1 }}
+        style={{ width: '100%', position: 'relative', zIndex: 1 }}
       >
-        <label style={{ fontSize: 11, color: 'rgba(255,255,255,0.38)', fontWeight: 700, letterSpacing: '0.22em' }}>
+      <motion.div
+        animate={nameShake}
+        style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 7 }}
+      >
+        <label style={{ fontSize: 11, color: nameError ? '#ef4444' : 'rgba(255,255,255,0.38)', fontWeight: 700, letterSpacing: '0.22em', transition: 'color 0.2s' }}>
           {t.yourName}
         </label>
         <input
           dir={isRtl ? 'rtl' : 'ltr'}
           value={name}
-          onChange={(e) => setName(e.target.value.slice(0, 16))}
+          onChange={(e) => { setName(e.target.value.slice(0, 16)); setNameError(false) }}
           onKeyDown={(e) => e.key === 'Enter' && handleStart()}
           placeholder={t.namePlaceholder}
           maxLength={16}
           style={{
             width: '100%', borderRadius: 14,
-            border: '1.5px solid rgba(255,255,255,0.16)',
-            background: 'rgba(255,255,255,0.18)',
+            border: `1.5px solid ${nameError ? '#ef4444' : 'rgba(255,255,255,0.16)'}`,
+            background: nameError ? 'rgba(239,68,68,0.12)' : 'rgba(255,255,255,0.18)',
             color: 'white', padding: '13px 16px',
             fontSize: 17, outline: 'none',
-            boxSizing: 'border-box',
+            boxSizing: 'border-box', transition: 'border-color 0.2s, background 0.2s',
           }}
         />
+      </motion.div>
       </motion.div>
 
       {/* Difficulty picker */}

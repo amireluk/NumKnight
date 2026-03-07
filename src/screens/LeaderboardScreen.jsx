@@ -50,8 +50,9 @@ export function LeaderboardScreen({ totalScore, endWorld, cleared, difficulty, p
   return (
     <div
       dir={isRtl ? 'rtl' : 'ltr'}
-      className="flex flex-col min-h-dvh max-w-md mx-auto px-4 py-5 gap-4"
+      className="flex flex-col h-dvh max-w-md mx-auto px-4 py-5 gap-4"
       style={{
+        overflow: 'hidden',
         background:
           'radial-gradient(ellipse at 50% 30%, rgba(251,191,36,0.12) 0%, transparent 65%), ' +
           'linear-gradient(to bottom, #1e3a70, #2d5aaa)',

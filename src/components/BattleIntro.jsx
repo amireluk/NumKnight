@@ -2,7 +2,7 @@ import { motion, useAnimation } from 'framer-motion'
 import { useEffect } from 'react'
 
 
-export function BattleIntro({ onComplete, battleIndex, isFinal, t }) {
+export function BattleIntro({ onComplete, battleIndex, totalBattles, isFinal, t }) {
   const bannerControls = useAnimation()
   const roundControls  = useAnimation()
 
@@ -10,14 +10,16 @@ export function BattleIntro({ onComplete, battleIndex, isFinal, t }) {
     async function run() {
       await new Promise((r) => setTimeout(r, battleIndex === 0 ? 530 : 460))
 
-      // "ROUND N" or "FINAL ROUND" slams in
-      await roundControls.start({
-        y: ['-120%', '0%'],
-        scale: [0.55, 1.18, 1],
-        opacity: 1,
-        transition: { duration: 0.2, ease: 'easeOut' },
-      })
-      await new Promise((r) => setTimeout(r, 140))
+      if (totalBattles > 1) {
+        // "ROUND N" or "FINAL ROUND" slams in
+        await roundControls.start({
+          y: ['-120%', '0%'],
+          scale: [0.55, 1.18, 1],
+          opacity: 1,
+          transition: { duration: 0.2, ease: 'easeOut' },
+        })
+        await new Promise((r) => setTimeout(r, 140))
+      }
 
       // "Go!" slams in
       await bannerControls.start({
@@ -32,7 +34,7 @@ export function BattleIntro({ onComplete, battleIndex, isFinal, t }) {
 
       // Everything bursts off
       const burst = { duration: 0.18, ease: 'easeIn' }
-      roundControls.start({ scale: 2.4, opacity: 0, transition: burst })
+      if (totalBattles > 1) roundControls.start({ scale: 2.4, opacity: 0, transition: burst })
       await bannerControls.start({ scale: 2.6, opacity: 0, transition: burst })
 
       onComplete()
@@ -47,7 +49,7 @@ export function BattleIntro({ onComplete, battleIndex, isFinal, t }) {
       alignItems: 'center', justifyContent: 'center',
       gap: 6, pointerEvents: 'none',
     }}>
-      <motion.div
+      {totalBattles > 1 && <motion.div
         animate={roundControls}
         initial={{ y: '-120%', scale: 0.55, opacity: 0 }}
       >
@@ -72,7 +74,7 @@ export function BattleIntro({ onComplete, battleIndex, isFinal, t }) {
             {(t?.round ?? 'ROUND')} {battleIndex + 1}
           </span>
         )}
-      </motion.div>
+      </motion.div>}
 
       <motion.div
         animate={bannerControls}

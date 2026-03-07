@@ -332,10 +332,12 @@ export function BattleScreen({ world, battleIndex, onBattleEnd, lang, t }) {
               <span style={{ fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.72)', letterSpacing: '0.04em', textShadow: '0 1px 5px rgba(0,0,0,0.9)' }}>
                 {t?.worldName?.[world.id] ?? world.name}
               </span>
-              <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.30)' }}>·</span>
-              <span style={{ fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.55)', letterSpacing: '0.05em', textShadow: '0 1px 5px rgba(0,0,0,0.9)' }}>
-                {t?.roundLabel ? t.roundLabel(battleIndex + 1, world.battles) : `Round ${battleIndex + 1}/${world.battles}`}
-              </span>
+              {world.battles > 1 && (<>
+                <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.30)' }}>·</span>
+                <span style={{ fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.55)', letterSpacing: '0.05em', textShadow: '0 1px 5px rgba(0,0,0,0.9)' }}>
+                  {t?.roundLabel ? t.roundLabel(battleIndex + 1, world.battles) : `Round ${battleIndex + 1}/${world.battles}`}
+                </span>
+              </>)}
             </motion.div>
           </div>
 
@@ -445,7 +447,7 @@ export function BattleScreen({ world, battleIndex, onBattleEnd, lang, t }) {
       </div>
 
       {/* Intro overlay */}
-      {introPlaying && <BattleIntro onComplete={() => setIntroPlaying(false)} battleIndex={battleIndex} isFinal={battleIndex === world.battles - 1} t={t} />}
+      {introPlaying && <BattleIntro onComplete={() => setIntroPlaying(false)} battleIndex={battleIndex} totalBattles={world.battles} isFinal={battleIndex === world.battles - 1} t={t} />}
 
       {/* In-scene trophy overlay — dims arena and shows trophy drop */}
       {showTrophy && (
