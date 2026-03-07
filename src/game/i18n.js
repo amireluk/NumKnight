@@ -8,6 +8,7 @@ export const T = {
     difficulty: 'DIFFICULTY',
     startAdventure: 'START ADVENTURE',
     diffLabel: { easy: 'Easy', medium: 'Medium', hard: 'Hard' },
+    questions: 'questions',
 
     // WorldMapScreen
     fight: 'Go!',
@@ -64,6 +65,7 @@ export const T = {
     difficulty: 'רמת קושי',
     startAdventure: 'התחל הרפתקה',
     diffLabel: { easy: 'קל', medium: 'בינוני', hard: 'קשה' },
+    questions: 'שאלות',
 
     // WorldMapScreen
     fight: 'קדימה!',

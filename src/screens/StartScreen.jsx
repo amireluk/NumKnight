@@ -1,11 +1,15 @@
 import { useState, useEffect, useRef } from 'react'
 import { motion, useMotionValue, useTransform, animate, useAnimation } from 'framer-motion'
 import { KnightCharacter } from '../components/KnightCharacter'
+import { CAMPAIGN } from '../game/campaign.config'
 
 const NAME_KEY = 'numknight_player_name'
 
 const DIFF_VALUES = ['easy', 'medium', 'hard']
 const DIFF_COLOR  = { easy: '#4ade80', medium: '#fbbf24', hard: '#ef4444' }
+
+const totalQuestions = (diff) =>
+  CAMPAIGN[diff].reduce((sum, w) => sum + w.battles * w.enemy.hp, 0)
 
 // ── Background layer: sky, sun, clouds, hills, ground (knight walks in front of this)
 function KingdomBackground() {
@@ -257,6 +261,9 @@ export function StartScreen({ onStart, lang, onLangChange, t }) {
         <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.28)', fontWeight: 700, letterSpacing: '0.18em', marginTop: 6 }}>
           v{__APP_VERSION__}
         </p>
+        <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.22)', fontWeight: 600, marginTop: 4, letterSpacing: '0.05em' }}>
+          Created by Amir Eluk &nbsp;·&nbsp; נוצר על ידי אמיר אלוק
+        </p>
       </motion.div>
 
       {/* Name input */}
@@ -321,6 +328,9 @@ export function StartScreen({ onStart, lang, onLangChange, t }) {
                 }}
               >
                 <span>{t.diffLabel[val]}</span>
+                <span style={{ fontSize: 10, fontWeight: 700, opacity: 0.65, letterSpacing: '0.04em' }}>
+                  {totalQuestions(val)} {t?.questions ?? 'questions'}
+                </span>
               </motion.button>
             )
           })}
