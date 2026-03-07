@@ -221,10 +221,10 @@ export function StartScreen({ onStart, lang, onLangChange, t }) {
           'linear-gradient(to bottom, #1e3a70, #2d5aaa)',
       }}
     >
-      {/* Language toggle — top right corner, always LTR regardless of language */}
+      {/* Language toggle — top of flow, right-aligned, always LTR */}
       <div dir="ltr" style={{
-        position: 'absolute', top: 14, right: 14, zIndex: 10,
-        display: 'flex', gap: 4,
+        width: '100%', display: 'flex', justifyContent: 'flex-end',
+        position: 'relative', zIndex: 1,
       }}>
         {['en', 'he'].map((l) => (
           <button
