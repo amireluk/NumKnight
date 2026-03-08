@@ -5,6 +5,7 @@ import { FlyingCreatures } from '../components/FlyingCreatures'
 import { CAMPAIGN } from '../game/campaign.config'
 
 const NAME_KEY    = 'numknight_player_name'
+const DIFF_KEY    = 'numknight_difficulty'
 const DIFF_VALUES = ['easy', 'medium', 'hard']
 const DIFF_COLOR  = { easy: '#4ade80', medium: '#fbbf24', hard: '#ef4444' }
 const totalQuestions = (diff) =>
@@ -17,7 +18,8 @@ export function StartScreen({ onStart, onViewLeaderboard, lang, onLangChange, t 
   const [view,       setView]       = useState('home')
   const [name,       setName]       = useState(() => localStorage.getItem(NAME_KEY) ?? '')
   const [nameError,  setNameError]  = useState(false)
-  const [difficulty, setDifficulty] = useState('medium')
+  const [difficulty, setDifficulty] = useState(() => localStorage.getItem(DIFF_KEY) ?? 'medium')
+  const handleDifficulty = (val) => { setDifficulty(val); localStorage.setItem(DIFF_KEY, val) }
   const nameShake = useAnimation()
 
   // Android back: inside newgame view → go back to home view
@@ -39,7 +41,7 @@ export function StartScreen({ onStart, onViewLeaderboard, lang, onLangChange, t 
     onStart({ name: trimmed, diff: difficulty })
   }
 
-  const flyDiff = view === 'newgame' ? difficulty : 'easy'
+  const flyDiff = difficulty
 
   return (
     <div
@@ -58,7 +60,7 @@ export function StartScreen({ onStart, onViewLeaderboard, lang, onLangChange, t 
       <FlyingCreatures difficulty={flyDiff} />
       <KingdomBackground />
       <StrollingKnight />
-      <KingdomForeground difficulty={view === 'newgame' ? difficulty : 'easy'} />
+      <KingdomForeground difficulty={difficulty} />
 
       {/* ── Animated UI panel ── */}
       <AnimatePresence mode="wait">
@@ -184,7 +186,7 @@ export function StartScreen({ onStart, onViewLeaderboard, lang, onLangChange, t 
                   return (
                     <motion.button
                       key={val}
-                      onClick={() => setDifficulty(val)}
+                      onClick={() => handleDifficulty(val)}
                       whileTap={{ scale: 0.94 }}
                       style={{
                         flex: 1, padding: '11px 4px', borderRadius: 14,
