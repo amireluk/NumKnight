@@ -19,11 +19,33 @@ There are two deployments. All code lives on `main` — no separate source branc
 
 > ⚠️ Running `npm run deploy` (prod) will overwrite the `/dev/` subfolder. Run `deploy:dev` again afterwards if needed.
 
+### Deploy + push sequence (ALWAYS follow this order)
+
+**Deploy to dev:**
+```
+npm run deploy:dev                        # bumps version, builds, deploys
+git add package.json
+git commit -m "chore: bump version to X.X.X"
+git tag deploy-dev-vX.X.X
+git push origin main --tags
+```
+
+**Deploy to prod:**
+```
+npm run deploy                            # bumps version, builds, deploys
+git add package.json
+git commit -m "chore: bump version to X.X.X"
+git tag deploy-prod-vX.X.X
+git push origin main --tags
+```
+
+Deploy FIRST (the deploy script bumps the version), THEN commit + tag + push so the bumped version is persisted in git.
+
 ---
 
 ## ⚠️ After every session that changes code — ALWAYS ask the user:
-1. **"Deploy to dev?"** — if yes, run `npm run deploy:dev`
-2. **"Push to GitHub?"** — if yes, commit any unstaged changes and run `git push origin main`
+1. **"Deploy to dev?"** — if yes, follow the deploy-to-dev sequence above
+2. **"Push to GitHub?"** — if yes, commit any unstaged changes, then push
 
 Do NOT deploy to prod unless the user explicitly asks.
 
