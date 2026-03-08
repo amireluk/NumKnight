@@ -1,14 +1,50 @@
-import { motion } from 'framer-motion'
+import { useState, useEffect } from 'react'
+import { motion, AnimatePresence, useAnimation } from 'framer-motion'
 import { KingdomBackground, KingdomForeground, StrollingKnight } from '../components/KingdomScenery'
 import { FlyingCreatures } from '../components/FlyingCreatures'
+import { CAMPAIGN } from '../game/campaign.config'
 
-export function StartScreen({ onNewGame, onViewLeaderboard, lang, onLangChange, t }) {
+const NAME_KEY    = 'numknight_player_name'
+const DIFF_VALUES = ['easy', 'medium', 'hard']
+const DIFF_COLOR  = { easy: '#4ade80', medium: '#fbbf24', hard: '#ef4444' }
+const totalQuestions = (diff) =>
+  CAMPAIGN[diff].reduce((sum, w) => sum + w.battles * w.enemy.hp, 0)
+
+// Merged start + new-game screen — background layers never remount when toggling views
+export function StartScreen({ onStart, onViewLeaderboard, lang, onLangChange, t }) {
   const isRtl = lang === 'he'
+
+  const [view,       setView]       = useState('home')
+  const [name,       setName]       = useState(() => localStorage.getItem(NAME_KEY) ?? '')
+  const [nameError,  setNameError]  = useState(false)
+  const [difficulty, setDifficulty] = useState('medium')
+  const nameShake = useAnimation()
+
+  // Android back: inside newgame view → go back to home view
+  useEffect(() => {
+    window.history.pushState(null, '', window.location.href)
+    const onPop = () => { setView('home') }
+    window.addEventListener('popstate', onPop)
+    return () => window.removeEventListener('popstate', onPop)
+  }, [])
+
+  const handleStart = () => {
+    const trimmed = name.trim().slice(0, 16)
+    if (!trimmed) {
+      setNameError(true)
+      nameShake.start({ x: [0, -10, 10, -8, 8, -4, 4, 0], transition: { duration: 0.4 } })
+      return
+    }
+    localStorage.setItem(NAME_KEY, trimmed)
+    onStart({ name: trimmed, diff: difficulty })
+  }
+
+  const flyDiff = view === 'newgame' ? difficulty : 'easy'
 
   return (
     <div
       dir={isRtl ? 'rtl' : 'ltr'}
-      className="flex flex-col items-center justify-center h-dvh max-w-md mx-auto px-6 gap-7 select-none"
+      className="flex flex-col items-center justify-center h-dvh max-w-md mx-auto px-6 select-none"
       style={{
         position: 'relative',
         overflow: 'hidden',
@@ -18,79 +54,169 @@ export function StartScreen({ onNewGame, onViewLeaderboard, lang, onLangChange, 
           'linear-gradient(to bottom, #1e3a70, #2d5aaa)',
       }}
     >
-      {/* Title */}
-      <motion.div
-        initial={{ opacity: 0, y: -22 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
-        className="text-center"
-        style={{ position: 'relative', zIndex: 1 }}
-      >
-        <p className="font-black text-white tracking-widest" style={{
-          fontSize: 52, lineHeight: 1,
-          textShadow: '0 0 48px rgba(251,191,36,0.45), 0 2px 0 rgba(0,0,0,0.6)',
-        }}>
-          NumKnight
-        </p>
-        <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.22)', fontWeight: 600, marginTop: 6, letterSpacing: '0.05em' }}>
-          {isRtl ? 'נוצר על ידי אמיר אלוק' : 'Created by Amir Eluk'}
-        </p>
-        <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.20)', fontWeight: 600, marginTop: 2, letterSpacing: '0.12em' }}>
-          v{__APP_VERSION__}
-        </p>
-      </motion.div>
-
-      {/* New Game button */}
-      <motion.button
-        initial={{ opacity: 0, y: 18 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.28, type: 'spring', stiffness: 200, damping: 18 }}
-        whileTap={{ scale: 0.95 }}
-        whileHover={{ scale: 1.03 }}
-        onClick={onNewGame}
-        style={{ position: 'relative', zIndex: 1 }}
-        className="w-full bg-yellow-400 border-b-4 border-yellow-600 text-black font-black text-2xl rounded-2xl h-16 shadow-xl cursor-pointer tracking-widest"
-      >
-        {t?.newGame ?? 'NEW GAME'}
-      </motion.button>
-
-      {/* Leaderboard button */}
-      <motion.button
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.4 }}
-        whileTap={{ scale: 0.95 }}
-        whileHover={{ scale: 1.03 }}
-        onClick={onViewLeaderboard}
-        style={{ position: 'relative', zIndex: 1 }}
-        className="w-full bg-yellow-400 border-b-4 border-yellow-600 text-black font-black text-2xl rounded-2xl h-16 shadow-xl cursor-pointer tracking-widest"
-      >
-        {t?.kingdomRecords ?? 'KINGDOM RECORDS'}
-      </motion.button>
-
-      {/* Language toggle — centered, below leaderboard */}
-      <div dir="ltr" style={{ width: '100%', display: 'flex', justifyContent: 'center', position: 'relative', zIndex: 1 }}>
-        <button
-          onClick={() => onLangChange(lang === 'en' ? 'he' : 'en')}
-          style={{
-            display: 'flex', alignItems: 'center', gap: 5,
-            padding: '5px 14px', borderRadius: 20, cursor: 'pointer',
-            fontSize: 12, fontWeight: 900, letterSpacing: '0.06em',
-            border: '1.5px solid rgba(255,255,255,0.22)',
-            background: 'rgba(255,255,255,0.10)',
-            color: 'rgba(255,255,255,0.70)',
-            transition: 'all 0.15s',
-          }}
-        >
-          🌐 {lang === 'en' ? 'EN' : 'עב'}
-        </button>
-      </div>
-
-      {/* Scenery layers */}
-      <FlyingCreatures difficulty="easy" />
-      <KingdomBackground difficulty="easy" />
+      {/* ── Persistent background — never remounts ── */}
+      <FlyingCreatures difficulty={flyDiff} />
+      <KingdomBackground />
       <StrollingKnight />
-      <KingdomForeground difficulty="easy" />
+      <KingdomForeground difficulty={view === 'newgame' ? difficulty : 'easy'} />
+
+      {/* ── Animated UI panel ── */}
+      <AnimatePresence mode="wait">
+
+        {/* HOME view */}
+        {view === 'home' && (
+          <motion.div
+            key="home"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.18 }}
+            style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 28, position: 'relative', zIndex: 1 }}
+          >
+            {/* Title */}
+            <div className="text-center">
+              <p
+                className="font-black text-white tracking-widest"
+                style={{ fontSize: 52, lineHeight: 1, textShadow: '0 0 48px rgba(251,191,36,0.45), 0 2px 0 rgba(0,0,0,0.6)' }}
+              >
+                NumKnight
+              </p>
+              <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.22)', fontWeight: 600, marginTop: 6, letterSpacing: '0.05em' }}>
+                {isRtl ? 'נוצר על ידי אמיר אלוק' : 'Created by Amir Eluk'}
+              </p>
+              <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.20)', fontWeight: 600, marginTop: 2, letterSpacing: '0.12em' }}>
+                v{__APP_VERSION__}
+              </p>
+            </div>
+
+            <motion.button
+              whileTap={{ scale: 0.95 }} whileHover={{ scale: 1.03 }}
+              onClick={() => setView('newgame')}
+              className="w-full bg-yellow-400 border-b-4 border-yellow-600 text-black font-black text-2xl rounded-2xl h-16 shadow-xl cursor-pointer tracking-widest"
+            >
+              {t?.newGame ?? 'NEW GAME'}
+            </motion.button>
+
+            <motion.button
+              whileTap={{ scale: 0.95 }} whileHover={{ scale: 1.03 }}
+              onClick={onViewLeaderboard}
+              className="w-full bg-yellow-400 border-b-4 border-yellow-600 text-black font-black text-2xl rounded-2xl h-16 shadow-xl cursor-pointer tracking-widest"
+            >
+              {t?.hallOfFameTitle ?? 'HALL OF FAME'}
+            </motion.button>
+
+            <div dir="ltr" style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
+              <button
+                onClick={() => onLangChange(lang === 'en' ? 'he' : 'en')}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: 5,
+                  padding: '5px 14px', borderRadius: 20, cursor: 'pointer',
+                  fontSize: 12, fontWeight: 900, letterSpacing: '0.06em',
+                  border: '1.5px solid rgba(255,255,255,0.22)',
+                  background: 'rgba(255,255,255,0.10)',
+                  color: 'rgba(255,255,255,0.70)',
+                }}
+              >
+                🌐 {lang === 'en' ? 'EN' : 'עב'}
+              </button>
+            </div>
+          </motion.div>
+        )}
+
+        {/* NEW GAME view */}
+        {view === 'newgame' && (
+          <motion.div
+            key="newgame"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.18 }}
+            style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 22, position: 'relative', zIndex: 1 }}
+          >
+            {/* Back */}
+            <div dir="ltr" style={{ width: '100%', display: 'flex', justifyContent: 'flex-start' }}>
+              <button
+                onClick={() => setView('home')}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: 5,
+                  padding: '5px 11px', borderRadius: 20, cursor: 'pointer',
+                  fontSize: 12, fontWeight: 900, letterSpacing: '0.06em',
+                  border: '1.5px solid rgba(255,255,255,0.22)',
+                  background: 'rgba(255,255,255,0.10)',
+                  color: 'rgba(255,255,255,0.70)',
+                }}
+              >
+                {isRtl ? '← חזור' : '← Back'}
+              </button>
+            </div>
+
+            {/* Name input */}
+            <motion.div animate={nameShake} style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 7 }}>
+              <label style={{ fontSize: 11, color: nameError ? '#ef4444' : 'rgba(255,255,255,0.38)', fontWeight: 700, letterSpacing: '0.22em', transition: 'color 0.2s' }}>
+                {t?.yourName ?? 'YOUR NAME'}
+              </label>
+              <input
+                dir={isRtl ? 'rtl' : 'ltr'}
+                value={name}
+                onChange={(e) => { setName(e.target.value.slice(0, 16)); setNameError(false) }}
+                onKeyDown={(e) => e.key === 'Enter' && handleStart()}
+                placeholder={t?.namePlaceholder ?? 'Enter your name...'}
+                maxLength={16}
+                style={{
+                  width: '100%', borderRadius: 14,
+                  border: `1.5px solid ${nameError ? '#ef4444' : 'rgba(255,255,255,0.16)'}`,
+                  background: nameError ? 'rgba(239,68,68,0.12)' : 'rgba(255,255,255,0.18)',
+                  color: 'white', padding: '13px 16px', fontSize: 17, outline: 'none',
+                  boxSizing: 'border-box', transition: 'border-color 0.2s, background 0.2s',
+                }}
+              />
+            </motion.div>
+
+            {/* Difficulty */}
+            <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 7 }}>
+              <label style={{ fontSize: 11, color: 'rgba(255,255,255,0.38)', fontWeight: 700, letterSpacing: '0.22em' }}>
+                {t?.difficulty ?? 'DIFFICULTY'}
+              </label>
+              <div style={{ display: 'flex', gap: 8 }}>
+                {DIFF_VALUES.map((val) => {
+                  const selected = difficulty === val
+                  const color    = DIFF_COLOR[val]
+                  return (
+                    <motion.button
+                      key={val}
+                      onClick={() => setDifficulty(val)}
+                      whileTap={{ scale: 0.94 }}
+                      style={{
+                        flex: 1, padding: '11px 4px', borderRadius: 14,
+                        border: `2px solid ${selected ? color : 'rgba(255,255,255,0.11)'}`,
+                        background: selected ? `${color}2e` : 'rgba(255,255,255,0.12)',
+                        color: selected ? color : 'rgba(255,255,255,0.35)',
+                        fontWeight: 900, fontSize: 14, cursor: 'pointer', transition: 'all 0.15s',
+                        display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
+                      }}
+                    >
+                      <span>{t?.diffLabel?.[val] ?? val}</span>
+                      <span style={{ fontSize: 10, fontWeight: 700, opacity: 0.65, letterSpacing: '0.04em' }}>
+                        {totalQuestions(val)} {t?.questions ?? 'questions'}
+                      </span>
+                    </motion.button>
+                  )
+                })}
+              </div>
+            </div>
+
+            {/* Start */}
+            <motion.button
+              whileTap={{ scale: 0.95 }} whileHover={{ scale: 1.03 }}
+              onClick={handleStart}
+              className="w-full bg-yellow-400 border-b-4 border-yellow-600 text-black font-black text-2xl rounded-2xl h-16 shadow-xl cursor-pointer tracking-widest"
+            >
+              {t?.startAdventure ?? 'START ADVENTURE'}
+            </motion.button>
+          </motion.div>
+        )}
+
+      </AnimatePresence>
     </div>
   )
 }

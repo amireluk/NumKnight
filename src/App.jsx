@@ -7,7 +7,6 @@ import { AreaClearedScreen } from './screens/AreaClearedScreen'
 import { LeaderboardScreen } from './screens/LeaderboardScreen'
 import { VictoryScreen } from './screens/VictoryScreen'
 import { StartScreen } from './screens/StartScreen'
-import { NewGameScreen } from './screens/NewGameScreen'
 import { DesignScreen } from './screens/DesignScreen'
 import { EASY, MEDIUM, HARD, DEV } from './game/campaign.config'
 import { createNewRun, loadRun, saveRun, clearRun } from './game/runState'
@@ -155,16 +154,7 @@ export default function App() {
           initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
           transition={{ duration: 0.25 }} className="w-full"
         >
-          <StartScreen onNewGame={() => setScreen('newgame')} onViewLeaderboard={handleViewLeaderboard} lang={lang} onLangChange={handleLangChange} t={t} />
-        </motion.div>
-      )}
-
-      {screen === 'newgame' && (
-        <motion.div key="newgame"
-          initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-          transition={{ duration: 0.25 }} className="w-full"
-        >
-          <NewGameScreen onStart={handleStart} onBack={() => setScreen('start')} lang={lang} t={t} />
+          <StartScreen onStart={handleStart} onViewLeaderboard={handleViewLeaderboard} lang={lang} onLangChange={handleLangChange} t={t} />
         </motion.div>
       )}
 
@@ -255,7 +245,7 @@ export default function App() {
             difficulty={difficulty}
             onFight={handleFight}
             onRestart={handleRestart}
-            onBack={() => setScreen('newgame')}
+            onBack={() => setScreen('start')}
             lang={lang} t={t}
           />
         </motion.div>

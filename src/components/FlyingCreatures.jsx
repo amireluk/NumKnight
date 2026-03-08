@@ -59,7 +59,7 @@ export function FlyingCreatures({ difficulty = 'easy' }) {
   const creatures = useMemo(() =>
     Array.from({ length: cfg.count }, (_, i) => ({
       id: i,
-      topPct: 4 + (i / cfg.count) * 48 + (Math.random() - 0.5) * 6,
+      topPct: 48 + (i / cfg.count) * 20 + (Math.random() - 0.5) * 5,
       duration: (10 + Math.random() * 8) / cfg.speedMult,
       delay: -(i / cfg.count) * (12 / cfg.speedMult), // negative delay = already in-flight on mount
       scale: 0.65 + Math.random() * 0.55,
