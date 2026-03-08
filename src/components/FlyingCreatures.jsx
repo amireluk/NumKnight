@@ -70,7 +70,7 @@ export function FlyingCreatures({ difficulty = 'easy' }) {
   [difficulty]) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
-    <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', overflow: 'hidden', zIndex: 0 }}>
+    <div dir="ltr" style={{ position: 'absolute', inset: 0, pointerEvents: 'none', overflow: 'hidden', zIndex: 0 }}>
       {creatures.map(c => (
         // Outer div: horizontal flight (left → right)
         <motion.div
