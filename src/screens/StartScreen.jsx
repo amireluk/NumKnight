@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion'
 import { KingdomBackground, KingdomForeground, StrollingKnight } from '../components/KingdomScenery'
+import { FlyingCreatures } from '../components/FlyingCreatures'
 
 export function StartScreen({ onNewGame, onViewLeaderboard, lang, onLangChange, t }) {
   const isRtl = lang === 'he'
@@ -86,6 +87,7 @@ export function StartScreen({ onNewGame, onViewLeaderboard, lang, onLangChange, 
       </div>
 
       {/* Scenery layers */}
+      <FlyingCreatures difficulty="easy" />
       <KingdomBackground difficulty="easy" />
       <StrollingKnight />
       <KingdomForeground difficulty="easy" />
