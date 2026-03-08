@@ -121,3 +121,17 @@ P5-D  Victory particle burst    ← 1 hr, great on gold trophy
 P5-G  Idle enemy variety        ← 1 hr, world feels alive
 Phase 6 (Backend)               ← biggest lift, do after all Phase 5
 ```
+
+---
+
+## Dragon Boss — see PLAN_BOSS.md
+
+All dragon boss work is tracked separately.
+→ **[PLAN_BOSS.md](./PLAN_BOSS.md)**
+
+```
+Boss Phase 1  Shield mechanic (3-hit crack/fall/damage)  ✅ complete
+Boss Phase 2  Boss polish (intro banner, rage phase)      ⏳ pending
+Boss Phase 3  Audio cues (entire app)                     ⏳ pending
+Boss Phase 4  Visual overhaul (enemies + backgrounds)     ⏳ pending
+```
