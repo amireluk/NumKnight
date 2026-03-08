@@ -265,17 +265,20 @@ export function LeaderboardScreen({ totalScore, endWorld, cleared, difficulty, p
                         <span style={{ flex: 1, minWidth: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column', gap: 1 }}>
                           {entry ? (
                             <>
-                              <span style={{
-                                color: isNew ? '#fff' : 'rgba(255,255,255,0.85)',
-                                fontWeight: isNew ? 900 : 700, fontSize: isNew ? 15 : 14,
-                                overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-                              }}>
-                                {entry.name}
+                              <span style={{ display: 'flex', alignItems: 'center', gap: 6, overflow: 'hidden' }}>
+                                <span style={{
+                                  color: isNew ? '#fff' : 'rgba(255,255,255,0.85)',
+                                  fontWeight: isNew ? 900 : 700, fontSize: isNew ? 15 : 14,
+                                  overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                                  flex: 1, minWidth: 0,
+                                }}>
+                                  {entry.name}
+                                </span>
                                 {isNew && (
                                   <span style={{
-                                    marginInlineStart: 8, fontSize: 9, fontWeight: 900, letterSpacing: '0.12em',
+                                    flexShrink: 0, fontSize: 9, fontWeight: 900, letterSpacing: '0.12em',
                                     background: '#fbbf24', color: '#000',
-                                    borderRadius: 4, padding: '1px 5px', verticalAlign: 'middle',
+                                    borderRadius: 4, padding: '1px 5px',
                                   }}>
                                     NEW
                                   </span>
