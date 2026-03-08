@@ -323,7 +323,6 @@ export function BattleScreen({ world, battleIndex, onBattleEnd, lang, t }) {
   return (
     <motion.div
       animate={shakeControls}
-      dir={lang === 'he' ? 'rtl' : 'ltr'}
       className="flex flex-col h-dvh max-w-md mx-auto px-3 py-4 gap-4"
       style={{ position: 'relative', overflow: 'hidden', background: 'linear-gradient(to bottom, #1e3a70, #2d5aaa)' }}
     >
