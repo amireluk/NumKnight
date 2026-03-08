@@ -130,7 +130,7 @@ function TrophyOverlay({ trophy, timeBonus, onContinue, t }) {
           padding: '4px 18px',
         }}
       >
-        <span dir="ltr">{baseScore.toLocaleString()} {t?.pts ?? 'pts'}</span>
+        {t?.ptsLabel ? t.ptsLabel(baseScore.toLocaleString()) : `${baseScore.toLocaleString()} pts`}
       </motion.p>
 
       {/* Time bonus */}
@@ -145,7 +145,7 @@ function TrophyOverlay({ trophy, timeBonus, onContinue, t }) {
             padding: '3px 14px',
           }}
         >
-          <span dir="ltr">{timeBonus.toLocaleString()} {t?.timeBonus ?? 'time bonus'}</span>
+          {t?.timeBonusLabel ? t.timeBonusLabel(timeBonus.toLocaleString()) : `${timeBonus.toLocaleString()} time bonus`}
         </motion.p>
       )}
 

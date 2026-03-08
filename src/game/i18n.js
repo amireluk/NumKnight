@@ -23,6 +23,8 @@ export const T = {
     roundLabel: (n, total) => `Round ${n}/${total}`,
     trophyLabel: { gold: 'PERFECT!', silver: 'GREAT!', bronze: 'SURVIVED!' },
     pts: 'pts',
+    ptsLabel: (n) => `${n} pts`,
+    timeBonusLabel: (n) => `${n} time bonus`,
     timeBonus: 'time bonus',
     tapToContinue: 'TAP TO CONTINUE',
 
@@ -94,6 +96,8 @@ export const T = {
     roundLabel: (n, total) => `סיבוב ${n}/${total}`,
     trophyLabel: { gold: '!מושלם', silver: '!כל הכבוד', bronze: '!שרדת' },
     pts: 'נק׳',
+    ptsLabel: (n) => `${n} נק׳`,
+    timeBonusLabel: (n) => `${n} בונוס זמן`,
     timeBonus: 'בונוס זמן',
     tapToContinue: 'לחץ להמשך',
 
