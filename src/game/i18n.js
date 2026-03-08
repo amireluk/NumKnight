@@ -96,8 +96,8 @@ export const T = {
     roundLabel: (n, total) => `סיבוב ${n}/${total}`,
     trophyLabel: { gold: '!מושלם', silver: '!כל הכבוד', bronze: '!שרדת' },
     pts: 'נק׳',
-    ptsLabel: (n) => `${n} נק׳`,
-    timeBonusLabel: (n) => `${n} בונוס זמן`,
+    ptsLabel: (n) => `נק׳ ${n}`,
+    timeBonusLabel: (n) => `בונוס זמן ${n}`,
     timeBonus: 'בונוס זמן',
     tapToContinue: 'לחץ להמשך',
 
