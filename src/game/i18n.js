@@ -28,6 +28,13 @@ export const T = {
     timeBonus: 'time bonus',
     tapToContinue: 'TAP TO CONTINUE',
 
+    // Boss mechanic
+    bossShieldUp: 'SHIELD UP',
+    bossShieldCrack: 'SHIELD CRACK!',
+    bossShieldCrackHint: 'one more!',
+    bossShieldShatter: 'SHATTERED!',
+    bossShieldShatterHint: 'hit landed!',
+
     // AreaClearedScreen
     areaCleared: 'Area Cleared',
     tapReveal: 'Tap to reveal score',
@@ -100,6 +107,13 @@ export const T = {
     timeBonusLabel: (n) => `בונוס זמן ${n}`,
     timeBonus: 'בונוס זמן',
     tapToContinue: 'לחץ להמשך',
+
+    // Boss mechanic
+    bossShieldUp: 'המגן פעיל',
+    bossShieldCrack: '!המגן נסדק',
+    bossShieldCrackHint: '!עוד אחד',
+    bossShieldShatter: '!המגן התנפץ',
+    bossShieldShatterHint: '!מכה',
 
     // AreaClearedScreen
     areaCleared: 'האזור נוקה',

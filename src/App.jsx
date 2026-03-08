@@ -29,7 +29,7 @@ export default function App() {
 
   const [run, setRun] = useState(() => loadRun() ?? createNewRun())
   const [screen, setScreen] = useState(
-    () => window.location.search.includes('design') ? 'design' : 'start'
+    () => window.location.search.includes('design') ? 'design' : IS_DEV_MODE ? 'map' : 'start'
   )
   const [clearedData, setClearedData] = useState(null)
   const [battleKey, setBattleKey] = useState(0)
@@ -106,7 +106,11 @@ export default function App() {
     setScreen('map')
   }
 
-  const handleFight = () => {
+  const handleFight = (worldIndex) => {
+    if (IS_DEV_MODE && worldIndex != null) {
+      setRun((r) => ({ ...r, worldIndex, battleIndex: 0 }))
+      setWorldScore(0)
+    }
     setMapIsTransition(false)
     setBattleKey((k) => k + 1)
     setScreen('battle')
@@ -243,6 +247,7 @@ export default function App() {
             worldScores={run.worldScores ?? []}
             isTransition={mapIsTransition}
             difficulty={difficulty}
+            isDevMode={IS_DEV_MODE}
             onFight={handleFight}
             onRestart={handleRestart}
             onBack={() => setScreen('start')}

@@ -256,19 +256,20 @@ export const REGION_STRIPS = {
 
 // ── Region band ──────────────────────────────────────────────────────────────
 
-function RegionBand({ world, status, trophy, score, delay, onTap, t }) {
+function RegionBand({ world, worldIndex, status, trophy, score, delay, onTap, isDevMode, t }) {
   const Strip       = REGION_STRIPS[world.id] ?? ForestStrip
   const isLocked    = status === 'locked'
   const isCurrent   = status === 'current'
   const isCompleted = status === 'completed'
+  const isClickable = isCurrent || isDevMode
 
   return (
     <motion.div
       initial={{ opacity: 0, x: -28 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay, duration: 0.28 }}
-      onClick={isCurrent ? onTap : undefined}
-      whileTap={isCurrent ? { scale: 0.97 } : undefined}
+      onClick={isClickable ? () => onTap(worldIndex) : undefined}
+      whileTap={isClickable ? { scale: 0.97 } : undefined}
       style={{
         position: 'relative',
         flex: 1,
@@ -276,8 +277,10 @@ function RegionBand({ world, status, trophy, score, delay, onTap, t }) {
         borderRadius: 10,
         border: isCurrent
           ? '2px solid rgba(251,191,36,0.9)'
-          : '2px solid rgba(255,255,255,0.06)',
-        cursor: isCurrent ? 'pointer' : 'default',
+          : isDevMode && isLocked
+            ? '2px solid rgba(255,100,100,0.5)'
+            : '2px solid rgba(255,255,255,0.06)',
+        cursor: isClickable ? 'pointer' : 'default',
       }}
     >
       {/* Scene background */}
@@ -401,7 +404,7 @@ function RegionBand({ world, status, trophy, score, delay, onTap, t }) {
 
 export function WorldMapScreen({
   worlds, currentWorldIndex, trophies, worldScores,
-  isTransition, difficulty, onFight, onRestart, onBack, lang, t,
+  isTransition, difficulty, isDevMode, onFight, onRestart, onBack, lang, t,
 }) {
   const isRtl = lang === 'he'
 
@@ -474,11 +477,13 @@ export function WorldMapScreen({
             <RegionBand
               key={world.id}
               world={world}
+              worldIndex={i}
               status={status}
               trophy={trophy}
               score={score}
               delay={0.08 + di * 0.06}
               onTap={onFight}
+              isDevMode={isDevMode}
               t={t}
             />
           )

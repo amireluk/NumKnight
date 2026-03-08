@@ -2,7 +2,7 @@
 const APP_VERSION = typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : 'dev'
 
 import { useState, useEffect, useRef } from 'react'
-import { motion, useAnimation } from 'framer-motion'
+import { motion, useAnimation, AnimatePresence } from 'framer-motion'
 import { makeRound, getTrophy } from '../game/battleLogic'
 import { playCorrect, playWrong, playSwordSwing, playImpact, playVictory, playDefeat } from '../game/sounds'
 import { HPBar } from '../components/HPBar'
@@ -66,6 +66,31 @@ const BURST_COLORS = {
   gold:   ['#fbbf24', '#fde68a', '#fff', '#f59e0b'],
   silver: ['#c0c8d4', '#e2e8f0', '#fff', '#94a3b8'],
   bronze: ['#cd7c3a', '#e9a96a', '#fff', '#b45309'],
+}
+
+// Blue banner shown when the dragon's shield powers up
+function ShieldUpBanner({ t }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: -10, scale: 0.88 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      exit={{ opacity: 0, y: -14, scale: 0.92 }}
+      transition={{ duration: 0.3, ease: 'easeOut' }}
+      style={{
+        position: 'absolute', top: '52%', left: 0, right: 0,
+        display: 'flex', flexDirection: 'column', alignItems: 'center',
+        pointerEvents: 'none', zIndex: 15,
+      }}
+    >
+      <span style={{
+        fontSize: 22, fontWeight: 900, letterSpacing: '0.14em',
+        color: '#93c5fd',
+        textShadow: '0 0 22px rgba(96,165,250,0.9), 0 2px 0 rgba(0,0,0,0.7)',
+      }}>
+        {t?.bossShieldUp ?? 'SHIELD UP'}
+      </span>
+    </motion.div>
+  )
 }
 
 // In-scene overlay shown when the enemy is defeated
@@ -166,8 +191,25 @@ export function BattleScreen({ world, battleIndex, onBattleEnd, lang, t }) {
   const shakeControls = useAnimation()
 
   const PLAYER_HP = world.playerHP ?? DEFAULT_PLAYER_HP
+  const isBoss = world.enemy.id === 'dragon'
+
   const [playerHP,  setPlayerHP]  = useState(PLAYER_HP)
   const [enemyHP,   setEnemyHP]   = useState(world.enemy.hp)
+
+  // Boss shield state
+  const [shieldStreak,  setShieldStreak]  = useState(0)
+  const shieldStreakRef = useRef(0)  // mirror for reading inside timeouts
+  const [shieldState,      setShieldState]      = useState(isBoss ? 'full' : null) // 'full'|'cracked'|null
+  const shieldStateRef = useRef(isBoss ? 'full' : null)
+  const [shieldFlashKey, setShieldFlashKey] = useState(0)
+  const [shieldCrackKey, setShieldCrackKey] = useState(0)
+  const [shieldBanner,     setShieldBanner]     = useState(false)
+  const shieldBannerTimer = useRef(null)
+
+  // Keep refs in sync
+  shieldStreakRef.current = shieldStreak
+  shieldStateRef.current  = shieldState
+
   const [round,     setRound]     = useState(() => makeRound(world.multipliers, world.factorRange))
   const [phase,     setPhase]     = useState('idle')
   const [mistakes,  setMistakes]  = useState(0)
@@ -191,6 +233,21 @@ export function BattleScreen({ world, battleIndex, onBattleEnd, lang, t }) {
   const phaseRef     = useRef(phase);     phaseRef.current     = phase
   const mistakesRef  = useRef(mistakes);  mistakesRef.current  = mistakes
   const playerHPRef  = useRef(playerHP);  playerHPRef.current  = playerHP
+
+  // Shield power-up: flash pips + show banner for 2s
+  const triggerShieldUp = () => {
+    setShieldFlashKey((k) => k + 1)
+    if (shieldBannerTimer.current) clearTimeout(shieldBannerTimer.current)
+    setShieldBanner(true)
+    shieldBannerTimer.current = setTimeout(() => setShieldBanner(false), 1000)
+  }
+
+  // Fire shield-up animation once intro finishes
+  useEffect(() => {
+    if (introPlaying || !isBoss) return
+    const t = setTimeout(triggerShieldUp, 350)
+    return () => clearTimeout(t)
+  }, [introPlaying]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Landing shake — only on the very first encounter of a world
   useEffect(() => {
@@ -228,6 +285,14 @@ export function BattleScreen({ world, battleIndex, onBattleEnd, lang, t }) {
     const newMistakes = mistakesRef.current + 1
     setMistakes(newMistakes)
     setPhase('hit')
+
+    // Boss: reset shield streak on timeout — flash only if crack was active
+    if (isBoss) {
+      const wasCracked = shieldStreakRef.current > 0
+      setShieldStreak(0)
+      setShieldState('full')
+      if (wasCracked) triggerShieldUp()
+    }
 
     setTimeout(() => {
       playImpact()
@@ -273,20 +338,42 @@ export function BattleScreen({ world, battleIndex, onBattleEnd, lang, t }) {
       playCorrect()
       setPhase('attacking')
 
+      // ── Boss shield mechanic ──────────────────────────────────────────
+      if (isBoss && shieldStreak < 1) {
+        // First correct: crack the shield — trigger split animation immediately, state after delay
+        setShieldCrackKey((k) => k + 1)
+        setTimeout(() => {
+          setShieldStreak(1)
+          setShieldState('cracked')
+          setEnemyHitKey((k) => k + 1)
+          loadNextRound()
+        }, 280)
+        return
+      }
+      // ─────────────────────────────────────────────────────────────────
+
       setTimeout(() => {
         playSwordSwing()
         setEnemyHitKey((k) => k + 1)
         const newEnemyHP = Math.max(0, enemyHP - 1)
         setEnemyHP(newEnemyHP)
 
+        // Boss: clear shield after shards have had time to animate (~350ms head start)
+        if (isBoss) {
+          setShieldStreak(0)
+          setShieldState(null)
+          // Only raise a new shield if dragon is still alive
+          if (newEnemyHP > 0) {
+            setTimeout(() => { setShieldState('full'); triggerShieldUp() }, 750)
+          }
+        }
+
         if (newEnemyHP <= 0) {
           timerActiveRef.current = false
           setPhase('won')
           playVictory()
-          // Capture mistakes and timeBonus (state won't change after this point)
           wonMistakesRef.current = mistakes
           wonTimeBonusRef.current = timeBonusAccRef.current
-          // Enemy death-anim plays (~650ms), then trophy overlay appears
           setTimeout(() => setShowTrophy(true), 700)
         } else {
           loadNextRound()
@@ -298,6 +385,14 @@ export function BattleScreen({ world, battleIndex, onBattleEnd, lang, t }) {
       const newMistakes = mistakes + 1
       setMistakes(newMistakes)
       setPhase('hit')
+
+      // Boss: reset streak — flash only if crack progress was lost
+      if (isBoss) {
+        const wasCracked = shieldStreakRef.current > 0
+        setShieldStreak(0)
+        setShieldState('full')
+        if (wasCracked) triggerShieldUp()
+      }
 
       setTimeout(() => {
         playImpact()
@@ -364,6 +459,11 @@ export function BattleScreen({ world, battleIndex, onBattleEnd, lang, t }) {
             </motion.div>
           </div>
 
+          {/* Shield-up banner */}
+          <AnimatePresence>
+            {shieldBanner && <ShieldUpBanner key={shieldFlashKey} t={t} />}
+          </AnimatePresence>
+
           <div className="flex flex-1 items-end gap-3 px-2" style={{ position: 'relative', zIndex: 1 }}>
             {/* Player HP */}
             <motion.div
@@ -426,7 +526,7 @@ export function BattleScreen({ world, battleIndex, onBattleEnd, lang, t }) {
               transition={{ duration: 0.35, delay: 0.1 }}
               className="mb-6"
             >
-              <HPBar current={enemyHP} max={world.enemy.hp} color="red" />
+              <HPBar current={enemyHP} max={world.enemy.hp} color="red" shieldState={shieldState} shieldFlashKey={shieldFlashKey} shieldCrackKey={shieldCrackKey} />
             </motion.div>
           </div>
         </div>
