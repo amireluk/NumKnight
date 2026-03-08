@@ -9,11 +9,23 @@ If the user is only running `npm run dev`, update `package.json` manually.
 ---
 
 ## Deploying
-When the user asks to deploy, run:
-```
-npm run deploy
-```
-This runs `npm run build` (bumps version + builds) then `gh-pages -d dist` to publish to GitHub Pages.
+
+There are two deployments. All code lives on `main` — no separate source branch.
+
+| Command | URL | When to use |
+|---------|-----|-------------|
+| `npm run deploy:dev` | `https://amireluk.github.io/NumKnight/dev/` | Test changes |
+| `npm run deploy` | `https://amireluk.github.io/NumKnight/` | Stable release |
+
+> ⚠️ Running `npm run deploy` (prod) will overwrite the `/dev/` subfolder. Run `deploy:dev` again afterwards if needed.
+
+---
+
+## ⚠️ After every session that changes code — ALWAYS ask the user:
+1. **"Deploy to dev?"** — if yes, run `npm run deploy:dev`
+2. **"Push to GitHub?"** — if yes, commit any unstaged changes and run `git push origin main`
+
+Do NOT deploy to prod unless the user explicitly asks.
 
 ---
 

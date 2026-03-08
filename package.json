@@ -8,7 +8,9 @@
     "build": "node scripts/bump-version.js && vite build",
     "preview": "vite preview",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d dist"
+    "deploy": "gh-pages -d dist",
+    "build:dev": "node scripts/bump-version.js && VITE_BASE=/NumKnight/dev/ vite build",
+    "deploy:dev": "npm run build:dev && gh-pages -d dist -b gh-pages --dest dev --add"
   },
   "dependencies": {
     "framer-motion": "^11.0.0",

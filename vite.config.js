@@ -5,7 +5,7 @@ import { readFileSync } from 'fs'
 const { version } = JSON.parse(readFileSync('./package.json', 'utf-8'))
 
 export default defineConfig({
-  base: '/NumKnight/',
+  base: process.env.VITE_BASE ?? '/NumKnight/',
   plugins: [react()],
   define: {
     __APP_VERSION__: JSON.stringify(version),
