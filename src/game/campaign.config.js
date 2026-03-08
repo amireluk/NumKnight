@@ -127,7 +127,7 @@ export const DEV = [
     timer: null, multipliers: [0], factorRange: [1, 10],
   },
   {
-    id: 'dragonLair', name: 'Dragon Lair', battles: 2, playerHP: 2,
+    id: 'dragonLair', name: 'Dragon Lair', battles: 1, playerHP: 2,
     enemy: { id: 'dragon', name: 'Dragon', hp: 1 },
     timer: null, multipliers: [0], factorRange: [1, 10],
   },
