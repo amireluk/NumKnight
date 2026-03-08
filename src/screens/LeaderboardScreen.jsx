@@ -280,7 +280,7 @@ export function LeaderboardScreen({ totalScore, endWorld, cleared, difficulty, p
                                     background: '#fbbf24', color: '#000',
                                     borderRadius: 4, padding: '1px 5px',
                                   }}>
-                                    NEW
+                                    {t?.newBadge ?? 'NEW'}
                                   </span>
                                 )}
                               </span>

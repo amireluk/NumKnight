@@ -47,6 +47,7 @@ export const T = {
     seeScores: 'SEE SCORES',
 
     // LeaderboardScreen
+    newBadge: 'NEW',
     hallOfFameTitle: 'HALL OF FAME',
     kingdomRecords: 'Kingdom Records',
     leaderboard: 'Leaderboard',
@@ -117,6 +118,7 @@ export const T = {
     seeScores: 'צפה בשיאים',
 
     // LeaderboardScreen
+    newBadge: 'חדש',
     hallOfFameTitle: 'היכל התהילה',
     kingdomRecords: 'שיאי הממלכה',
     leaderboard: 'טבלת שיאים',

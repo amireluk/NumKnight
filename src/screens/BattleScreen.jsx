@@ -130,7 +130,7 @@ function TrophyOverlay({ trophy, timeBonus, onContinue, t }) {
           padding: '4px 18px',
         }}
       >
-        {baseScore.toLocaleString()} {t?.pts ?? 'pts'}
+        <span dir="ltr">{baseScore.toLocaleString()} {t?.pts ?? 'pts'}</span>
       </motion.p>
 
       {/* Time bonus */}
@@ -145,7 +145,7 @@ function TrophyOverlay({ trophy, timeBonus, onContinue, t }) {
             padding: '3px 14px',
           }}
         >
-          {timeBonus.toLocaleString()} {t?.timeBonus ?? 'time bonus'}
+          <span dir="ltr">{timeBonus.toLocaleString()} {t?.timeBonus ?? 'time bonus'}</span>
         </motion.p>
       )}
 
@@ -323,7 +323,8 @@ export function BattleScreen({ world, battleIndex, onBattleEnd, lang, t }) {
   return (
     <motion.div
       animate={shakeControls}
-      className="flex flex-col min-h-dvh max-w-md mx-auto px-3 py-4 gap-4"
+      dir={lang === 'he' ? 'rtl' : 'ltr'}
+      className="flex flex-col h-dvh max-w-md mx-auto px-3 py-4 gap-4"
       style={{ position: 'relative', overflow: 'hidden', background: 'linear-gradient(to bottom, #1e3a70, #2d5aaa)' }}
     >
       <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', flex: 1, gap: 16 }}>

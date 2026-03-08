@@ -41,9 +41,10 @@ export function NewGameScreen({ onStart, onBack, lang, t }) {
   return (
     <div
       dir={isRtl ? 'rtl' : 'ltr'}
-      className="flex flex-col items-center justify-center min-h-dvh max-w-md mx-auto px-6 gap-7 select-none"
+      className="flex flex-col items-center justify-center h-dvh max-w-md mx-auto px-6 gap-7 select-none"
       style={{
         position: 'relative',
+        overflow: 'hidden',
         paddingBottom: 210,
         background:
           'radial-gradient(ellipse at 50% 20%, rgba(251,191,36,0.12) 0%, transparent 55%), ' +

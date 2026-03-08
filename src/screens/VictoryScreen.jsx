@@ -236,7 +236,9 @@ export function VictoryScreen({ playerName, totalScore, onContinue, lang, t }) {
         style={{
           zIndex: 4,
           marginTop: 28,
-          padding: '0 28px',
+          marginLeft: 24,
+          marginRight: 24,
+          alignSelf: 'stretch',
           height: 56,
           borderRadius: 18,
           background: '#fbbf24',
