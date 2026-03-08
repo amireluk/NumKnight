@@ -39,8 +39,8 @@ export function ParticleBurst({
       {particles.map(p => (
         <motion.div
           key={p.id}
-          initial={{ x: 0, y: 0, opacity: 1, scale: 1, rotate: 0 }}
-          animate={{ x: p.tx, y: p.ty, opacity: 0, scale: 0.15, rotate: p.rotateEnd }}
+          initial={{ x: 0, y: 0, opacity: 0, scale: 1, rotate: 0 }}
+          animate={{ x: p.tx, y: p.ty, opacity: [0, 1, 0], scale: 0.15, rotate: p.rotateEnd }}
           transition={{ duration: p.duration, delay: p.delay + baseDelay, ease: 'easeOut' }}
           style={{
             position: 'absolute',
