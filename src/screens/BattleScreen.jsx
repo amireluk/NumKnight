@@ -202,7 +202,8 @@ export function BattleScreen({ world, battleIndex, onBattleEnd, lang, t }) {
   const [shieldState,      setShieldState]      = useState(isBoss ? 'full' : null) // 'full'|'cracked'|null
   const shieldStateRef = useRef(isBoss ? 'full' : null)
   const [shieldFlashKey, setShieldFlashKey] = useState(0)
-  const [shieldCrackKey, setShieldCrackKey] = useState(0)
+  const [shieldFallKey,  setShieldFallKey]  = useState(0)
+  const [shieldFallPip,  setShieldFallPip]  = useState(0)
   const [shieldBanner,     setShieldBanner]     = useState(false)
   const shieldBannerTimer = useRef(null)
 
@@ -338,15 +339,54 @@ export function BattleScreen({ world, battleIndex, onBattleEnd, lang, t }) {
       playCorrect()
       setPhase('attacking')
 
-      // ── Boss shield mechanic ──────────────────────────────────────────
-      if (isBoss && shieldStreak < 1) {
-        // First correct: crack the shield — trigger split animation immediately, state after delay
-        setShieldCrackKey((k) => k + 1)
+      // ── Boss shield mechanic (3-hit) ─────────────────────────────────
+      if (isBoss) {
+        if (shieldStreak === 0) {
+          // Hit 1: crack line appears on top pip, no HP damage
+          setTimeout(() => {
+            setShieldStreak(1)
+            setShieldState('cracked')
+            setEnemyHitKey((k) => k + 1)
+            loadNextRound()
+          }, 280)
+          return
+        }
+
+        if (shieldStreak === 1) {
+          // Hit 2: pip falls — trigger fall anim immediately, then state update
+          const pip = world.enemy.hp - enemyHP   // current top filled pip index
+          setShieldFallPip(pip)
+          setShieldFallKey((k) => k + 1)
+          setTimeout(() => {
+            setShieldStreak(2)
+            setShieldState('broken')
+            setEnemyHitKey((k) => k + 1)
+            loadNextRound()
+          }, 280)
+          return
+        }
+
+        // Hit 3: actual HP damage, reset shield
         setTimeout(() => {
-          setShieldStreak(1)
-          setShieldState('cracked')
+          playSwordSwing()
           setEnemyHitKey((k) => k + 1)
-          loadNextRound()
+          const newEnemyHP = Math.max(0, enemyHP - 1)
+          setEnemyHP(newEnemyHP)
+          setShieldStreak(0)
+          setShieldState(null)
+          if (newEnemyHP > 0) {
+            setTimeout(() => { setShieldState('full'); triggerShieldUp() }, 650)
+          }
+          if (newEnemyHP <= 0) {
+            timerActiveRef.current = false
+            setPhase('won')
+            playVictory()
+            wonMistakesRef.current = mistakes
+            wonTimeBonusRef.current = timeBonusAccRef.current
+            setTimeout(() => setShowTrophy(true), 700)
+          } else {
+            loadNextRound()
+          }
         }, 280)
         return
       }
@@ -357,17 +397,6 @@ export function BattleScreen({ world, battleIndex, onBattleEnd, lang, t }) {
         setEnemyHitKey((k) => k + 1)
         const newEnemyHP = Math.max(0, enemyHP - 1)
         setEnemyHP(newEnemyHP)
-
-        // Boss: clear shield after shards have had time to animate (~350ms head start)
-        if (isBoss) {
-          setShieldStreak(0)
-          setShieldState(null)
-          // Only raise a new shield if dragon is still alive
-          if (newEnemyHP > 0) {
-            setTimeout(() => { setShieldState('full'); triggerShieldUp() }, 750)
-          }
-        }
-
         if (newEnemyHP <= 0) {
           timerActiveRef.current = false
           setPhase('won')
@@ -526,7 +555,7 @@ export function BattleScreen({ world, battleIndex, onBattleEnd, lang, t }) {
               transition={{ duration: 0.35, delay: 0.1 }}
               className="mb-6"
             >
-              <HPBar current={enemyHP} max={world.enemy.hp} color="red" shieldState={shieldState} shieldFlashKey={shieldFlashKey} shieldCrackKey={shieldCrackKey} />
+              <HPBar current={enemyHP} max={world.enemy.hp} color="red" shieldState={shieldState} shieldFlashKey={shieldFlashKey} shieldFallKey={shieldFallKey} shieldFallPip={shieldFallPip} />
             </motion.div>
           </div>
         </div>

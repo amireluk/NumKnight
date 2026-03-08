@@ -43,7 +43,7 @@ export const EASY = [
   },
   {
     id: 'dragonLair', name: 'Dragon Lair', battles: 3,
-    enemy: { id: 'dragon', name: 'Dragon', hp: 5 },
+    enemy: { id: 'dragon', name: 'Dragon', hp: 3 },
     timer: 20, multipliers: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10], factorRange: [1, 10],
   },
 ]
@@ -76,7 +76,7 @@ export const MEDIUM = [
   },
   {
     id: 'dragonLair', name: 'Dragon Lair', battles: 3,
-    enemy: { id: 'dragon', name: 'Dragon', hp: 6 },
+    enemy: { id: 'dragon', name: 'Dragon', hp: 4 },
     timer: 8, multipliers: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], factorRange: [1, 10],
     enemyDamage: 2,
   },
@@ -111,7 +111,7 @@ export const HARD = [
   },
   {
     id: 'dragonLair', name: 'Dragon Lair', battles: 3,
-    enemy: { id: 'dragon', name: 'Dragon', hp: 6 },
+    enemy: { id: 'dragon', name: 'Dragon', hp: 5 },
     timer: 5, multipliers: [2, 3, 4, 5, 6, 7, 8, 9], factorRange: [1, 10],
     enemyDamage: 3,
   },
@@ -128,7 +128,7 @@ export const DEV = [
   },
   {
     id: 'dragonLair', name: 'Dragon Lair', battles: 2, playerHP: 2,
-    enemy: { id: 'dragon', name: 'Dragon', hp: 4 },
+    enemy: { id: 'dragon', name: 'Dragon', hp: 2 },
     timer: null, multipliers: [0], factorRange: [1, 10],
   },
 ]

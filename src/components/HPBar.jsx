@@ -3,14 +3,35 @@ import { motion } from 'framer-motion'
 const PIP_H = 22
 const GAP   = 6
 
-// One-pip-sized crack overlay, positioned at the pip that is breaking
-function ShieldCrackOverlay({ topFilled }) {
-  const W   = 14
-  const H   = PIP_H   // 22px — one pip only
-  const cx  = 7
-  const top = topFilled * (PIP_H + GAP)
+// Static crack line drawn on a pip — appears on hit 1, stays until hit 2
+function CrackLine() {
+  return (
+    <svg
+      width="14" height="22" viewBox="0 0 14 22"
+      style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 4 }}
+    >
+      <path
+        d="M7 0 L5 7 L9 12 L4 17 L7 22"
+        stroke="rgba(255,255,255,0.9)" strokeWidth="0.8" fill="none"
+        strokeLinecap="round" strokeLinejoin="round"
+      />
+      <path
+        d="M7 0 L5 7 L9 12 L4 17 L7 22"
+        stroke="rgba(251,191,36,0.45)" strokeWidth="1.4" fill="none"
+        strokeLinecap="round" strokeLinejoin="round"
+        style={{ mixBlendMode: 'overlay' }}
+      />
+    </svg>
+  )
+}
 
-  // Tight zigzag in 14×22px space
+// One-pip fall animation — triggers on hit 2, positioned at the falling pip
+function ShieldFallOverlay({ pipIdx }) {
+  const W   = 14
+  const H   = PIP_H
+  const cx  = 7
+  const top = pipIdx * (PIP_H + GAP)
+
   const steps = 4
   const jag   = Array.from({ length: steps + 1 }, (_, i) => {
     const y = Math.round((H / steps) * i)
@@ -28,7 +49,6 @@ function ShieldCrackOverlay({ topFilled }) {
       width: W, height: H,
       pointerEvents: 'none', zIndex: 10, overflow: 'visible',
     }}>
-      {/* Left half — flies left */}
       <motion.svg width={W} height={H}
         style={{ position: 'absolute', top: 0, left: 0, overflow: 'visible' }}
         initial={{ x: 0, y: 0, rotate: 0, opacity: 1 }}
@@ -42,7 +62,6 @@ function ShieldCrackOverlay({ topFilled }) {
           strokeLinecap="round" strokeLinejoin="round" opacity="0.9" />
       </motion.svg>
 
-      {/* Right half — flies right */}
       <motion.svg width={W} height={H}
         style={{ position: 'absolute', top: 0, left: 0, overflow: 'visible' }}
         initial={{ x: 0, y: 0, rotate: 0, opacity: 1 }}
@@ -56,7 +75,6 @@ function ShieldCrackOverlay({ topFilled }) {
           strokeLinecap="round" strokeLinejoin="round" opacity="0.9" />
       </motion.svg>
 
-      {/* Quick flash */}
       <motion.div
         initial={{ opacity: 0.7 }}
         animate={{ opacity: 0 }}
@@ -71,23 +89,32 @@ function ShieldCrackOverlay({ topFilled }) {
   )
 }
 
-// shieldState:    null | 'full' | 'cracked'
-// shieldFlashKey: increments each time shield powers up → triggers sweep anim
-// shieldCrackKey: increments on first hit → triggers vertical crack animation
-export function HPBar({ current, max, color = 'green', shieldState = null, shieldFlashKey = 0, shieldCrackKey = 0 }) {
+// shieldState:   null | 'full' | 'cracked' | 'broken'
+//   full    — all filled pips have blue border
+//   cracked — top pip has blue border + visible crack line (hit 1)
+//   broken  — top pip has no border (shield stripped), rest still blue (hit 2)
+// shieldFlashKey: increments on shield power-up
+// shieldFallKey:  increments on hit 2 → triggers fall animation
+// shieldFallPip:  pip index that falls (captured at trigger time)
+export function HPBar({ current, max, color = 'green', shieldState = null, shieldFlashKey = 0, shieldFallKey = 0, shieldFallPip = 0 }) {
   const isGreen   = color === 'green'
   const topFilled = max - current
 
   return (
     <div className="flex flex-col justify-center gap-1.5" style={{ position: 'relative', overflow: 'visible' }}>
-      {shieldCrackKey > 0 && <ShieldCrackOverlay key={shieldCrackKey} topFilled={topFilled} />}
+      {shieldFallKey > 0 && (
+        <ShieldFallOverlay key={shieldFallKey} pipIdx={shieldFallPip} />
+      )}
 
       {Array.from({ length: max }, (_, i) => {
         const filled = i >= topFilled
 
+        // cracked: top pip keeps blue border (crack line overlaid)
+        // broken:  top pip loses blue border, rest keep it
         const shielded = filled && (
           shieldState === 'full' ||
-          (shieldState === 'cracked' && i > topFilled)
+          shieldState === 'cracked' ||
+          (shieldState === 'broken' && i > topFilled)
         )
 
         const baseBg    = filled ? (isGreen ? '#22c55e' : '#ef4444') : '#1f2937'
@@ -99,7 +126,6 @@ export function HPBar({ current, max, color = 'green', shieldState = null, shiel
             ? isGreen ? '0 0 6px rgba(34,197,94,0.5)' : '0 0 6px rgba(239,68,68,0.5)'
             : 'none'
 
-        // Flash: narrower beam, lower opacity
         const flashDelay = (max - 1 - i) * 0.16
 
         return (
@@ -110,7 +136,10 @@ export function HPBar({ current, max, color = 'green', shieldState = null, shiel
               style={{ width: 14, height: 22, borderRadius: 4, border: `${borderW}px solid` }}
             />
 
-            {/* Shield power-up beam — toned down */}
+            {/* Crack line — static, shown on hit 1 until hit 2 clears it */}
+            {shieldState === 'cracked' && i === topFilled && <CrackLine />}
+
+            {/* Shield power-up beam */}
             {shieldFlashKey > 0 && filled && (
               <motion.div
                 key={`flash-${shieldFlashKey}`}
