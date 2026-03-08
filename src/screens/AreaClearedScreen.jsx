@@ -254,11 +254,12 @@ export function AreaClearedScreen({ world, worldTrophies, worldScore, totalScore
   const bestTrophy = worldTrophies.reduce((best, tr) =>
     (TROPHY_RANK[tr] ?? 2) < (TROPHY_RANK[best] ?? 2) ? tr : best, 'bronze')
 
-  // Random origin positions so each firework fires from a different spot
+  // Random origin positions spread across the full screen
   const BURST_ORIGINS = [
-    { x: '50%', y: '50%' }, { x: '30%', y: '40%' }, { x: '70%', y: '60%' },
-    { x: '20%', y: '55%' }, { x: '80%', y: '45%' }, { x: '60%', y: '35%' },
-    { x: '40%', y: '65%' }, { x: '55%', y: '30%' },
+    { x: '50%', y: '45%' }, { x: '25%', y: '30%' }, { x: '75%', y: '35%' },
+    { x: '15%', y: '60%' }, { x: '85%', y: '55%' }, { x: '60%', y: '20%' },
+    { x: '35%', y: '70%' }, { x: '70%', y: '75%' }, { x: '10%', y: '40%' },
+    { x: '90%', y: '30%' }, { x: '45%', y: '80%' }, { x: '80%', y: '65%' },
   ]
 
   useEffect(() => {
@@ -301,6 +302,19 @@ export function AreaClearedScreen({ world, worldTrophies, worldScore, totalScore
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
+    <div style={{ position: 'relative' }}>
+    {/* Full-screen fireworks overlay — fixed so they aren't clipped */}
+    {bursts.map(b => (
+      <ParticleBurst
+        key={b.id}
+        fixed
+        count={BURST_COUNT[bestTrophy]}
+        colors={BURST_COLORS[bestTrophy]}
+        originX={b.origin.x} originY={b.origin.y}
+        spread={bestTrophy === 'gold' ? 320 : bestTrophy === 'silver' ? 220 : 140}
+        gravity={bestTrophy === 'gold' ? 100 : 60}
+      />
+    ))}
     <div
       dir={isRtl ? 'rtl' : 'ltr'}
       className="flex flex-col items-center h-dvh max-w-md mx-auto px-4 py-5 gap-4"
@@ -350,7 +364,7 @@ export function AreaClearedScreen({ world, worldTrophies, worldScore, totalScore
         }}
       >
         {/* Trophy row */}
-        <div style={{ display: 'flex', gap: 24, alignItems: 'center', justifyContent: 'center', paddingBottom: 4, position: 'relative' }}>
+        <div style={{ display: 'flex', gap: 24, alignItems: 'center', justifyContent: 'center', paddingBottom: 4 }}>
           {worldTrophies.map((trophy, i) => (
             <motion.div
               key={i}
@@ -360,16 +374,6 @@ export function AreaClearedScreen({ world, worldTrophies, worldScore, totalScore
             >
               <TrophyCup trophy={trophy} size={48} />
             </motion.div>
-          ))}
-          {bursts.map(b => (
-            <ParticleBurst
-              key={b.id}
-              count={BURST_COUNT[bestTrophy]}
-              colors={BURST_COLORS[bestTrophy]}
-              originX={b.origin.x} originY={b.origin.y}
-              spread={bestTrophy === 'gold' ? 200 : bestTrophy === 'silver' ? 150 : 100}
-              gravity={bestTrophy === 'gold' ? 80 : 50}
-            />
           ))}
         </div>
 
@@ -428,6 +432,7 @@ export function AreaClearedScreen({ world, worldTrophies, worldScore, totalScore
       ) : (
         <div style={{ height: 64 }} />
       )}
+    </div>
     </div>
   )
 }

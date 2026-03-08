@@ -28,7 +28,7 @@ export function LeaderboardScreen({ totalScore, endWorld, cleared, difficulty, p
   const isRtl = lang === 'he'
 
   const [[allScores, newScoreIndex]] = useState(() => {
-    const name = playerName || localStorage.getItem(NAME_KEY) || 'Knight'
+    const name = playerName || localStorage.getItem(NAME_KEY) || ''
     if (name) localStorage.setItem(NAME_KEY, name)
     if (totalScore > 0) {
       saveScore(difficulty, {
@@ -153,7 +153,7 @@ export function LeaderboardScreen({ totalScore, endWorld, cleared, difficulty, p
         transition={{ duration: 0.3 }}
         style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, flexShrink: 0 }}
       >
-        <p className="text-white font-black text-3xl tracking-wide">{t?.kingdomRecords ?? 'Kingdom Records'}</p>
+        <p className="text-white font-black text-3xl tracking-wide">{t?.hallOfFameTitle ?? 'HALL OF FAME'}</p>
 
         {/* Pill indicator — 5-slot virtual track, same infinite-carousel trick as main cards */}
         <div style={{
@@ -164,6 +164,7 @@ export function LeaderboardScreen({ totalScore, endWorld, cleared, difficulty, p
         }}>
           <div style={{
             display: 'flex',
+            direction: 'ltr',
             gap: PILL_GAP,
             transform: `translateX(${pillTrackX}px)`,
             transition: pillAnimated ? 'transform 0.28s ease' : 'none',
@@ -221,6 +222,7 @@ export function LeaderboardScreen({ totalScore, endWorld, cleared, difficulty, p
       >
         <div style={{
           display: 'flex',
+          direction: 'ltr',
           gap: GAP,
           transform: `translateX(${trackX}px)`,
           transition: animated ? 'transform 0.3s ease' : 'none',
@@ -229,7 +231,7 @@ export function LeaderboardScreen({ totalScore, endWorld, cleared, difficulty, p
           {DIFFS.map((d) => {
             const scores = displayScores[d]
             return (
-              <div key={d} style={{ width: cardWidth, flexShrink: 0, display: 'flex', flexDirection: 'column' }}>
+              <div key={d} dir={isRtl ? 'rtl' : 'ltr'} style={{ width: cardWidth, flexShrink: 0, display: 'flex', flexDirection: 'column' }}>
                 {/* Score rows */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                   {Array.from({ length: 3 }, (_, i) => {
@@ -238,7 +240,7 @@ export function LeaderboardScreen({ totalScore, endWorld, cleared, difficulty, p
                     return (
                       <motion.div
                         key={i}
-                        initial={{ opacity: 0, x: -18 }}
+                        initial={{ opacity: 0, x: isRtl ? 18 : -18 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: 0.18 + i * 0.04 }}
                         style={{
@@ -271,7 +273,7 @@ export function LeaderboardScreen({ totalScore, endWorld, cleared, difficulty, p
                                 {entry.name}
                                 {isNew && (
                                   <span style={{
-                                    marginLeft: 8, fontSize: 9, fontWeight: 900, letterSpacing: '0.12em',
+                                    marginInlineStart: 8, fontSize: 9, fontWeight: 900, letterSpacing: '0.12em',
                                     background: '#fbbf24', color: '#000',
                                     borderRadius: 4, padding: '1px 5px', verticalAlign: 'middle',
                                   }}>

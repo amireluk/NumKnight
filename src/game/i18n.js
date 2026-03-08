@@ -47,6 +47,7 @@ export const T = {
     seeScores: 'SEE SCORES',
 
     // LeaderboardScreen
+    hallOfFameTitle: 'HALL OF FAME',
     kingdomRecords: 'Kingdom Records',
     leaderboard: 'Leaderboard',
     yourScore: 'YOUR SCORE',
@@ -116,6 +117,7 @@ export const T = {
     seeScores: 'צפה בשיאים',
 
     // LeaderboardScreen
+    hallOfFameTitle: 'היכל התהילה',
     kingdomRecords: 'שיאי הממלכה',
     leaderboard: 'טבלת שיאים',
     yourScore: 'הניקוד שלך',

@@ -30,11 +30,12 @@ export function ParticleBurst({
   spread = 110,
   gravity = 50,
   baseDelay = 0,
+  fixed = false,
 }) {
   const [particles] = useState(() => generate(count, colors, spread, gravity))
 
   return (
-    <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 40, overflow: 'visible' }}>
+    <div style={{ position: fixed ? 'fixed' : 'absolute', inset: 0, pointerEvents: 'none', zIndex: 40, overflow: 'visible' }}>
       {particles.map(p => (
         <motion.div
           key={p.id}
