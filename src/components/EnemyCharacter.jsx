@@ -620,7 +620,7 @@ const ENEMIES = {
 // ─────────────────────────────────────────────
 // Animated enemy wrapper (shared for all)
 // ─────────────────────────────────────────────
-export function EnemyCharacter({ phase, enemy, hitKey }) {
+export function EnemyCharacter({ phase, enemy, hitKey, raging = false }) {
   const cfg = ENEMIES[enemy.id] ?? ENEMIES.goblin
   const { Body, Weapon, splashColor, pivotX, pivotY } = cfg
 
@@ -661,11 +661,13 @@ export function EnemyCharacter({ phase, enemy, hitKey }) {
     }
   }, [hitKey, moveControls, weaponControls])
 
-  // Idle variety — random actions every 4–7s during idle
+  // Idle variety — random actions every 4–7s during idle (2–3.5s when raging)
   useEffect(() => {
     if (idleTimerRef.current) clearTimeout(idleTimerRef.current)
     if (phase !== 'idle') return
     const schedule = () => {
+      const minDelay = raging ? 2000 : 4000
+      const randExtra = raging ? 1500 : 3000
       idleTimerRef.current = setTimeout(() => {
         const action = Math.floor(Math.random() * 3)
         if (action === 0) {
@@ -676,11 +678,11 @@ export function EnemyCharacter({ phase, enemy, hitKey }) {
           idleControls.start({ x: [0, 4, -4, 0], transition: { duration: 0.6, ease: 'easeInOut' } })
         }
         schedule()
-      }, 4000 + Math.random() * 3000)
+      }, minDelay + Math.random() * randExtra)
     }
     schedule()
     return () => clearTimeout(idleTimerRef.current)
-  }, [phase]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [phase, raging]) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div className="relative flex flex-col items-center">
@@ -688,7 +690,7 @@ export function EnemyCharacter({ phase, enemy, hitKey }) {
         animate={phase === 'idle' ? { y: [0, -2, 0] } : { y: 0 }}
         transition={
           phase === 'idle'
-            ? { duration: 3.4, repeat: Infinity, ease: 'easeInOut', delay: 0.4 }
+            ? { duration: raging ? 1.8 : 3.4, repeat: Infinity, ease: 'easeInOut', delay: 0.4 }
             : { duration: 0.2 }
         }
       >
