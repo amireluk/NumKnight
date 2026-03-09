@@ -5,9 +5,8 @@ import { useState, useEffect, useRef } from 'react'
 import { motion, useAnimation, AnimatePresence } from 'framer-motion'
 import { makeRound, getTrophy } from '../game/battleLogic'
 import { playCorrect, playWrong, playSwordSwing, playImpact, playVictory, playDefeat,
-  playShieldCrack, playShieldShatter, playShieldRestore,
-  playTimerTick, playTimerExpiry, playTrophyReveal } from '../game/sounds'
-import { MuteButton } from '../components/MuteButton'
+  playShieldCrack, playShieldRestore,
+  playTimerTick, playTimerExpiry } from '../game/sounds'
 import { HPBar } from '../components/HPBar'
 import { KnightCharacter } from '../components/KnightCharacter'
 import { EnemyCharacter } from '../components/EnemyCharacter'
@@ -101,8 +100,6 @@ function TrophyOverlay({ trophy, timeBonus, onContinue, t }) {
   const TROPHY_LABEL = t?.trophyLabel ?? TROPHY_LABEL_DEFAULT
   const BASE_SCORE = { gold: 100, silver: 50, bronze: 25 }
   const baseScore = BASE_SCORE[trophy] ?? 0
-
-  useEffect(() => { playTrophyReveal(trophy) }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <motion.div
@@ -256,27 +253,43 @@ function BossShieldBar({ streak }) {
 }
 
 // "DRAGON ENRAGED!" banner shown when HP drops to ≤ 2
-function RageBanner() {
+// Rocks that fall from the ceiling when the dragon enters rage phase
+const ROCK_SHAPES = [
+  'M0,0 L12,2 L14,14 L2,16 Z',
+  'M0,4 L8,0 L16,6 L10,14 L2,12 Z',
+  'M0,6 L6,0 L14,4 L12,14 L4,14 Z',
+  'M2,0 L10,0 L14,8 L8,14 L0,10 Z',
+  'M0,2 L10,0 L12,10 L4,14 L0,8 Z',
+]
+function FallingRocks() {
+  const rocks = Array.from({ length: 14 }, (_, i) => ({
+    id: i,
+    x: 4 + (i * 7.1) % 92,           // spread across width %
+    delay: (i * 0.13) % 1.2,
+    duration: 1.1 + (i * 0.07) % 0.7,
+    size: 10 + (i * 3) % 12,
+    shape: ROCK_SHAPES[i % ROCK_SHAPES.length],
+    rotate: (i * 47) % 360,
+    rotateEnd: ((i * 47) + 90 + (i % 2 === 0 ? 1 : -1) * 120) % 360,
+  }))
   return (
-    <motion.div
-      initial={{ opacity: 0, y: -10, scale: 0.88 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      exit={{ opacity: 0, y: -14, scale: 0.92 }}
-      transition={{ duration: 0.3, ease: 'easeOut' }}
-      style={{
-        position: 'absolute', top: '42%', left: 0, right: 0,
-        display: 'flex', flexDirection: 'column', alignItems: 'center',
-        pointerEvents: 'none', zIndex: 15,
-      }}
-    >
-      <span style={{
-        fontSize: 22, fontWeight: 900, letterSpacing: '0.14em',
-        color: '#f87171',
-        textShadow: '0 0 22px rgba(248,113,113,0.9), 0 2px 0 rgba(0,0,0,0.7)',
-      }}>
-        DRAGON ENRAGED!
-      </span>
-    </motion.div>
+    <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 13, overflow: 'hidden' }}>
+      {rocks.map((r) => (
+        <motion.svg
+          key={r.id}
+          viewBox="0 0 16 16"
+          width={r.size}
+          height={r.size}
+          initial={{ y: -r.size - 10, x: `${r.x}vw`, rotate: r.rotate, opacity: 0.85 }}
+          animate={{ y: '110vh', rotate: r.rotateEnd, opacity: [0.85, 0.85, 0] }}
+          transition={{ delay: r.delay, duration: r.duration, ease: 'easeIn', repeat: Infinity, repeatDelay: 1.2 + (r.id * 0.08) % 0.8 }}
+          style={{ position: 'absolute', top: 0 }}
+        >
+          <path d={r.shape} fill="#78716c" stroke="#44403c" strokeWidth="1" />
+          <path d={r.shape} fill="rgba(255,255,255,0.08)" stroke="none" />
+        </motion.svg>
+      ))}
+    </div>
   )
 }
 
@@ -311,14 +324,10 @@ export function BattleScreen({ world, battleIndex, onBattleEnd, lang, t }) {
   const [enemyHitKey,  setEnemyHitKey]  = useState(0)
   const [playerHitKey, setPlayerHitKey] = useState(0)
   const [introPlaying, setIntroPlaying] = useState(true)
-  const [bossIntroActive, setBossIntroActive] = useState(false)
-
   // Rage phase
   const [raging, setRaging] = useState(false)
   const ragingRef = useRef(false)
   ragingRef.current = raging
-  const [rageBanner, setRageBanner] = useState(false)
-  const rageBannerTimer = useRef(null)
   const [ragePulseKey, setRagePulseKey] = useState(0)
   const ragePulseTimer = useRef(null)
 
@@ -349,19 +358,12 @@ export function BattleScreen({ world, battleIndex, onBattleEnd, lang, t }) {
     shieldBannerTimer.current = setTimeout(() => setShieldBanner(false), 1000)
   }
 
-  // Boss intro overlay shown after regular intro finishes
-  useEffect(() => {
-    if (introPlaying || !isBoss) return
-    setBossIntroActive(true)
-  }, [introPlaying]) // eslint-disable-line react-hooks/exhaustive-deps
-
-  // Fire shield-up animation once boss intro ends (or immediately for non-boss)
+  // Fire shield-up animation once regular intro ends
   useEffect(() => {
     if (!isBoss || introPlaying) return
-    if (bossIntroActive) return
     const t = setTimeout(triggerShieldUp, 350)
     return () => clearTimeout(t)
-  }, [bossIntroActive]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [introPlaying]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Rage pulse — pulses dark red overlay every 2s while raging
   useEffect(() => {
@@ -383,9 +385,9 @@ export function BattleScreen({ world, battleIndex, onBattleEnd, lang, t }) {
     return () => clearTimeout(t)
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Countdown timer — resets each round once intro (and boss intro) is done
+  // Countdown timer — resets each round once intro is done
   useEffect(() => {
-    if (!world.timer || introPlaying || bossIntroActive) return
+    if (!world.timer || introPlaying) return
     setTimeLeft(world.timer)
     setTimedOut(false)
 
@@ -401,7 +403,7 @@ export function BattleScreen({ world, battleIndex, onBattleEnd, lang, t }) {
     }, 1000)
 
     return () => { timerActiveRef.current = false; clearInterval(id) }
-  }, [round, introPlaying, bossIntroActive]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [round, introPlaying]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Timer expiry → wrong answer
   useEffect(() => {
@@ -483,11 +485,11 @@ export function BattleScreen({ world, battleIndex, onBattleEnd, lang, t }) {
 
         if (shieldStreak === 1) {
           // Hit 2: pip falls — trigger fall anim immediately, then state update
-          playShieldShatter()
           const pip = world.enemy.hp - enemyHP   // current top filled pip index
           setShieldFallPip(pip)
           setShieldFallKey((k) => k + 1)
           setTimeout(() => {
+            playShieldCrack()
             setShieldStreak(2)
             setShieldState('broken')
             setEnemyHitKey((k) => k + 1)
@@ -507,9 +509,6 @@ export function BattleScreen({ world, battleIndex, onBattleEnd, lang, t }) {
           // Trigger rage phase when HP first drops to ≤ 2
           if (newEnemyHP > 0 && newEnemyHP <= 2 && !ragingRef.current) {
             setRaging(true)
-            if (rageBannerTimer.current) clearTimeout(rageBannerTimer.current)
-            setRageBanner(true)
-            rageBannerTimer.current = setTimeout(() => setRageBanner(false), 2000)
           }
           if (newEnemyHP > 0) {
             setTimeout(() => { setShieldState('full'); triggerShieldUp() }, 650)
@@ -580,7 +579,7 @@ export function BattleScreen({ world, battleIndex, onBattleEnd, lang, t }) {
     }
   }
 
-  const isActive = phase !== 'won' && phase !== 'lost' && !bossIntroActive
+  const isActive = phase !== 'won' && phase !== 'lost'
 
   return (
     <motion.div
@@ -631,10 +630,8 @@ export function BattleScreen({ world, battleIndex, onBattleEnd, lang, t }) {
             {shieldBanner && <ShieldUpBanner key={shieldFlashKey} t={t} />}
           </AnimatePresence>
 
-          {/* Rage banner */}
-          <AnimatePresence>
-            {rageBanner && <RageBanner key="rage-banner" />}
-          </AnimatePresence>
+          {/* Falling rocks when dragon enrages */}
+          {raging && <FallingRocks />}
 
           <div className="flex flex-1 items-end gap-3 px-2" style={{ position: 'relative', zIndex: 1 }}>
             {/* Player HP */}
@@ -691,7 +688,7 @@ export function BattleScreen({ world, battleIndex, onBattleEnd, lang, t }) {
               </div>
             </div>
 
-            {/* Enemy HP + boss shield bar */}
+            {/* Enemy HP bar */}
             <motion.div
               initial={{ y: -60, opacity: 0 }}
               animate={introPlaying ? {} : { y: 0, opacity: 1 }}
@@ -699,7 +696,6 @@ export function BattleScreen({ world, battleIndex, onBattleEnd, lang, t }) {
               className="mb-6"
               style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}
             >
-              {isBoss && <BossShieldBar streak={shieldStreak} />}
               <HPBar current={enemyHP} max={world.enemy.hp} color="red" shieldState={shieldState} shieldFlashKey={shieldFlashKey} shieldFallKey={shieldFallKey} shieldFallPip={shieldFallPip} />
             </motion.div>
           </div>
@@ -765,16 +761,8 @@ export function BattleScreen({ world, battleIndex, onBattleEnd, lang, t }) {
         />
       )}
 
-      {/* Mute toggle */}
-      <MuteButton />
-
       {/* Intro overlay */}
       {introPlaying && <BattleIntro onComplete={() => setIntroPlaying(false)} battleIndex={battleIndex} totalBattles={world.battles} isFinal={battleIndex === world.battles - 1} t={t} />}
-
-      {/* Boss intro overlay — shown after regular intro, before first question */}
-      <AnimatePresence>
-        {bossIntroActive && <BossIntroOverlay key="boss-intro" onDone={() => setBossIntroActive(false)} />}
-      </AnimatePresence>
 
       {/* In-scene trophy overlay — dims arena and shows trophy drop */}
       {showTrophy && (

@@ -3,7 +3,6 @@ import { motion } from 'framer-motion'
 import { EnemyCharacter } from '../components/EnemyCharacter'
 import { KnightCharacter } from '../components/KnightCharacter'
 import { playMapTap, playMapLocked } from '../game/sounds'
-import { MuteButton } from '../components/MuteButton'
 
 function MedalBadge({ trophy, size = 30 }) {
   const c = {
@@ -454,9 +453,6 @@ export function WorldMapScreen({
       >
         ←
       </motion.button>
-
-      {/* Mute toggle */}
-      <MuteButton />
 
       {/* Header */}
       <motion.div
