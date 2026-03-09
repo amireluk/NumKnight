@@ -1,5 +1,5 @@
 import { motion, useAnimation, AnimatePresence } from 'framer-motion'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 // ─────────────────────────────────────────────
 // Shared hit-splash
@@ -626,6 +626,8 @@ export function EnemyCharacter({ phase, enemy, hitKey }) {
 
   const moveControls = useAnimation()
   const weaponControls = useAnimation()
+  const idleControls = useAnimation()
+  const idleTimerRef = useRef(null)
   const [splashKey, setSplashKey] = useState(null)
 
   // Enemy attacks — lunges left, weapon swings
@@ -659,6 +661,27 @@ export function EnemyCharacter({ phase, enemy, hitKey }) {
     }
   }, [hitKey, moveControls, weaponControls])
 
+  // Idle variety — random actions every 4–7s during idle
+  useEffect(() => {
+    if (idleTimerRef.current) clearTimeout(idleTimerRef.current)
+    if (phase !== 'idle') return
+    const schedule = () => {
+      idleTimerRef.current = setTimeout(() => {
+        const action = Math.floor(Math.random() * 3)
+        if (action === 0) {
+          idleControls.start({ y: [0, -6, 0], transition: { duration: 0.5, ease: 'easeInOut' } })
+        } else if (action === 1) {
+          weaponControls.start({ rotate: [0, -15, 0], transition: { duration: 0.4, ease: 'easeInOut' } })
+        } else {
+          idleControls.start({ x: [0, 4, -4, 0], transition: { duration: 0.6, ease: 'easeInOut' } })
+        }
+        schedule()
+      }, 4000 + Math.random() * 3000)
+    }
+    schedule()
+    return () => clearTimeout(idleTimerRef.current)
+  }, [phase]) // eslint-disable-line react-hooks/exhaustive-deps
+
   return (
     <div className="relative flex flex-col items-center">
       <motion.div
@@ -669,6 +692,7 @@ export function EnemyCharacter({ phase, enemy, hitKey }) {
             : { duration: 0.2 }
         }
       >
+        <motion.div animate={idleControls}>
         <motion.div animate={moveControls} style={{ transform: 'scaleX(-1)' }}>
           <div style={{ position: 'relative', width: 84, height: 112, overflow: 'visible' }}>
             <Body />
@@ -691,6 +715,7 @@ export function EnemyCharacter({ phase, enemy, hitKey }) {
               {splashKey !== null && <HitSplash key={splashKey} color={splashColor} />}
             </AnimatePresence>
           </div>
+        </motion.div>
         </motion.div>
       </motion.div>
     </div>

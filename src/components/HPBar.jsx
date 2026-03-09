@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion'
+import { useState, useEffect } from 'react'
 
 const PIP_H = 22
 const GAP   = 6
@@ -96,9 +97,17 @@ function ShieldFallOverlay({ pipIdx }) {
 // shieldFlashKey: increments on shield power-up
 // shieldFallKey:  increments on hit 2 → triggers fall animation
 // shieldFallPip:  pip index that falls (captured at trigger time)
-export function HPBar({ current, max, color = 'green', shieldState = null, shieldFlashKey = 0, shieldFallKey = 0, shieldFallPip = 0 }) {
+export function HPBar({ current, max, color = 'green', shieldState = null, shieldFlashKey = 0, shieldFallKey = 0, shieldFallPip = 0, damageFlashKey = 0 }) {
   const isGreen   = color === 'green'
   const topFilled = max - current
+
+  const [flashing, setFlashing] = useState(false)
+  useEffect(() => {
+    if (damageFlashKey === 0) return
+    setFlashing(true)
+    const t = setTimeout(() => setFlashing(false), 300)
+    return () => clearTimeout(t)
+  }, [damageFlashKey])
 
   return (
     <div className="flex flex-col justify-center gap-1.5" style={{ position: 'relative', overflow: 'visible' }}>
@@ -117,7 +126,7 @@ export function HPBar({ current, max, color = 'green', shieldState = null, shiel
           (shieldState === 'broken' && i > topFilled)
         )
 
-        const baseBg    = filled ? (isGreen ? '#22c55e' : '#ef4444') : '#1f2937'
+        const baseBg    = filled ? (isGreen ? (flashing ? '#ef4444' : '#22c55e') : '#ef4444') : '#1f2937'
         const borderCol = shielded ? '#60a5fa' : filled ? (isGreen ? '#4ade80' : '#f87171') : '#374151'
         const borderW   = shielded ? 2.5 : 1
         const shadow    = shielded

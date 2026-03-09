@@ -226,6 +226,9 @@ export function BattleScreen({ world, battleIndex, onBattleEnd, lang, t }) {
   const timeBonusAccRef = useRef(0) // accumulated per correct answer this battle
   const timerActiveRef  = useRef(false) // set false to stop timer on enemy/player death
 
+  // Screen flash on player hit
+  const [flashHitKey, setFlashHitKey] = useState(0)
+
   // Timer
   const [timeLeft,  setTimeLeft]  = useState(world.timer ?? null)
   const [timedOut,  setTimedOut]  = useState(false)
@@ -298,6 +301,7 @@ export function BattleScreen({ world, battleIndex, onBattleEnd, lang, t }) {
     setTimeout(() => {
       playImpact()
       setPlayerHitKey((k) => k + 1)
+      setFlashHitKey((k) => k + 1)
       shakeControls.start({ x: [0, -12, 11, -8, 7, -4, 3, 0], transition: { duration: 0.5 } })
       const newPlayerHP = Math.max(0, playerHPRef.current - (world.enemyDamage ?? 1))
       setPlayerHP(newPlayerHP)
@@ -426,6 +430,7 @@ export function BattleScreen({ world, battleIndex, onBattleEnd, lang, t }) {
       setTimeout(() => {
         playImpact()
         setPlayerHitKey((k) => k + 1)
+        setFlashHitKey((k) => k + 1)
         shakeControls.start({ x: [0, -12, 11, -8, 7, -4, 3, 0], transition: { duration: 0.5 } })
         const newPlayerHP = Math.max(0, playerHP - (world.enemyDamage ?? 1))
         setPlayerHP(newPlayerHP)
@@ -501,7 +506,7 @@ export function BattleScreen({ world, battleIndex, onBattleEnd, lang, t }) {
               transition={{ duration: 0.35 }}
               className="mb-6"
             >
-              <HPBar current={playerHP} max={PLAYER_HP} color="green" />
+              <HPBar current={playerHP} max={PLAYER_HP} color="green" damageFlashKey={flashHitKey} />
             </motion.div>
 
             {/* Characters */}
@@ -597,6 +602,17 @@ export function BattleScreen({ world, battleIndex, onBattleEnd, lang, t }) {
           ))}
         </div>
       </div>
+
+      {/* Red screen flash on player hit */}
+      {flashHitKey > 0 && (
+        <motion.div
+          key={flashHitKey}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: [0, 0.35, 0] }}
+          transition={{ duration: 0.3 }}
+          style={{ position: 'absolute', inset: 0, background: 'red', pointerEvents: 'none', zIndex: 15 }}
+        />
+      )}
 
       {/* Intro overlay */}
       {introPlaying && <BattleIntro onComplete={() => setIntroPlaying(false)} battleIndex={battleIndex} totalBattles={world.battles} isFinal={battleIndex === world.battles - 1} t={t} />}
