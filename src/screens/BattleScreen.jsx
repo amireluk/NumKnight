@@ -4,7 +4,10 @@ const APP_VERSION = typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : '
 import { useState, useEffect, useRef } from 'react'
 import { motion, useAnimation, AnimatePresence } from 'framer-motion'
 import { makeRound, getTrophy } from '../game/battleLogic'
-import { playCorrect, playWrong, playSwordSwing, playImpact, playVictory, playDefeat } from '../game/sounds'
+import { playCorrect, playWrong, playSwordSwing, playImpact, playVictory, playDefeat,
+  playShieldCrack, playShieldShatter, playShieldRestore,
+  playTimerTick, playTimerExpiry, playTrophyReveal } from '../game/sounds'
+import { MuteButton } from '../components/MuteButton'
 import { HPBar } from '../components/HPBar'
 import { KnightCharacter } from '../components/KnightCharacter'
 import { EnemyCharacter } from '../components/EnemyCharacter'
@@ -98,6 +101,9 @@ function TrophyOverlay({ trophy, timeBonus, onContinue, t }) {
   const TROPHY_LABEL = t?.trophyLabel ?? TROPHY_LABEL_DEFAULT
   const BASE_SCORE = { gold: 100, silver: 50, bronze: 25 }
   const baseScore = BASE_SCORE[trophy] ?? 0
+
+  useEffect(() => { playTrophyReveal(trophy) }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -388,7 +394,9 @@ export function BattleScreen({ world, battleIndex, onBattleEnd, lang, t }) {
       if (!timerActiveRef.current) { clearInterval(id); return }
       setTimeLeft((t) => {
         if (t <= 1) { setTimedOut(true); clearInterval(id); return 0 }
-        return t - 1
+        const next = t - 1
+        if (next <= 5) playTimerTick()
+        return next
       })
     }, 1000)
 
@@ -400,6 +408,7 @@ export function BattleScreen({ world, battleIndex, onBattleEnd, lang, t }) {
     if (!timedOut || phaseRef.current !== 'idle') return
     setTimedOut(false)
     setButtonStates(round.options.map((opt) => (opt === round.problem.answer ? 'correct' : 'idle')))
+    playTimerExpiry()
     playWrong()
     const newMistakes = mistakesRef.current + 1
     setMistakes(newMistakes)
@@ -410,7 +419,7 @@ export function BattleScreen({ world, battleIndex, onBattleEnd, lang, t }) {
       const wasCracked = shieldStreakRef.current > 0
       setShieldStreak(0)
       setShieldState('full')
-      if (wasCracked) triggerShieldUp()
+      if (wasCracked) { playShieldRestore(); triggerShieldUp() }
     }
 
     setTimeout(() => {
@@ -463,6 +472,7 @@ export function BattleScreen({ world, battleIndex, onBattleEnd, lang, t }) {
         if (shieldStreak === 0) {
           // Hit 1: crack line appears on top pip, no HP damage
           setTimeout(() => {
+            playShieldCrack()
             setShieldStreak(1)
             setShieldState('cracked')
             setEnemyHitKey((k) => k + 1)
@@ -473,6 +483,7 @@ export function BattleScreen({ world, battleIndex, onBattleEnd, lang, t }) {
 
         if (shieldStreak === 1) {
           // Hit 2: pip falls — trigger fall anim immediately, then state update
+          playShieldShatter()
           const pip = world.enemy.hp - enemyHP   // current top filled pip index
           setShieldFallPip(pip)
           setShieldFallKey((k) => k + 1)
@@ -546,7 +557,7 @@ export function BattleScreen({ world, battleIndex, onBattleEnd, lang, t }) {
         const wasCracked = shieldStreakRef.current > 0
         setShieldStreak(0)
         setShieldState('full')
-        if (wasCracked) triggerShieldUp()
+        if (wasCracked) { playShieldRestore(); triggerShieldUp() }
       }
 
       setTimeout(() => {
@@ -753,6 +764,9 @@ export function BattleScreen({ world, battleIndex, onBattleEnd, lang, t }) {
           style={{ position: 'absolute', inset: 0, background: 'red', pointerEvents: 'none', zIndex: 15 }}
         />
       )}
+
+      {/* Mute toggle */}
+      <MuteButton />
 
       {/* Intro overlay */}
       {introPlaying && <BattleIntro onComplete={() => setIntroPlaying(false)} battleIndex={battleIndex} totalBattles={world.battles} isFinal={battleIndex === world.battles - 1} t={t} />}

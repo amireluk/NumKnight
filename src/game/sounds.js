@@ -1,5 +1,15 @@
 let audioCtx = null
 
+const MUTE_KEY = 'numknight_mute'
+
+export function isMuted() {
+  return localStorage.getItem(MUTE_KEY) === 'true'
+}
+
+export function toggleMute() {
+  localStorage.setItem(MUTE_KEY, isMuted() ? 'false' : 'true')
+}
+
 function getCtx() {
   if (!audioCtx) audioCtx = new AudioContext()
   if (audioCtx.state === 'suspended') audioCtx.resume()
@@ -34,6 +44,7 @@ function sweep(ctx, freqStart, freqEnd, type, startTime, duration, volume = 0.2)
 }
 
 export function playCorrect() {
+  if (isMuted()) return
   const ctx = getCtx()
   const t = ctx.currentTime
   tone(ctx, 523, 'sine', t, 0.12, 0.2)
@@ -41,6 +52,7 @@ export function playCorrect() {
 }
 
 export function playWrong() {
+  if (isMuted()) return
   const ctx = getCtx()
   const t = ctx.currentTime
   tone(ctx, 220, 'sawtooth', t, 0.08, 0.12)
@@ -48,18 +60,21 @@ export function playWrong() {
 }
 
 export function playSwordSwing() {
+  if (isMuted()) return
   const ctx = getCtx()
   const t = ctx.currentTime
   sweep(ctx, 700, 100, 'sawtooth', t, 0.22, 0.15)
 }
 
 export function playImpact() {
+  if (isMuted()) return
   const ctx = getCtx()
   const t = ctx.currentTime
   sweep(ctx, 180, 35, 'sine', t, 0.18, 0.45)
 }
 
 export function playPowerStrike() {
+  if (isMuted()) return
   const ctx = getCtx()
   const t = ctx.currentTime
   sweep(ctx, 1000, 60, 'sawtooth', t, 0.3, 0.18)
@@ -67,6 +82,7 @@ export function playPowerStrike() {
 }
 
 export function playVictory() {
+  if (isMuted()) return
   const ctx = getCtx()
   const t = ctx.currentTime
   ;[523, 659, 784, 1047].forEach((freq, i) => {
@@ -75,9 +91,86 @@ export function playVictory() {
 }
 
 export function playDefeat() {
+  if (isMuted()) return
   const ctx = getCtx()
   const t = ctx.currentTime
   ;[392, 349, 311, 262].forEach((freq, i) => {
     tone(ctx, freq, 'sine', t + i * 0.22, 0.3, 0.18)
   })
+}
+
+// ── Boss shield sounds ─────────────────────────────────────────────────────────
+
+export function playShieldCrack() {
+  if (isMuted()) return
+  const ctx = getCtx()
+  const t = ctx.currentTime
+  sweep(ctx, 800, 1400, 'sine', t, 0.15, 0.3)
+}
+
+export function playShieldShatter() {
+  if (isMuted()) return
+  const ctx = getCtx()
+  const t = ctx.currentTime
+  tone(ctx, 400, 'sawtooth', t, 0.3, 0.35)
+  tone(ctx, 600, 'square',   t, 0.3, 0.18)
+}
+
+export function playShieldRestore() {
+  if (isMuted()) return
+  const ctx = getCtx()
+  const t = ctx.currentTime
+  sweep(ctx, 300, 620, 'sine', t, 0.4, 0.2)
+}
+
+// ── Timer sounds ───────────────────────────────────────────────────────────────
+
+export function playTimerTick() {
+  if (isMuted()) return
+  const ctx = getCtx()
+  const t = ctx.currentTime
+  tone(ctx, 1000, 'sine', t, 0.05, 0.15)
+}
+
+export function playTimerExpiry() {
+  if (isMuted()) return
+  const ctx = getCtx()
+  const t = ctx.currentTime
+  tone(ctx, 200, 'sawtooth', t, 0.4, 0.45)
+}
+
+// ── Trophy / area clear sounds ─────────────────────────────────────────────────
+
+// grade: 'gold' (3 notes) | 'silver' (2 notes) | 'bronze' (1 note)
+export function playTrophyReveal(grade = 'bronze') {
+  if (isMuted()) return
+  const ctx = getCtx()
+  const t = ctx.currentTime
+  const notes = grade === 'gold' ? [523, 659, 784] : grade === 'silver' ? [523, 659] : [523]
+  notes.forEach((freq, i) => tone(ctx, freq, 'sine', t + i * 0.1, 0.22, 0.25))
+}
+
+export function playAreaCleared() {
+  if (isMuted()) return
+  const ctx = getCtx()
+  const t = ctx.currentTime
+  ;[523, 659, 784, 1047].forEach((freq, i) => {
+    tone(ctx, freq, 'sine', t + i * 0.18, 0.3, 0.25)
+  })
+}
+
+// ── World map sounds ───────────────────────────────────────────────────────────
+
+export function playMapTap() {
+  if (isMuted()) return
+  const ctx = getCtx()
+  const t = ctx.currentTime
+  tone(ctx, 150, 'sine', t, 0.08, 0.3)
+}
+
+export function playMapLocked() {
+  if (isMuted()) return
+  const ctx = getCtx()
+  const t = ctx.currentTime
+  sweep(ctx, 100, 70, 'sine', t, 0.12, 0.25)
 }

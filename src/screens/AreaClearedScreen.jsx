@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { motion, useAnimation } from 'framer-motion'
 import { ParticleBurst } from '../components/ParticleBurst'
+import { playAreaCleared } from '../game/sounds'
 
 const TROPHY_COLOR = { gold: '#fbbf24', silver: '#c0c8d4', bronze: '#cd7c3a' }
 
@@ -249,6 +250,8 @@ export function AreaClearedScreen({ world, worldTrophies, worldScore, totalScore
   const cancelRef     = useRef([])
   const roundControls = useAnimation()
   const burstIntervalRef = useRef(null)
+
+  useEffect(() => { playAreaCleared() }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Derive best trophy for burst sizing
   const bestTrophy = worldTrophies.reduce((best, tr) =>

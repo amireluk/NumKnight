@@ -2,6 +2,8 @@ import { useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { EnemyCharacter } from '../components/EnemyCharacter'
 import { KnightCharacter } from '../components/KnightCharacter'
+import { playMapTap, playMapLocked } from '../game/sounds'
+import { MuteButton } from '../components/MuteButton'
 
 function MedalBadge({ trophy, size = 30 }) {
   const c = {
@@ -268,7 +270,10 @@ function RegionBand({ world, worldIndex, status, trophy, score, delay, onTap, is
       initial={{ opacity: 0, x: -28 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay, duration: 0.28 }}
-      onClick={isClickable ? () => onTap(worldIndex) : undefined}
+      onClick={() => {
+        if (isClickable) { playMapTap(); onTap(worldIndex) }
+        else if (isLocked) { playMapLocked() }
+      }}
       whileTap={isClickable ? { scale: 0.97 } : undefined}
       style={{
         position: 'relative',
@@ -449,6 +454,9 @@ export function WorldMapScreen({
       >
         ←
       </motion.button>
+
+      {/* Mute toggle */}
+      <MuteButton />
 
       {/* Header */}
       <motion.div
