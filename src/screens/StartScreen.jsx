@@ -5,6 +5,7 @@ import { KingdomBackground, KingdomForeground, StrollingKnight } from '../compon
 import { FlyingCreatures } from '../components/FlyingCreatures'
 import { CAMPAIGN } from '../game/campaign.config'
 import { isRunInProgress, hasSavedBattle } from '../game/runState'
+import { playMapTap } from '../game/sounds'
 
 const NAME_KEY    = 'numknight_player_name'
 const DIFF_KEY    = 'numknight_difficulty'
@@ -29,9 +30,13 @@ export function StartScreen({ onStart, onContinue, run, onViewLeaderboard, lang,
   const handleDifficulty = (val) => { setDifficulty(val); localStorage.setItem(DIFF_KEY, val) }
   const nameShake = useAnimation()
 
-  // Android back: inside newgame view → go back to home view
+  // Android back: newgame view → home; home → close/minimize app (no pushState on home)
   useEffect(() => {
-    window.history.pushState(null, '', window.location.href)
+    if (view === 'newgame') {
+      window.history.pushState(null, '', window.location.href)
+    }
+  }, [view])
+  useEffect(() => {
     const onPop = () => { setView('home') }
     window.addEventListener('popstate', onPop)
     return () => window.removeEventListener('popstate', onPop)
@@ -213,8 +218,9 @@ export function StartScreen({ onStart, onContinue, run, onViewLeaderboard, lang,
                   return (
                     <motion.button
                       key={val}
-                      onClick={() => handleDifficulty(val)}
-                      whileTap={{ scale: 0.94 }}
+                      onClick={() => { handleDifficulty(val); playMapTap() }}
+                      whileTap={{ scale: 0.92 }}
+                      whileHover={{ scale: 1.04 }}
                       style={{
                         flex: 1, padding: '11px 4px', borderRadius: 14,
                         border: `2px solid ${selected ? color : 'rgba(255,255,255,0.11)'}`,

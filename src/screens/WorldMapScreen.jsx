@@ -273,7 +273,8 @@ function RegionBand({ world, worldIndex, status, trophy, score, delay, onTap, is
         if (isClickable) { playMapTap(); onTap(worldIndex) }
         else if (isLocked) { playMapLocked() }
       }}
-      whileTap={isClickable ? { scale: 0.97 } : undefined}
+      whileTap={isClickable ? { scale: 0.95 } : undefined}
+      whileHover={isClickable ? { scale: 1.02 } : undefined}
       style={{
         position: 'relative',
         flex: 1,

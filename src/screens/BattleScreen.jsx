@@ -381,6 +381,14 @@ export function BattleScreen({ world, worldIndex, battleIndex, onBattleEnd, onQu
     return () => clearTimeout(ragePulseTimer.current)
   }, [raging])
 
+  // Android back button → same as ✕ quit
+  useEffect(() => {
+    window.history.pushState(null, '', window.location.href)
+    const onPop = () => { onQuit?.() }
+    window.addEventListener('popstate', onPop)
+    return () => window.removeEventListener('popstate', onPop)
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
   // Landing shake — only on the very first encounter of a world
   useEffect(() => {
     if (battleIndex !== 0) return
