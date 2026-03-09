@@ -1,137 +1,150 @@
 # NumKnight — Feature Roadmap
 
-> The original 4-phase plan has been superseded. This file now reflects the current 6-phase roadmap.
-> See [`PROGRESS.md`](./PROGRESS.md) for what is already done.
-> See [`CLAUDE.md`](./CLAUDE.md) for architecture details and the canonical roadmap description.
+> Phases 1–4 complete. Phase 6 and enemy/background visual overhaul are out of scope.
+> Boss work tracked in [PLAN_BOSS.md](./PLAN_BOSS.md).
+> Architecture details in [CLAUDE.md](./CLAUDE.md).
 
 ---
 
 ## Phase 1 — World Map Screen ✅ COMPLETE
-
-A vertical world map with 5 nodes shown between worlds.
-
-- World bands with icon + name + trophy indicator
-- Completed worlds show best trophy across their battles
-- Locked worlds are dimmed
-- Framer Motion staggered entrance and path draw
-- Screen state: `'map'` — inserted between `result` and `battle`
-
----
-
 ## Phase 2 — Per-World Backgrounds ✅ COMPLETE
-
-Each world has a visually distinct battle arena.
-
-| World | Sky | Special |
-|-------|-----|---------|
-| Forest | Blue → light blue | Sun, green hills |
-| Swamp | Purple-grey | Dim moon, dead trees |
-| Mountains | Cold grey-blue | Rocky peaks, snow |
-| Castle | Dark navy | Battlements, storm clouds |
-| Dragon Lair | Deep red | Volcanic rock, lava glow |
-
----
-
 ## Phase 3 — Scoring System ✅ COMPLETE
-
-```
-battleScore = basePoints × trophyMultiplier + timeBonus
-
-basePoints       = enemy.hp × 100
-trophyMultiplier = gold:3  silver:2  bronze:1
-timeBonus        = floor((timeLeft / world.timer) × 50)  [timed worlds only]
-```
-
-- Score tracked in `runState.totalScore` and per-world `runState.worldScores`
-- Battle score shown on result screen
-- Animated score transfer on Area Cleared screen
-
----
-
 ## Phase 4 — Local Leaderboard ✅ COMPLETE
-
-Top 3 runs per difficulty stored in `localStorage` (keys: `numknight_scores_easy/medium/hard`).
-
-```js
-{ name, score, date, endWorld, cleared, version }
-```
-
-- Victory → LeaderboardScreen with name entry
-- Death → ResultScreen → LeaderboardScreen
-- `cleared: true` shows "CONQUERED" for full-campaign wins
-- Scores persist across sessions
-- **Per-difficulty carousel** — swipe left/right (or tap arrows) to browse Easy / Medium / Hard ladders; adjacent panels peek from each side; circular (Easy ↔ Hard wraps); gradient fade on indicator edges
-- Newly submitted score highlighted with gold border + "NEW" badge
+## Phase 6 — Backend Leaderboard 🚫 OUT OF SCOPE
 
 ---
 
-## Phase 5 — Visual Polish ⏳ PENDING
+## Phase 5 — Visual Polish
 
-Priority list:
+### P5-A  Enemy death animation ⏳ PENDING
 
-1. **Enemy death animation** — rotate + fall off-screen when HP hits 0
-2. **Player death animation** — knight topples/falls on death
-3. **Screen flash on hit** — brief red overlay when player takes damage
-4. **Victory particle burst** — confetti/stars on gold trophy
-5. **Answer button shake** — wrong answer: button shakes left-right
-6. **HP bar animate** — smooth lerp + flash red on damage
-7. **Idle enemy variety** — occasional random actions during long idle
+**Trigger:** `phase === 'won'` fires in BattleScreen (after the last HP drops).
 
-### Technical notes
-- Enemy fall: add `'dying'` phase to `EnemyCharacter`, Framer Motion exit animation
-- Player fall: same in `KnightCharacter`
-- Screen flash: absolute overlay in `BattleScreen`, `AnimatePresence` + opacity keyframe
-- Particles: hand-rolled CSS/SVG burst, no library needed
+**What to build — `EnemyCharacter.jsx`:**
+- Add a `dying` prop (boolean). When `true`, run a Framer Motion animate sequence:
+  - `rotate: 90, y: 200, opacity: 0` over `duration: 0.6, ease: 'easeIn'`
+  - Use `animate` on the wrapper div; normal state is `{ rotate:0, y:0, opacity:1 }`
+- BattleScreen sets `enemyDying = true` the moment `enemyHP` reaches 0 (before transitioning phase).
+- Wait ~700 ms after setting `enemyDying`, then proceed to `phase = 'won'` as normal.
+- Shield (dragon) should also exit at the same time — set `shieldState = null` alongside `enemyDying`.
+
+**Files:** `src/components/EnemyCharacter.jsx`, `src/screens/BattleScreen.jsx`
 
 ---
 
-## Phase 6 — Backend Leaderboard ⏳ PENDING
+### P5-B  Player death animation ⏳ PENDING
 
-Global scores across devices using Supabase (free tier).
+**Trigger:** `playerHP` hits 0 in BattleScreen.
 
-### Schema
-```sql
-CREATE TABLE scores (
-  id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  name        text NOT NULL,
-  total_score integer NOT NULL,
-  worlds_cleared integer NOT NULL,
-  trophy_summary  text,
-  created_at  timestamptz DEFAULT now()
-);
-```
+**What to build — `KnightCharacter.jsx`:**
+- Add a `dying` prop (boolean). Animate: `rotate: -90, y: 200, opacity: 0` over `0.6s easeIn`.
+  - Knight falls to the left (negative rotate) since it faces right.
+- BattleScreen sets `knightDying = true` when `playerHP` reaches 0.
+- Wait ~700 ms, then transition to `phase = 'lost'` / `onBattleEnd` as normal.
 
-### App changes
-- `src/game/api.js` — `submitScore(entry)`, `fetchLeaderboard(limit=20)`
-- Leaderboard screen fetches global scores on mount; falls back to local if offline
-- Player name persisted in `localStorage` so they don't re-enter each run
-- Score recomputed server-side from submitted `battles[]` for basic anti-cheat
+**Files:** `src/components/KnightCharacter.jsx`, `src/screens/BattleScreen.jsx`
 
 ---
 
-## Suggested implementation order
+### P5-C  Screen flash on hit ⏳ PENDING
 
-```
-P5-E  Answer button shake       ← 30 min, big feel improvement
-P5-C  Screen flash on hit       ← 30 min, visceral damage feedback
-P5-A  Enemy death animation     ← 1–2 hrs, biggest wow moment
-P5-B  Player death animation    ← 30 min (reuses P5-A pattern)
-P5-F  HP bar smooth lerp        ← 30 min, easy win
-P5-D  Victory particle burst    ← 1 hr, great on gold trophy
-P5-G  Idle enemy variety        ← 1 hr, world feels alive
-Phase 6 (Backend)               ← biggest lift, do after all Phase 5
-```
+**Trigger:** Any time the player takes damage (wrong answer or timer expiry).
+
+**What to build — `BattleScreen.jsx`:**
+- Add a `flashHit` state (boolean, default false).
+- When player takes damage: `setFlashHit(true)`, then `setTimeout(() => setFlashHit(false), 300)`.
+- Render an absolute-positioned `div` covering the full arena, pointer-events none:
+  ```jsx
+  <motion.div
+    className="absolute inset-0 pointer-events-none z-50"
+    animate={{ opacity: flashHit ? [0, 0.35, 0] : 0 }}
+    transition={{ duration: 0.3 }}
+    style={{ background: 'red' }}
+  />
+  ```
+- Also flash for boss shield restore (same mechanism, same color).
+
+**Files:** `src/screens/BattleScreen.jsx`
+
+---
+
+### P5-D  Answer button shake ⏳ PENDING
+
+**Trigger:** Wrong answer selected.
+
+**What to build — `AnswerButton.jsx`:**
+- Track a `shaking` state in the parent (`BattleScreen`) or inside the button via a key trick.
+- On wrong answer, set the selected button's `shaking = true`; clear after 400 ms.
+- Framer Motion `animate` on the button wrapper:
+  ```js
+  shaking ? { x: [0, -8, 8, -6, 6, -4, 4, 0] } : { x: 0 }
+  transition: { duration: 0.4 }
+  ```
+- Only the selected wrong button shakes (not the correct-highlight button).
+- The `state` prop already tracks `'wrong'` — use that to drive the shake.
+
+**Files:** `src/components/AnswerButton.jsx`, `src/screens/BattleScreen.jsx`
+
+---
+
+### P5-E  HP bar smooth lerp ⏳ PENDING
+
+**Trigger:** Player or enemy HP changes.
+
+**What to build — `HPBar.jsx`:**
+- Replace instant width with a `motion.div` width transition:
+  ```jsx
+  <motion.div
+    className="h-full rounded-full"
+    animate={{ width: `${(hp / maxHp) * 100}%` }}
+    transition={{ duration: 0.3, ease: 'easeOut' }}
+    style={{ background: barColor }}
+  />
+  ```
+- On damage: flash the bar red briefly. Add a `flashing` state — `true` for 300 ms after hp drops. While `flashing`, override bar color to `#ef4444` (red-500), then back to normal.
+- Apply to both the player HP bar and the enemy HP bar.
+
+**Files:** `src/components/HPBar.jsx`
+
+---
+
+### P5-F  Idle enemy variety ⏳ PENDING
+
+**Trigger:** During idle phase when no answer is being processed.
+
+**What to build — `EnemyCharacter.jsx`:**
+- Every 4–7 seconds (random interval), trigger one of 3 random idle actions:
+  1. **Head bob** — `y: [0, -6, 0]` over 0.5s
+  2. **Weapon twitch** — weapon arm rotates briefly: `rotate: [0, -15, 0]` over 0.4s
+  3. **Body sway** — `x: [0, 4, -4, 0]` over 0.6s
+- Use a `useEffect` that sets a random timeout; on each fire, pick an action at random, animate it, then schedule the next one.
+- Only run during `phase === 'idle'` or `phase === 'question'` (not during `hit`, `dying`, `attack`, or `won`/`lost`).
+- Use a ref for the timeout so it clears on unmount.
+
+**Files:** `src/components/EnemyCharacter.jsx`
 
 ---
 
 ## Dragon Boss — see PLAN_BOSS.md
 
-All dragon boss work is tracked separately.
-→ **[PLAN_BOSS.md](./PLAN_BOSS.md)**
-
 ```
 Boss Phase 1  Shield mechanic (3-hit crack/fall/damage)  ✅ complete
 Boss Phase 2  Boss polish (intro banner, rage phase)      ⏳ pending
 Boss Phase 3  Audio cues (entire app)                     ⏳ pending
-Boss Phase 4  Visual overhaul (enemies + backgrounds)     ⏳ pending
+Boss Phase 4  Visual overhaul (enemies + backgrounds)     🚫 out of scope
+```
+
+---
+
+## Implementation order
+
+```
+P5-C  Screen flash on hit        ← 20 min, single file, no dependencies
+P5-D  Answer button shake        ← 20 min, AnswerButton.jsx only
+P5-E  HP bar smooth lerp         ← 20 min, HPBar.jsx only
+P5-A  Enemy death animation      ← 45 min, biggest wow moment
+P5-B  Player death animation     ← 20 min, reuses P5-A pattern
+P5-F  Idle enemy variety         ← 30 min, EnemyCharacter.jsx only
+Boss Phase 2  Boss polish        ← see PLAN_BOSS.md
+Boss Phase 3  Audio cues         ← see PLAN_BOSS.md
 ```
