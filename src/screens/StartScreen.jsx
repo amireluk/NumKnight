@@ -22,6 +22,10 @@ export function StartScreen({ onStart, onContinue, run, onViewLeaderboard, lang,
   const [name,       setName]       = useState(() => localStorage.getItem(NAME_KEY) ?? '')
   const [nameError,  setNameError]  = useState(false)
   const [difficulty, setDifficulty] = useState(() => localStorage.getItem(DIFF_KEY) ?? 'medium')
+
+  const savedWorld    = canContinue ? CAMPAIGN[difficulty]?.[run?.worldIndex] ?? null : null
+  const savedName     = localStorage.getItem(NAME_KEY) ?? ''
+  const savedDiffLabel = t?.diffLabel?.[difficulty] ?? difficulty
   const handleDifficulty = (val) => { setDifficulty(val); localStorage.setItem(DIFF_KEY, val) }
   const nameShake = useAnimation()
 
@@ -94,16 +98,27 @@ export function StartScreen({ onStart, onContinue, run, onViewLeaderboard, lang,
               </p>
             </div>
 
-            <motion.button
-              whileTap={canContinue ? { scale: 0.95 } : {}}
-              whileHover={canContinue ? { scale: 1.03 } : {}}
-              onClick={canContinue ? onContinue : undefined}
-              disabled={!canContinue}
-              className="w-full bg-yellow-400 border-b-4 border-yellow-600 text-black font-black text-2xl rounded-2xl h-16 shadow-xl tracking-widest"
-              style={{ opacity: canContinue ? 1 : 0.35, cursor: canContinue ? 'pointer' : 'default' }}
-            >
-              {t?.continueRun ?? 'CONTINUE'}
-            </motion.button>
+            {canContinue && (
+              <motion.button
+                whileTap={{ scale: 0.95 }}
+                whileHover={{ scale: 1.03 }}
+                onClick={onContinue}
+                className="w-full bg-yellow-400 border-b-4 border-yellow-600 text-black font-black text-2xl rounded-2xl h-16 shadow-xl cursor-pointer tracking-widest"
+                style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2 }}
+              >
+                <span style={{ lineHeight: 1 }}>{t?.continueRun ?? 'CONTINUE'}</span>
+                {savedWorld && (
+                  <span dir="ltr" style={{ fontSize: 11, fontWeight: 700, opacity: 0.60, letterSpacing: '0.05em', lineHeight: 1 }}>
+                    {[
+                      savedName,
+                      savedDiffLabel,
+                      t?.worldName?.[savedWorld.id] ?? savedWorld.name,
+                      savedWorld.battles > 1 ? `${run.battleIndex + 1}/${savedWorld.battles}` : null,
+                    ].filter(Boolean).join(' · ')}
+                  </span>
+                )}
+              </motion.button>
+            )}
 
             <motion.button
               whileTap={{ scale: 0.95 }} whileHover={{ scale: 1.03 }}

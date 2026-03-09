@@ -70,6 +70,7 @@ export const T = {
     playAgain: 'PLAY AGAIN',
     back: 'BACK',
     newGame: 'NEW GAME',
+    continueRun: 'CONTINUE',
 
     // World names (by id)
     worldName: {
@@ -150,6 +151,7 @@ export const T = {
     playAgain: 'שחק שוב',
     back: 'חזור',
     newGame: 'משחק חדש',
+    continueRun: 'המשך',
 
     // World names (by id)
     worldName: {

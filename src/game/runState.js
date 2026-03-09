@@ -54,8 +54,13 @@ export function loadBattleState(worldIndex, battleIndex) {
     if (!raw) return null
     const s = JSON.parse(raw)
     if (s.worldIndex !== worldIndex || s.battleIndex !== battleIndex) return null
+    // Sanity-check required fields — corrupted state starts fresh
+    if (typeof s.playerHP !== 'number' || typeof s.enemyHP !== 'number') return null
     return s
-  } catch { return null }
+  } catch {
+    clearBattleState()
+    return null
+  }
 }
 
 export function clearBattleState() {
