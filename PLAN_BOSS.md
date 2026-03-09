@@ -25,7 +25,7 @@ The dragon behaves differently from every other enemy. You cannot simply answer 
 
 ---
 
-## Boss Phase 2 — Boss Polish ⏳ PENDING
+## Boss Phase 2 — Boss Polish ✅ COMPLETE
 
 ### Boss-specific battle intro banner
 
@@ -65,7 +65,7 @@ The dragon behaves differently from every other enemy. You cannot simply answer 
 
 ---
 
-## Boss Phase 3 — Audio Cues (entire app) ⏳ PENDING
+## Boss Phase 3 — Audio Cues (entire app) ✅ COMPLETE
 
 All sounds use the Web Audio API pattern already established in `src/game/sounds.js`. No external files. Keep sounds short (< 1s). Classroom-safe — nothing jarring.
 

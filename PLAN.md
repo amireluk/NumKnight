@@ -14,9 +14,9 @@
 
 ---
 
-## Phase 5 — Visual Polish
+## Phase 5 — Visual Polish ✅ COMPLETE
 
-### P5-A  Enemy death animation ⏳ PENDING
+### P5-A  Enemy death animation ✅ COMPLETE
 
 **Trigger:** `phase === 'won'` fires in BattleScreen (after the last HP drops).
 
@@ -32,7 +32,7 @@
 
 ---
 
-### P5-B  Player death animation ⏳ PENDING
+### P5-B  Player death animation ✅ COMPLETE
 
 **Trigger:** `playerHP` hits 0 in BattleScreen.
 
@@ -46,7 +46,7 @@
 
 ---
 
-### P5-C  Screen flash on hit ⏳ PENDING
+### P5-C  Screen flash on hit ✅ COMPLETE
 
 **Trigger:** Any time the player takes damage (wrong answer or timer expiry).
 
@@ -68,7 +68,7 @@
 
 ---
 
-### P5-D  Answer button shake ⏳ PENDING
+### P5-D  Answer button shake ✅ COMPLETE
 
 **Trigger:** Wrong answer selected.
 
@@ -87,7 +87,7 @@
 
 ---
 
-### P5-E  HP bar smooth lerp ⏳ PENDING
+### P5-E  HP bar smooth lerp ✅ COMPLETE
 
 **Trigger:** Player or enemy HP changes.
 
@@ -108,7 +108,7 @@
 
 ---
 
-### P5-F  Idle enemy variety ⏳ PENDING
+### P5-F  Idle enemy variety ✅ COMPLETE
 
 **Trigger:** During idle phase when no answer is being processed.
 
@@ -129,22 +129,11 @@
 
 ```
 Boss Phase 1  Shield mechanic (3-hit crack/fall/damage)  ✅ complete
-Boss Phase 2  Boss polish (intro banner, rage phase)      ⏳ pending
-Boss Phase 3  Audio cues (entire app)                     ⏳ pending
+Boss Phase 2  Boss polish (intro banner, rage phase)      ✅ complete
+Boss Phase 3  Audio cues (entire app)                     ✅ complete
 Boss Phase 4  Visual overhaul (enemies + backgrounds)     🚫 out of scope
 ```
 
 ---
 
-## Implementation order
-
-```
-P5-C  Screen flash on hit        ← 20 min, single file, no dependencies
-P5-D  Answer button shake        ← 20 min, AnswerButton.jsx only
-P5-E  HP bar smooth lerp         ← 20 min, HPBar.jsx only
-P5-A  Enemy death animation      ← 45 min, biggest wow moment
-P5-B  Player death animation     ← 20 min, reuses P5-A pattern
-P5-F  Idle enemy variety         ← 30 min, EnemyCharacter.jsx only
-Boss Phase 2  Boss polish        ← see PLAN_BOSS.md
-Boss Phase 3  Audio cues         ← see PLAN_BOSS.md
-```
+## All phases complete. 🎉
