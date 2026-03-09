@@ -30,17 +30,14 @@ export function StartScreen({ onStart, onContinue, run, onViewLeaderboard, lang,
   const handleDifficulty = (val) => { setDifficulty(val); localStorage.setItem(DIFF_KEY, val) }
   const nameShake = useAnimation()
 
-  // Android back: newgame view → home; home → close/minimize app (no pushState on home)
+  // Android back: newgame view → home view; home view → no listener (back closes/minimizes app)
   useEffect(() => {
-    if (view === 'newgame') {
-      window.history.pushState(null, '', window.location.href)
-    }
-  }, [view])
-  useEffect(() => {
-    const onPop = () => { setView('home') }
+    if (view !== 'newgame') return
+    window.history.pushState(null, '', window.location.href)
+    const onPop = () => setView('home')
     window.addEventListener('popstate', onPop)
     return () => window.removeEventListener('popstate', onPop)
-  }, [])
+  }, [view])
 
   const handleStart = () => {
     const trimmed = name.trim().slice(0, 16)
