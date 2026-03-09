@@ -7,6 +7,7 @@ import { makeRound, getTrophy } from '../game/battleLogic'
 import { playCorrect, playWrong, playSwordSwing, playImpact, playVictory, playDefeat,
   playShieldCrack, playShieldRestore,
   playTimerTick, playTimerExpiry } from '../game/sounds'
+import { saveBattleState, loadBattleState, clearBattleState } from '../game/runState'
 import { HPBar } from '../components/HPBar'
 import { KnightCharacter } from '../components/KnightCharacter'
 import { EnemyCharacter } from '../components/EnemyCharacter'
@@ -293,20 +294,23 @@ function FallingRocks() {
   )
 }
 
-export function BattleScreen({ world, battleIndex, onBattleEnd, lang, t }) {
+export function BattleScreen({ world, worldIndex, battleIndex, onBattleEnd, onQuit, lang, t }) {
   const shakeControls = useAnimation()
 
   const PLAYER_HP = world.playerHP ?? DEFAULT_PLAYER_HP
   const isBoss = world.enemy.id === 'dragon'
 
-  const [playerHP,  setPlayerHP]  = useState(PLAYER_HP)
-  const [enemyHP,   setEnemyHP]   = useState(world.enemy.hp)
+  // Restore mid-battle state if the player closed the app during this exact battle
+  const [saved] = useState(() => loadBattleState(worldIndex, battleIndex))
+
+  const [playerHP,  setPlayerHP]  = useState(saved?.playerHP  ?? PLAYER_HP)
+  const [enemyHP,   setEnemyHP]   = useState(saved?.enemyHP   ?? world.enemy.hp)
 
   // Boss shield state
-  const [shieldStreak,  setShieldStreak]  = useState(0)
-  const shieldStreakRef = useRef(0)  // mirror for reading inside timeouts
-  const [shieldState,      setShieldState]      = useState(isBoss ? 'full' : null) // 'full'|'cracked'|null
-  const shieldStateRef = useRef(isBoss ? 'full' : null)
+  const [shieldStreak,  setShieldStreak]  = useState(saved?.shieldStreak ?? 0)
+  const shieldStreakRef = useRef(saved?.shieldStreak ?? 0)
+  const [shieldState,      setShieldState]      = useState(saved?.shieldState ?? (isBoss ? 'full' : null))
+  const shieldStateRef = useRef(saved?.shieldState ?? (isBoss ? 'full' : null))
   const [shieldFlashKey, setShieldFlashKey] = useState(0)
   const [shieldFallKey,  setShieldFallKey]  = useState(0)
   const [shieldFallPip,  setShieldFallPip]  = useState(0)
@@ -319,14 +323,14 @@ export function BattleScreen({ world, battleIndex, onBattleEnd, lang, t }) {
 
   const [round,     setRound]     = useState(() => makeRound(world.multipliers, world.factorRange))
   const [phase,     setPhase]     = useState('idle')
-  const [mistakes,  setMistakes]  = useState(0)
+  const [mistakes,  setMistakes]  = useState(saved?.mistakes ?? 0)
   const [buttonStates, setButtonStates] = useState(IDLE_BUTTON_STATES)
   const [enemyHitKey,  setEnemyHitKey]  = useState(0)
   const [playerHitKey, setPlayerHitKey] = useState(0)
-  const [introPlaying, setIntroPlaying] = useState(true)
+  const [introPlaying, setIntroPlaying] = useState(saved ? false : true)
   // Rage phase
-  const [raging, setRaging] = useState(false)
-  const ragingRef = useRef(false)
+  const [raging, setRaging] = useState(saved?.raging ?? false)
+  const ragingRef = useRef(saved?.raging ?? false)
   ragingRef.current = raging
   const [ragePulseKey, setRagePulseKey] = useState(0)
   const ragePulseTimer = useRef(null)
@@ -335,13 +339,14 @@ export function BattleScreen({ world, battleIndex, onBattleEnd, lang, t }) {
   const [showTrophy,  setShowTrophy]  = useState(false)
   const wonMistakesRef  = useRef(0)
   const wonTimeBonusRef = useRef(0)
-  const timeBonusAccRef = useRef(0) // accumulated per correct answer this battle
+  const timeBonusAccRef = useRef(saved?.timeBonusAcc ?? 0) // accumulated per correct answer this battle
   const timerActiveRef  = useRef(false) // set false to stop timer on enemy/player death
 
   // Screen flash on player hit
   const [flashHitKey, setFlashHitKey] = useState(0)
 
-  // Timer
+  // Timer — on resume, first question gets saved time + 1s bonus
+  const resumeTimeLeft = useRef(saved?.timeLeft != null ? Math.min(saved.timeLeft + 1, world.timer ?? Infinity) : null)
   const [timeLeft,  setTimeLeft]  = useState(world.timer ?? null)
   const [timedOut,  setTimedOut]  = useState(false)
 
@@ -388,7 +393,9 @@ export function BattleScreen({ world, battleIndex, onBattleEnd, lang, t }) {
   // Countdown timer — resets each round once intro is done
   useEffect(() => {
     if (!world.timer || introPlaying) return
-    setTimeLeft(world.timer)
+    const startTime = resumeTimeLeft.current ?? world.timer
+    resumeTimeLeft.current = null  // only applies to the first round after resume
+    setTimeLeft(startTime)
     setTimedOut(false)
 
     timerActiveRef.current = true
@@ -404,6 +411,19 @@ export function BattleScreen({ world, battleIndex, onBattleEnd, lang, t }) {
 
     return () => { timerActiveRef.current = false; clearInterval(id) }
   }, [round, introPlaying]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Persist mid-battle state so OS-kill or deliberate quit can be resumed
+  useEffect(() => {
+    if (introPlaying) return
+    saveBattleState({
+      worldIndex, battleIndex,
+      playerHP, enemyHP, mistakes,
+      timeLeft,
+      shieldStreak, shieldState,
+      raging,
+      timeBonusAcc: timeBonusAccRef.current,
+    })
+  }, [playerHP, enemyHP, mistakes, timeLeft, shieldStreak, shieldState, raging]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Timer expiry → wrong answer
   useEffect(() => {
@@ -434,6 +454,7 @@ export function BattleScreen({ world, battleIndex, onBattleEnd, lang, t }) {
 
       if (newPlayerHP <= 0) {
         timerActiveRef.current = false
+        clearBattleState()
         setPhase('lost')
         playDefeat()
         setTimeout(() => onBattleEnd({ won: false, mistakes: newMistakes }), 1100)
@@ -515,6 +536,7 @@ export function BattleScreen({ world, battleIndex, onBattleEnd, lang, t }) {
           }
           if (newEnemyHP <= 0) {
             timerActiveRef.current = false
+            clearBattleState()
             setPhase('won')
             playVictory()
             wonMistakesRef.current = mistakes
@@ -535,6 +557,7 @@ export function BattleScreen({ world, battleIndex, onBattleEnd, lang, t }) {
         setEnemyHP(newEnemyHP)
         if (newEnemyHP <= 0) {
           timerActiveRef.current = false
+          clearBattleState()
           setPhase('won')
           playVictory()
           wonMistakesRef.current = mistakes
@@ -569,6 +592,7 @@ export function BattleScreen({ world, battleIndex, onBattleEnd, lang, t }) {
 
         if (newPlayerHP <= 0) {
           timerActiveRef.current = false
+          clearBattleState()
           setPhase('lost')
           playDefeat()
           setTimeout(() => onBattleEnd({ won: false, mistakes: newMistakes }), 1100)
@@ -593,9 +617,9 @@ export function BattleScreen({ world, battleIndex, onBattleEnd, lang, t }) {
         <div className="flex flex-1 min-h-0" style={{ position: 'relative' }}>
           <BattleBackground worldId={world.id} />
 
-          {/* Region + round — stacked top-left */}
+          {/* Region + round — below the ✕ button */}
           <div style={{
-            position: 'absolute', top: 8, left: 10, zIndex: 2,
+            position: 'absolute', top: 44, left: 10, zIndex: 2,
             pointerEvents: 'none', userSelect: 'none',
             display: 'flex', flexDirection: 'column', gap: 2,
           }}>
@@ -624,6 +648,22 @@ export function BattleScreen({ world, battleIndex, onBattleEnd, lang, t }) {
               </>)}
             </motion.div>
           </div>
+
+          {/* Back to menu button — top-left */}
+          {onQuit && (
+            <button
+              onClick={onQuit}
+              style={{
+                position: 'absolute', top: 8, left: 10, zIndex: 5,
+                background: 'rgba(0,0,0,0.35)', border: '1.5px solid rgba(255,255,255,0.18)',
+                borderRadius: 8, padding: '4px 10px',
+                fontSize: 12, fontWeight: 900, color: 'rgba(255,255,255,0.7)',
+                cursor: 'pointer', letterSpacing: '0.04em',
+              }}
+            >
+              ✕
+            </button>
+          )}
 
           {/* Shield-up banner */}
           <AnimatePresence>

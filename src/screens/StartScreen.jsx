@@ -1,8 +1,10 @@
+/* eslint-disable no-undef */
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence, useAnimation } from 'framer-motion'
 import { KingdomBackground, KingdomForeground, StrollingKnight } from '../components/KingdomScenery'
 import { FlyingCreatures } from '../components/FlyingCreatures'
 import { CAMPAIGN } from '../game/campaign.config'
+import { isRunInProgress, hasSavedBattle } from '../game/runState'
 
 const NAME_KEY    = 'numknight_player_name'
 const DIFF_KEY    = 'numknight_difficulty'
@@ -12,8 +14,9 @@ const totalQuestions = (diff) =>
   CAMPAIGN[diff].reduce((sum, w) => sum + w.battles * w.enemy.hp, 0)
 
 // Merged start + new-game screen — background layers never remount when toggling views
-export function StartScreen({ onStart, onViewLeaderboard, lang, onLangChange, t }) {
+export function StartScreen({ onStart, onContinue, run, onViewLeaderboard, lang, onLangChange, t }) {
   const isRtl = lang === 'he'
+  const canContinue = isRunInProgress(run) || hasSavedBattle()
 
   const [view,       setView]       = useState('home')
   const [name,       setName]       = useState(() => localStorage.getItem(NAME_KEY) ?? '')
@@ -87,9 +90,20 @@ export function StartScreen({ onStart, onViewLeaderboard, lang, onLangChange, t 
                 {isRtl ? 'נוצר על ידי אמיר אלוק' : 'Created by Amir Eluk'}
               </p>
               <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.20)', fontWeight: 600, marginTop: 2, letterSpacing: '0.12em' }}>
-                v{__APP_VERSION__}
+                v{typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : ''}
               </p>
             </div>
+
+            <motion.button
+              whileTap={canContinue ? { scale: 0.95 } : {}}
+              whileHover={canContinue ? { scale: 1.03 } : {}}
+              onClick={canContinue ? onContinue : undefined}
+              disabled={!canContinue}
+              className="w-full bg-yellow-400 border-b-4 border-yellow-600 text-black font-black text-2xl rounded-2xl h-16 shadow-xl tracking-widest"
+              style={{ opacity: canContinue ? 1 : 0.35, cursor: canContinue ? 'pointer' : 'default' }}
+            >
+              {t?.continueRun ?? 'CONTINUE'}
+            </motion.button>
 
             <motion.button
               whileTap={{ scale: 0.95 }} whileHover={{ scale: 1.03 }}
@@ -140,15 +154,13 @@ export function StartScreen({ onStart, onViewLeaderboard, lang, onLangChange, t 
               <button
                 onClick={() => setView('home')}
                 style={{
-                  display: 'flex', alignItems: 'center', gap: 5,
-                  padding: '5px 11px', borderRadius: 20, cursor: 'pointer',
-                  fontSize: 12, fontWeight: 900, letterSpacing: '0.06em',
-                  border: '1.5px solid rgba(255,255,255,0.22)',
-                  background: 'rgba(255,255,255,0.10)',
-                  color: 'rgba(255,255,255,0.70)',
+                  background: 'rgba(0,0,0,0.35)', border: '1.5px solid rgba(255,255,255,0.18)',
+                  borderRadius: 8, padding: '4px 10px',
+                  fontSize: 12, fontWeight: 900, color: 'rgba(255,255,255,0.7)',
+                  cursor: 'pointer', letterSpacing: '0.04em',
                 }}
               >
-                {isRtl ? '← חזור' : '← Back'}
+                ✕
               </button>
             </div>
 

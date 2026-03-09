@@ -441,17 +441,15 @@ export function WorldMapScreen({
         onClick={onRestart}
         style={{
           position: 'absolute', top: 14, left: 14, zIndex: 30,
-          width: 34, height: 34, borderRadius: '50%',
-          background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.30)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          cursor: 'pointer', color: 'rgba(255,255,255,0.45)', fontSize: 16,
-          backdropFilter: 'blur(4px)',
+          background: 'rgba(0,0,0,0.35)', border: '1.5px solid rgba(255,255,255,0.18)',
+          borderRadius: 8, padding: '4px 10px',
+          fontSize: 12, fontWeight: 900, color: 'rgba(255,255,255,0.7)',
+          cursor: 'pointer', letterSpacing: '0.04em',
         }}
         whileTap={{ scale: 0.9 }}
-        whileHover={{ background: 'rgba(255,255,255,0.28)', color: 'rgba(255,255,255,0.90)' }}
         title="New Game"
       >
-        ←
+        ✕
       </motion.button>
 
       {/* Header */}

@@ -9,7 +9,7 @@ import { VictoryScreen } from './screens/VictoryScreen'
 import { StartScreen } from './screens/StartScreen'
 import { DesignScreen } from './screens/DesignScreen'
 import { EASY, MEDIUM, HARD, DEV } from './game/campaign.config'
-import { createNewRun, loadRun, saveRun, clearRun } from './game/runState'
+import { createNewRun, loadRun, saveRun, clearRun, isRunInProgress, clearBattleState } from './game/runState'
 import { getTrophy, calcBattleScore } from './game/battleLogic'
 import { LANG_KEY, T } from './game/i18n'
 
@@ -17,7 +17,7 @@ const CONFIGS = { easy: EASY, medium: MEDIUM, hard: HARD }
 const IS_DEV_MODE = new URLSearchParams(window.location.search).has('dev')
 
 export default function App() {
-  const [difficulty, setDifficulty] = useState('medium')
+  const [difficulty, setDifficulty] = useState(() => loadRun()?.difficulty ?? 'medium')
   const [playerName, setPlayerName] = useState(() => localStorage.getItem('numknight_player_name') ?? '')
   const [lang, setLang] = useState(() => localStorage.getItem(LANG_KEY) ?? 'he')
 
@@ -34,19 +34,34 @@ export default function App() {
   const [clearedData, setClearedData] = useState(null)
   const [battleKey, setBattleKey] = useState(0)
   const [mapIsTransition, setMapIsTransition] = useState(false)
-  const [worldScore, setWorldScore] = useState(0)
+  const [worldScore, setWorldScore] = useState(() => loadRun()?.currentWorldScore ?? 0)
   // Holds score context passed to leaderboard
   const [pendingScore, setPendingScore] = useState(null)
 
   const world = worlds[run.worldIndex]
 
-  useEffect(() => { saveRun(run) }, [run])
+  useEffect(() => { saveRun({ ...run, currentWorldScore: worldScore }) }, [run, worldScore])
+
+  const handleContinue = () => {
+    const saved = loadRun()
+    if (!saved) return
+    setDifficulty(saved.difficulty ?? 'medium')
+    setRun(saved)
+    setWorldScore(saved.currentWorldScore ?? 0)
+    setBattleKey((k) => k + 1)
+    setScreen('battle')
+  }
+
+  const handleQuitBattle = () => {
+    setScreen('start')
+  }
 
   const handleStart = ({ name, diff }) => {
     setPlayerName(name)
     setDifficulty(diff)
     clearRun()
-    const fresh = createNewRun()
+    clearBattleState()
+    const fresh = createNewRun(diff)
     setRun(fresh)
     saveRun(fresh)
     setBattleKey(0)
@@ -131,6 +146,7 @@ export default function App() {
 
   const handleRestart = () => {
     clearRun()
+    clearBattleState()
     const fresh = createNewRun()
     setRun(fresh)
     saveRun(fresh)
@@ -158,7 +174,7 @@ export default function App() {
           initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
           transition={{ duration: 0.25 }} className="w-full"
         >
-          <StartScreen onStart={handleStart} onViewLeaderboard={handleViewLeaderboard} lang={lang} onLangChange={handleLangChange} t={t} />
+          <StartScreen onStart={handleStart} onContinue={handleContinue} run={run} onViewLeaderboard={handleViewLeaderboard} lang={lang} onLangChange={handleLangChange} t={t} />
         </motion.div>
       )}
 
@@ -167,7 +183,7 @@ export default function App() {
           initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
           transition={{ duration: 0.25 }} className="w-full"
         >
-          <BattleScreen key={battleKey} world={world} battleIndex={run.battleIndex} onBattleEnd={handleBattleEnd} lang={lang} t={t} />
+          <BattleScreen key={battleKey} world={world} worldIndex={run.worldIndex} battleIndex={run.battleIndex} onBattleEnd={handleBattleEnd} onQuit={handleQuitBattle} lang={lang} t={t} />
         </motion.div>
       )}
 
