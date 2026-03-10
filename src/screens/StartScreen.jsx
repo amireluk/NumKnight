@@ -1,6 +1,7 @@
 /* eslint-disable no-undef */
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence, useAnimation } from 'framer-motion'
+import { useLongPress } from '../hooks/useLongPress'
 import { KingdomBackground, KingdomForeground, StrollingKnight } from '../components/KingdomScenery'
 import { FlyingCreatures } from '../components/FlyingCreatures'
 import { CAMPAIGN } from '../game/campaign.config'
@@ -15,8 +16,9 @@ const totalQuestions = (diff) =>
   CAMPAIGN[diff].reduce((sum, w) => sum + w.battles * w.enemy.hp, 0)
 
 // Merged start + new-game screen — background layers never remount when toggling views
-export function StartScreen({ onStart, onContinue, run, onViewLeaderboard, lang, onLangChange, t }) {
+export function StartScreen({ onStart, onContinue, run, onViewLeaderboard, onLogoLongPress, lang, onLangChange, t }) {
   const isRtl = lang === 'he'
+  const logoLongPress = useLongPress(onLogoLongPress ?? (() => {}))
   const canContinue = isRunInProgress(run) || hasSavedBattle()
 
   const [view,       setView]       = useState('home')
@@ -87,8 +89,9 @@ export function StartScreen({ onStart, onContinue, run, onViewLeaderboard, lang,
             {/* Title */}
             <div className="text-center">
               <p
+                {...logoLongPress}
                 className="font-black text-white tracking-widest"
-                style={{ fontSize: 52, lineHeight: 1, textShadow: '0 0 48px rgba(251,191,36,0.45), 0 2px 0 rgba(0,0,0,0.6)' }}
+                style={{ fontSize: 52, lineHeight: 1, textShadow: '0 0 48px rgba(251,191,36,0.45), 0 2px 0 rgba(0,0,0,0.6)', userSelect: 'none', WebkitUserSelect: 'none' }}
               >
                 NumKnight
               </p>

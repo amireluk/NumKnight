@@ -12,6 +12,8 @@ import { EASY, MEDIUM, HARD, DEV } from './game/campaign.config'
 import { createNewRun, loadRun, saveRun, clearRun, isRunInProgress, clearBattleState } from './game/runState'
 import { getTrophy, calcBattleScore } from './game/battleLogic'
 import { LANG_KEY, T } from './game/i18n'
+import { clearLog } from './game/runLog'
+import { RunLogViewer } from './components/RunLogViewer'
 
 const CONFIGS = { easy: EASY, medium: MEDIUM, hard: HARD }
 const IS_DEV_MODE = new URLSearchParams(window.location.search).has('dev')
@@ -37,6 +39,7 @@ export default function App() {
   const [worldScore, setWorldScore] = useState(() => loadRun()?.currentWorldScore ?? 0)
   // Holds score context passed to leaderboard
   const [pendingScore, setPendingScore] = useState(null)
+  const [showLog, setShowLog] = useState(false)
 
   const world = worlds[run.worldIndex]
 
@@ -61,6 +64,7 @@ export default function App() {
     setDifficulty(diff)
     clearRun()
     clearBattleState()
+    clearLog()
     const fresh = createNewRun(diff)
     setRun(fresh)
     saveRun(fresh)
@@ -159,6 +163,7 @@ export default function App() {
   }
 
   return (
+    <>
     <AnimatePresence mode="wait">
       {screen === 'design' && (
         <motion.div key="design"
@@ -174,7 +179,7 @@ export default function App() {
           initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
           transition={{ duration: 0.25 }} className="w-full"
         >
-          <StartScreen onStart={handleStart} onContinue={handleContinue} run={run} onViewLeaderboard={handleViewLeaderboard} lang={lang} onLangChange={handleLangChange} t={t} />
+          <StartScreen onStart={handleStart} onContinue={handleContinue} run={run} onViewLeaderboard={handleViewLeaderboard} onLogoLongPress={() => setShowLog(true)} lang={lang} onLangChange={handleLangChange} t={t} />
         </motion.div>
       )}
 
@@ -267,10 +272,15 @@ export default function App() {
             onFight={handleFight}
             onRestart={handleRestart}
             onBack={() => setScreen('start')}
+            onLogoLongPress={() => setShowLog(true)}
             lang={lang} t={t}
           />
         </motion.div>
       )}
     </AnimatePresence>
+    <AnimatePresence>
+      {showLog && <RunLogViewer onClose={() => setShowLog(false)} />}
+    </AnimatePresence>
+    </>
   )
 }

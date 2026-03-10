@@ -8,6 +8,7 @@ import { playCorrect, playWrong, playSwordSwing, playImpact, playVictory, playDe
   playShieldCrack, playShieldRestore,
   playTimerTick, playTimerExpiry } from '../game/sounds'
 import { saveBattleState, loadBattleState, clearBattleState } from '../game/runState'
+import { logEvent } from '../game/runLog'
 import { HPBar } from '../components/HPBar'
 import { KnightCharacter } from '../components/KnightCharacter'
 import { EnemyCharacter } from '../components/EnemyCharacter'
@@ -389,6 +390,22 @@ export function BattleScreen({ world, worldIndex, battleIndex, onBattleEnd, onQu
     return () => window.removeEventListener('popstate', onPop)
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Log battle start once intro ends (or immediately for resumed battles)
+  useEffect(() => {
+    if (introPlaying) return
+    logEvent('battle_start', {
+      world: world.name, battle: battleIndex + 1,
+      enemy: world.enemy.name, enemyHp: world.enemy.hp,
+      playerHp: playerHP, resumed: !!saved,
+    })
+  }, [introPlaying]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Log each new question once intro is done
+  useEffect(() => {
+    if (introPlaying) return
+    logEvent('question', { q: `${round.problem.a}×${round.problem.b}`, answer: round.problem.answer })
+  }, [round, introPlaying]) // eslint-disable-line react-hooks/exhaustive-deps
+
   // Landing shake — only on the very first encounter of a world
   useEffect(() => {
     if (battleIndex !== 0) return
@@ -438,6 +455,7 @@ export function BattleScreen({ world, worldIndex, battleIndex, onBattleEnd, onQu
     if (!timedOut || phaseRef.current !== 'idle') return
     setTimedOut(false)
     setButtonStates(round.options.map((opt) => (opt === round.problem.answer ? 'correct' : 'idle')))
+    logEvent('timeout', { q: `${round.problem.a}×${round.problem.b}`, correct: round.problem.answer })
     playTimerExpiry()
     playWrong()
     const newMistakes = mistakesRef.current + 1
@@ -459,8 +477,10 @@ export function BattleScreen({ world, worldIndex, battleIndex, onBattleEnd, onQu
       shakeControls.start({ x: [0, -12, 11, -8, 7, -4, 3, 0], transition: { duration: 0.5 } })
       const newPlayerHP = Math.max(0, playerHPRef.current - (world.enemyDamage ?? 1))
       setPlayerHP(newPlayerHP)
+      logEvent('player_hit', { damage: world.enemyDamage ?? 1, prevHp: playerHPRef.current, playerHp: newPlayerHP })
 
       if (newPlayerHP <= 0) {
+        logEvent('battle_lost', { mistakes: newMistakes })
         timerActiveRef.current = false
         clearBattleState()
         setPhase('lost')
@@ -492,9 +512,12 @@ export function BattleScreen({ world, worldIndex, battleIndex, onBattleEnd, onQu
 
     if (isCorrect) {
       // Accumulate time bonus for timed worlds
+      let qTimeBonus = 0
       if (world.timer && timeLeft !== null) {
-        timeBonusAccRef.current += Math.floor((timeLeft / world.timer) * 50)
+        qTimeBonus = Math.floor((timeLeft / world.timer) * 50)
+        timeBonusAccRef.current += qTimeBonus
       }
+      logEvent('correct', { q: `${problem.a}×${problem.b}`, selected, timeBonus: qTimeBonus })
       playCorrect()
       setPhase('attacking')
 
@@ -502,6 +525,7 @@ export function BattleScreen({ world, worldIndex, battleIndex, onBattleEnd, onQu
       if (isBoss) {
         if (shieldStreak === 0) {
           // Hit 1: crack line appears on top pip, no HP damage
+          logEvent('shield_hit', { streak: 1 })
           setTimeout(() => {
             playShieldCrack()
             setShieldStreak(1)
@@ -514,6 +538,7 @@ export function BattleScreen({ world, worldIndex, battleIndex, onBattleEnd, onQu
 
         if (shieldStreak === 1) {
           // Hit 2: pip falls — trigger fall anim immediately, then state update
+          logEvent('shield_hit', { streak: 2 })
           const pip = world.enemy.hp - enemyHP   // current top filled pip index
           setShieldFallPip(pip)
           setShieldFallKey((k) => k + 1)
@@ -533,6 +558,7 @@ export function BattleScreen({ world, worldIndex, battleIndex, onBattleEnd, onQu
           setEnemyHitKey((k) => k + 1)
           const newEnemyHP = Math.max(0, enemyHP - 1)
           setEnemyHP(newEnemyHP)
+          logEvent('enemy_hit', { prevHp: enemyHP, enemyHp: newEnemyHP, enemyMaxHp: world.enemy.hp })
           setShieldStreak(0)
           setShieldState(null)
           // Trigger rage phase when HP first drops to ≤ 2
@@ -543,6 +569,7 @@ export function BattleScreen({ world, worldIndex, battleIndex, onBattleEnd, onQu
             setTimeout(() => { setShieldState('full'); triggerShieldUp() }, 650)
           }
           if (newEnemyHP <= 0) {
+            logEvent('battle_won', { trophy: getTrophy(mistakes), mistakes })
             timerActiveRef.current = false
             clearBattleState()
             setPhase('won')
@@ -563,7 +590,9 @@ export function BattleScreen({ world, worldIndex, battleIndex, onBattleEnd, onQu
         setEnemyHitKey((k) => k + 1)
         const newEnemyHP = Math.max(0, enemyHP - 1)
         setEnemyHP(newEnemyHP)
+        logEvent('enemy_hit', { prevHp: enemyHP, enemyHp: newEnemyHP, enemyMaxHp: world.enemy.hp })
         if (newEnemyHP <= 0) {
+          logEvent('battle_won', { trophy: getTrophy(mistakes), mistakes })
           timerActiveRef.current = false
           clearBattleState()
           setPhase('won')
@@ -577,6 +606,7 @@ export function BattleScreen({ world, worldIndex, battleIndex, onBattleEnd, onQu
       }, 280)
 
     } else {
+      logEvent('wrong', { q: `${problem.a}×${problem.b}`, selected, correct: problem.answer })
       playWrong()
       const newMistakes = mistakes + 1
       setMistakes(newMistakes)
@@ -597,8 +627,10 @@ export function BattleScreen({ world, worldIndex, battleIndex, onBattleEnd, onQu
         shakeControls.start({ x: [0, -12, 11, -8, 7, -4, 3, 0], transition: { duration: 0.5 } })
         const newPlayerHP = Math.max(0, playerHP - (world.enemyDamage ?? 1))
         setPlayerHP(newPlayerHP)
+        logEvent('player_hit', { damage: world.enemyDamage ?? 1, prevHp: playerHP, playerHp: newPlayerHP })
 
         if (newPlayerHP <= 0) {
+          logEvent('battle_lost', { mistakes: newMistakes })
           timerActiveRef.current = false
           clearBattleState()
           setPhase('lost')

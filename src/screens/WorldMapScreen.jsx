@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { motion } from 'framer-motion'
+import { useLongPress } from '../hooks/useLongPress'
 import { EnemyCharacter } from '../components/EnemyCharacter'
 import { KnightCharacter } from '../components/KnightCharacter'
 import { playMapTap, playMapLocked } from '../game/sounds'
@@ -409,9 +410,10 @@ function RegionBand({ world, worldIndex, status, trophy, score, delay, onTap, is
 
 export function WorldMapScreen({
   worlds, currentWorldIndex, trophies, worldScores,
-  isTransition, difficulty, isDevMode, onFight, onRestart, onBack, lang, t,
+  isTransition, difficulty, isDevMode, onFight, onRestart, onBack, onLogoLongPress, lang, t,
 }) {
   const isRtl = lang === 'he'
+  const logoLongPress = useLongPress(onLogoLongPress ?? (() => {}))
 
   // Android hardware back → new game screen
   useEffect(() => {
@@ -461,8 +463,11 @@ export function WorldMapScreen({
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.35 }}
       >
-        <p className="font-black text-3xl tracking-widest text-white"
-          style={{ textShadow: '0 2px 8px rgba(0,0,0,0.6)' }}>
+        <p
+          {...logoLongPress}
+          className="font-black text-3xl tracking-widest text-white"
+          style={{ textShadow: '0 2px 8px rgba(0,0,0,0.6)', userSelect: 'none', WebkitUserSelect: 'none' }}
+        >
           NumKnight
         </p>
       </motion.div>
