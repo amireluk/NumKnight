@@ -119,15 +119,30 @@ export const HARD = [
 
 // ── Dev ───────────────────────────────────────────────────────────────
 //  Activated by ?dev in the URL. Never used in production gameplay.
-//  2 worlds, 2 battles each, enemy hp 1, player hp 2, all 0× questions.
+//  All 5 worlds unlocked, minimal enemy HP, 0× questions only.
 export const DEV = [
   {
-    id: 'forest', name: 'Forest', battles: 2, playerHP: 2,
+    id: 'forest', name: 'Forest', battles: 1,
     enemy: { id: 'goblin', name: 'Goblin', hp: 1 },
     timer: null, multipliers: [0], factorRange: [1, 10],
   },
   {
-    id: 'dragonLair', name: 'Dragon Lair', battles: 2, playerHP: 2,
+    id: 'swamp', name: 'Swamp', battles: 1,
+    enemy: { id: 'skeleton', name: 'Skeleton', hp: 2 },
+    timer: null, multipliers: [0], factorRange: [1, 10],
+  },
+  {
+    id: 'mountains', name: 'Mountains', battles: 2,
+    enemy: { id: 'orc', name: 'Orc', hp: 2 },
+    timer: null, multipliers: [0], factorRange: [1, 10],
+  },
+  {
+    id: 'castle', name: 'Castle', battles: 1,
+    enemy: { id: 'darkKnight', name: 'Dark Knight', hp: 2 },
+    timer: null, multipliers: [0], factorRange: [1, 10],
+  },
+  {
+    id: 'dragonLair', name: 'Dragon Lair', battles: 1,
     enemy: { id: 'dragon', name: 'Dragon', hp: 3 },
     timer: null, multipliers: [0], factorRange: [1, 10],
   },
