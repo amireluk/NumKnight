@@ -39,6 +39,14 @@ export function RunLogViewer({ onClose }) {
     if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight
   }, [])
 
+  // Android / browser back button closes the viewer
+  useEffect(() => {
+    window.history.pushState(null, '', window.location.href)
+    const onPop = () => onClose()
+    window.addEventListener('popstate', onPop)
+    return () => window.removeEventListener('popstate', onPop)
+  }, [onClose])
+
   // Annotate each entry with seconds elapsed since the nearest preceding battle_start
   let battleStartTs = log[0]?.ts ?? Date.now()
   const entries = log.map((entry) => {
@@ -62,7 +70,6 @@ export function RunLogViewer({ onClose }) {
     >
       {/* Header */}
       <div
-        onClick={(e) => e.stopPropagation()}
         style={{
           padding: '14px 16px 10px',
           borderBottom: '1px solid rgba(255,255,255,0.10)',
@@ -81,7 +88,6 @@ export function RunLogViewer({ onClose }) {
       {/* Entries */}
       <div
         ref={scrollRef}
-        onClick={(e) => e.stopPropagation()}
         style={{ flex: 1, overflowY: 'auto', padding: '4px 0 32px' }}
       >
         {entries.length === 0 ? (
