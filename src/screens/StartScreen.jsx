@@ -8,6 +8,34 @@ import { CAMPAIGN } from '../game/campaign.config'
 import { isRunInProgress, hasSavedBattle } from '../game/runState'
 import { playMapTap } from '../game/sounds'
 
+function SwordDivider({ width = 200 }) {
+  const h = 18
+  const bladeEnd = width * 0.76
+  const guardX   = bladeEnd
+  const gripEnd  = width * 0.95
+  const pommelCx = width * 0.975
+  return (
+    <svg viewBox={`0 0 ${width} ${h}`} width={width} height={h} style={{ display: 'block', margin: '5px auto 0', overflow: 'visible' }}>
+      {/* Blade */}
+      <polygon points={`0,${h/2} ${bladeEnd},${h/2-2} ${bladeEnd},${h/2+2}`} fill="#b8c4d8" />
+      {/* Blade shine */}
+      <line x1="6" y1={h/2-0.8} x2={bladeEnd-8} y2={h/2-0.8} stroke="white" strokeWidth="0.7" opacity="0.45" />
+      {/* Crossguard */}
+      <rect x={guardX-2} y={h/2-7} width={5} height={14} rx="2" fill="#a08040" />
+      <rect x={guardX-1} y={h/2-6} width={3} height={12} rx="1.5" fill="#c8a050" opacity="0.5" />
+      {/* Grip */}
+      <rect x={guardX+3} y={h/2-3} width={gripEnd-(guardX+3)} height={6} rx="2.5" fill="#6b4820" />
+      {[...Array(5)].map((_, i) => {
+        const x = guardX + 6 + i * ((gripEnd - guardX - 9) / 4)
+        return <line key={i} x1={x} y1={h/2-3} x2={x} y2={h/2+3} stroke="#3a2010" strokeWidth="0.9" opacity="0.55" />
+      })}
+      {/* Pommel */}
+      <ellipse cx={pommelCx} cy={h/2} rx={width*0.028} ry={5} fill="#a08040" />
+      <ellipse cx={pommelCx} cy={h/2} rx={width*0.018} ry={3.5} fill="#d4a850" opacity="0.6" />
+    </svg>
+  )
+}
+
 const NAME_KEY    = 'numknight_player_name'
 const DIFF_KEY    = 'numknight_difficulty'
 const DIFF_VALUES = ['easy', 'medium', 'hard']
@@ -95,6 +123,7 @@ export function StartScreen({ onStart, onContinue, run, onViewLeaderboard, onLog
               >
                 NumKnight
               </p>
+              <SwordDivider />
               <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.22)', fontWeight: 600, marginTop: 6, letterSpacing: '0.05em' }}>
                 {isRtl ? 'נוצר על ידי אמיר אלוק' : 'Created by Amir Eluk'}
               </p>
@@ -169,19 +198,25 @@ export function StartScreen({ onStart, onContinue, run, onViewLeaderboard, onLog
             transition={{ duration: 0.18 }}
             style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 22, position: 'relative', zIndex: 1 }}
           >
-            {/* Back */}
-            <div dir="ltr" style={{ width: '100%', display: 'flex', justifyContent: 'flex-start' }}>
+            {/* Back + Title */}
+            <div dir="ltr" style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 10 }}>
               <button
                 onClick={() => setView('home')}
                 style={{
                   background: 'rgba(0,0,0,0.35)', border: '1.5px solid rgba(255,255,255,0.18)',
                   borderRadius: 8, padding: '4px 10px',
                   fontSize: 12, fontWeight: 900, color: 'rgba(255,255,255,0.7)',
-                  cursor: 'pointer', letterSpacing: '0.04em',
+                  cursor: 'pointer', letterSpacing: '0.04em', flexShrink: 0,
                 }}
               >
                 ✕
               </button>
+              <div style={{ flex: 1, textAlign: 'center', paddingRight: 28 }}>
+                <p className="font-black text-white tracking-widest" style={{ fontSize: 28, lineHeight: 1, textShadow: '0 0 32px rgba(251,191,36,0.45), 0 2px 0 rgba(0,0,0,0.6)', userSelect: 'none' }}>
+                  NumKnight
+                </p>
+                <SwordDivider width={140} />
+              </div>
             </div>
 
             {/* Name input */}
