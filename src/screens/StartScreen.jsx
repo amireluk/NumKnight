@@ -7,38 +7,7 @@ import { FlyingCreatures } from '../components/FlyingCreatures'
 import { CAMPAIGN } from '../game/campaign.config'
 import { isRunInProgress, hasSavedBattle } from '../game/runState'
 import { playMapTap } from '../game/sounds'
-
-// Longsword — hilt left, blade right, scales to container width.
-// ViewBox is 340×28; guard sits at x=24 (~7% from left) so it lines up
-// with the 'N' of a centred NumKnight title. Blade tip at x=336 extends
-// just past the right edge of the text.
-function SwordDivider({ style = {} }) {
-  const mid = 14 // vertical centre of 28-unit-tall viewBox
-  return (
-    <svg
-      viewBox="0 0 340 28"
-      style={{ display: 'block', width: '100%', height: 'auto', overflow: 'visible', marginTop: 5, ...style }}
-    >
-      {/* Pommel */}
-      <ellipse cx={6} cy={mid} rx={6} ry={7} fill="#b09050" />
-      <ellipse cx={6} cy={mid} rx={3.5} ry={4.5} fill="#d8be6a" opacity={0.65} />
-      {/* Grip */}
-      <rect x={13} y={mid - 4} width={9} height={8} rx={3} fill="#6b4820" />
-      <line x1={16}   y1={mid - 4} x2={16}   y2={mid + 4} stroke="#3a2010" strokeWidth={1.1} opacity={0.55} />
-      <line x1={18.5} y1={mid - 4} x2={18.5} y2={mid + 4} stroke="#3a2010" strokeWidth={1.1} opacity={0.55} />
-      <line x1={21}   y1={mid - 4} x2={21}   y2={mid + 4} stroke="#3a2010" strokeWidth={1.1} opacity={0.55} />
-      {/* Crossguard */}
-      <rect x={21} y={mid - 11} width={6} height={22} rx={2} fill="#a08040" />
-      <rect x={22.5} y={mid - 9} width={3} height={18} rx={1.5} fill="#d0aa58" opacity={0.6} />
-      {/* Blade — tapers from 8px wide at guard to a point */}
-      <polygon points={`27,${mid - 4} 27,${mid + 4} 336,${mid}`} fill="#c2cedf" />
-      {/* Fuller (central groove) */}
-      <line x1={32} y1={mid} x2={316} y2={mid} stroke="#8a9ab8" strokeWidth={1.6} opacity={0.65} />
-      {/* Top bevel shine */}
-      <line x1={31} y1={mid - 2.6} x2={312} y2={mid - 0.5} stroke="white" strokeWidth={1} opacity={0.38} />
-    </svg>
-  )
-}
+import { LogoBanner } from '../components/LogoBanner'
 
 const NAME_KEY    = 'numknight_player_name'
 const DIFF_KEY    = 'numknight_difficulty'
@@ -119,19 +88,12 @@ export function StartScreen({ onStart, onContinue, run, onViewLeaderboard, onLog
             style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 28, position: 'relative', zIndex: 1 }}
           >
             {/* Title */}
-            <div className="text-center">
-              <p
-                {...logoLongPress}
-                className="font-black text-white tracking-widest"
-                style={{ fontSize: 52, lineHeight: 1, textShadow: '0 0 48px rgba(251,191,36,0.45), 0 2px 0 rgba(0,0,0,0.6)', userSelect: 'none', WebkitUserSelect: 'none' }}
-              >
-                NumKnight
-              </p>
-              <SwordDivider />
-              <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.22)', fontWeight: 600, marginTop: 6, letterSpacing: '0.05em' }}>
+            <div>
+              <LogoBanner logoLongPress={logoLongPress} />
+              <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.22)', fontWeight: 600, marginTop: 10, letterSpacing: '0.05em', textAlign: 'center' }}>
                 {isRtl ? 'נוצר על ידי אמיר אלוק' : 'Created by Amir Eluk'}
               </p>
-              <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.20)', fontWeight: 600, marginTop: 2, letterSpacing: '0.12em' }}>
+              <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.20)', fontWeight: 600, marginTop: 2, letterSpacing: '0.12em', textAlign: 'center' }}>
                 v{typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : ''}
               </p>
             </div>
@@ -202,25 +164,22 @@ export function StartScreen({ onStart, onContinue, run, onViewLeaderboard, onLog
             transition={{ duration: 0.18 }}
             style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 22, position: 'relative', zIndex: 1 }}
           >
-            {/* Back + Title */}
-            <div dir="ltr" style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 10 }}>
+            {/* Title — same banner as home screen */}
+            <div style={{ position: 'relative' }}>
+              <LogoBanner />
               <button
+                dir="ltr"
                 onClick={() => setView('home')}
                 style={{
+                  position: 'absolute', top: 0, right: 0,
                   background: 'rgba(0,0,0,0.35)', border: '1.5px solid rgba(255,255,255,0.18)',
                   borderRadius: 8, padding: '4px 10px',
                   fontSize: 12, fontWeight: 900, color: 'rgba(255,255,255,0.7)',
-                  cursor: 'pointer', letterSpacing: '0.04em', flexShrink: 0,
+                  cursor: 'pointer', letterSpacing: '0.04em',
                 }}
               >
                 ✕
               </button>
-              <div style={{ flex: 1, textAlign: 'center', paddingRight: 28 }}>
-                <p className="font-black text-white tracking-widest" style={{ fontSize: 28, lineHeight: 1, textShadow: '0 0 32px rgba(251,191,36,0.45), 0 2px 0 rgba(0,0,0,0.6)', userSelect: 'none' }}>
-                  NumKnight
-                </p>
-                <SwordDivider />
-              </div>
             </div>
 
             {/* Name input */}

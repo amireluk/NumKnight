@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { useLongPress } from '../hooks/useLongPress'
+import { LogoBanner } from '../components/LogoBanner'
 import { EnemyCharacter } from '../components/EnemyCharacter'
 import { KnightCharacter } from '../components/KnightCharacter'
 import { playMapTap, playMapLocked } from '../game/sounds'
@@ -457,19 +458,13 @@ export function WorldMapScreen({
 
       {/* Header */}
       <motion.div
-        className="text-center pt-8 pb-3 px-6"
+        className="pt-4 pb-2 px-6"
         style={{ flexShrink: 0 }}
         initial={{ opacity: 0, y: -12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.35 }}
       >
-        <p
-          {...logoLongPress}
-          className="font-black text-3xl tracking-widest text-white"
-          style={{ textShadow: '0 2px 8px rgba(0,0,0,0.6)', userSelect: 'none', WebkitUserSelect: 'none' }}
-        >
-          NumKnight
-        </p>
+        <LogoBanner logoLongPress={logoLongPress} />
       </motion.div>
 
       {/* Region bands — Forest at top, Dragon Lair at bottom */}
