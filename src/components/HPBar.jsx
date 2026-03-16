@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, memo } from 'react'
 
 const PIP_H = 22
 const GAP   = 6
@@ -139,10 +139,14 @@ export function HPBar({ current, max, color = 'green', shieldState = null, shiel
 
         return (
           <div key={i} style={{ position: 'relative', width: 14, height: 22 }}>
-            <motion.div
-              animate={{ backgroundColor: baseBg, borderColor: borderCol, boxShadow: shadow }}
-              transition={{ duration: 0.25 }}
-              style={{ width: 14, height: 22, borderRadius: 4, border: `${borderW}px solid` }}
+            <div
+              style={{
+                width: 14, height: 22, borderRadius: 4,
+                border: `${borderW}px solid ${borderCol}`,
+                backgroundColor: baseBg,
+                boxShadow: shadow,
+                transition: 'background-color 0.25s, border-color 0.25s, box-shadow 0.25s',
+              }}
             />
 
             {/* Crack line — static, shown on hit 1 until hit 2 clears it */}

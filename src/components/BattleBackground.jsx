@@ -1,3 +1,5 @@
+import { memo } from 'react'
+
 // ─── Forest ───────────────────────────────────────────────────────────────────
 function ForestBackground() {
   return (
@@ -18,13 +20,6 @@ function ForestBackground() {
         width: 44, height: 44, borderRadius: '50%',
         background: '#f0d878', opacity: 0.60,
       }} />
-      {/* Birds (3 tiny arcs) */}
-      <svg style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '40%', pointerEvents: 'none' }}
-        viewBox="0 0 100 40" preserveAspectRatio="none">
-        <path d="M28 12 Q30 10 32 12" stroke="#3a6a88" strokeWidth="0.9" fill="none" strokeLinecap="round" />
-        <path d="M34 9  Q36 7  38 9"  stroke="#3a6a88" strokeWidth="0.9" fill="none" strokeLinecap="round" />
-        <path d="M22 17 Q24 15 26 17" stroke="#3a6a88" strokeWidth="0.8" fill="none" strokeLinecap="round" />
-      </svg>
       {/* Hills */}
       <svg style={{ position: 'absolute', bottom: 0, left: 0, width: '100%', height: '50%' }}
         viewBox="0 0 100 55" preserveAspectRatio="none" overflow="visible">
@@ -44,7 +39,7 @@ function ForestBackground() {
         {/* Ground */}
         <rect x="-5" y="46" width="115" height="12" fill="#3a5830" />
         {/* Grass tufts */}
-        {[18, 27, 55, 63, 80, 88].map((x, i) => (
+        {[18, 55, 88].map((x, i) => (
           <g key={i}>
             <line x1={x}   y1="47" x2={x}   y2="44" stroke="#4a7040" strokeWidth="0.9" strokeLinecap="round" />
             <line x1={x+2} y1="47" x2={x+2} y2="44.8" stroke="#3e6036" strokeWidth="0.9" strokeLinecap="round" />
@@ -90,9 +85,6 @@ function SwampBackground() {
         {/* Dark water patches */}
         <ellipse cx="22" cy="35" rx="13" ry="3.5" fill="#0e2018" />
         <ellipse cx="74" cy="37" rx="11" ry="3" fill="#0e2018" />
-        {/* Water shimmer lines */}
-        <line x1="15" y1="34" x2="28" y2="34" stroke="#243830" strokeWidth="0.7" opacity="0.8" />
-        <line x1="66" y1="36" x2="80" y2="36" stroke="#243830" strokeWidth="0.7" opacity="0.8" />
         {/* Dead tree left */}
         <line x1="9"  y1="28" x2="9"  y2="-8"  stroke="#0d1a0e" strokeWidth="2.8" strokeLinecap="round" />
         <line x1="9"  y1="6"  x2="2"  y2="-4"  stroke="#0d1a0e" strokeWidth="1.6" strokeLinecap="round" />
@@ -115,9 +107,6 @@ function SwampBackground() {
         <ellipse cx="62" cy="18" rx="1.4" ry="3.8" fill="#2a3e28" />
         {/* Ground fill */}
         <rect x="-5" y="44" width="115" height="18" fill="#121e12" />
-        {/* Mist layer */}
-        <path d="M-5 30 Q20 26 40 30 Q62 34 80 28 Q94 24 105 28 L105 36 L-5 36Z"
-          fill="white" opacity="0.03" />
       </svg>
     </div>
   )
@@ -187,8 +176,8 @@ function CastleBackground() {
       {/* Stars */}
       <svg style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '55%', pointerEvents: 'none' }}
         viewBox="0 0 100 55" preserveAspectRatio="none">
-        {[[12,8],[28,4],[44,11],[58,5],[76,9],[88,3],[18,22],[68,18],[92,25],[6,30],[48,28],[82,32]].map(([x,y],i) => (
-          <circle key={i} cx={x} cy={y} r={i%3===0?0.7:0.45} fill="white" opacity={i%3===0?0.55:0.35} />
+        {[[12,8,0.7,0.55],[44,11,0.45,0.35],[76,9,0.7,0.55],[18,22,0.45,0.35],[68,18,0.7,0.55],[92,25,0.45,0.35]].map(([x,y,r,o],i) => (
+          <circle key={i} cx={x} cy={y} r={r} fill="white" opacity={o} />
         ))}
       </svg>
       {/* Moon glow */}
@@ -239,8 +228,6 @@ function CastleBackground() {
         {/* Tower window — glowing amber */}
         <rect x="47" y="14" width="6" height="9" rx="3" fill="#f59e1a" opacity="0.55" />
         <rect x="48" y="15" width="4" height="7" rx="2" fill="#fbbf5a" opacity="0.45" />
-        {/* Window glow halo */}
-        <ellipse cx="50" cy="18.5" rx="7" ry="6" fill="#f59e1a" opacity="0.10" />
         {/* Arrow slits */}
         <rect x="43" y="22" width="1.5" height="5" rx="0.6" fill="#0d1828" opacity="0.8" />
         <rect x="55.5" y="22" width="1.5" height="5" rx="0.6" fill="#0d1828" opacity="0.8" />
@@ -256,9 +243,6 @@ function CastleBackground() {
         {/* Stone joints */}
         <line x1="-5" y1="54" x2="105" y2="54" stroke="#1a2840" strokeWidth="0.8" />
         <line x1="-5" y1="58" x2="105" y2="58" stroke="#1a2840" strokeWidth="0.8" />
-        {[8,24,40,56,72,88].map((x, i) => (
-          <line key={i} x1={x} y1="50" x2={x} y2="62" stroke="#1a2840" strokeWidth="0.7" />
-        ))}
       </svg>
     </div>
   )
@@ -325,39 +309,24 @@ function DragonLairBackground() {
         {/* Left fire pillar — bright column of light */}
         <rect x="-5" y="20" width="8" height="42" fill="#1a0500" />
         <rect x="-3" y="14" width="4" height="10" rx="1" fill="#ff5500" opacity="0.70" />
-        <rect x="-2" y="14" width="2" height="7"  rx="0.5" fill="#ffaa00" opacity="0.60" />
-        <ellipse cx="0" cy="14" rx="5" ry="8" fill="#ff4400" opacity="0.22" />
         {/* Right fire pillar */}
         <rect x="97" y="20" width="8" height="42" fill="#1a0500" />
         <rect x="99" y="14" width="4" height="10" rx="1" fill="#ff5500" opacity="0.70" />
-        <rect x="100" y="14" width="2" height="7"  rx="0.5" fill="#ffaa00" opacity="0.60" />
-        <ellipse cx="101" cy="14" rx="5" ry="8" fill="#ff4400" opacity="0.22" />
         {/* Rocky ground */}
         <path d="M-5 44 Q12 38 24 42 Q38 46 52 40 Q66 34 80 40 Q92 46 105 40 L105 62 L-5 62Z"
           fill="#120400" />
         {/* Lava rivers — wide glowing cracks */}
         <path d="M6 46 Q14 42 22 48 Q28 44 36 50" stroke="#cc3300" strokeWidth="2.5" fill="none" strokeLinecap="round" />
         <path d="M6 46 Q14 42 22 48 Q28 44 36 50" stroke="#ff6600" strokeWidth="1.0" fill="none" strokeLinecap="round" opacity="0.85" />
-        <path d="M6 46 Q14 42 22 48 Q28 44 36 50" stroke="#ffcc44" strokeWidth="0.35" fill="none" strokeLinecap="round" opacity="0.65" />
         <path d="M50 44 Q58 40 66 46 Q72 42 82 48" stroke="#cc3300" strokeWidth="2.5" fill="none" strokeLinecap="round" />
         <path d="M50 44 Q58 40 66 46 Q72 42 82 48" stroke="#ff6600" strokeWidth="1.0" fill="none" strokeLinecap="round" opacity="0.85" />
-        <path d="M50 44 Q58 40 66 46 Q72 42 82 48" stroke="#ffcc44" strokeWidth="0.35" fill="none" strokeLinecap="round" opacity="0.65" />
         <path d="M26 52 Q36 48 42 54 Q50 50 60 56" stroke="#cc3300" strokeWidth="2.0" fill="none" strokeLinecap="round" />
         <path d="M26 52 Q36 48 42 54 Q50 50 60 56" stroke="#ff6600" strokeWidth="0.8" fill="none" strokeLinecap="round" opacity="0.80" />
         {/* Lava pools */}
         <ellipse cx="20" cy="52" rx="10" ry="4"   fill="#7a1400" />
         <ellipse cx="20" cy="52" rx="6.5" ry="2.4" fill="#ff5500" opacity="0.65" />
-        <ellipse cx="20" cy="52" rx="3.5" ry="1.2" fill="#ffaa22" opacity="0.50" />
         <ellipse cx="76" cy="53" rx="9"  ry="3.5"  fill="#7a1400" />
         <ellipse cx="76" cy="53" rx="6"  ry="2.2"  fill="#ff5500" opacity="0.65" />
-        <ellipse cx="76" cy="53" rx="3"  ry="1.1"  fill="#ffaa22" opacity="0.50" />
-        {/* Skull on a rock — left side */}
-        <ellipse cx="43" cy="44.5" rx="3.5" ry="3" fill="#2e0800" />
-        <ellipse cx="43" cy="43.5" rx="3.2" ry="2.8" fill="#c8a882" opacity="0.80" />
-        <ellipse cx="43" cy="44.8" rx="2"   ry="1.2" fill="#b89870" opacity="0.80" />
-        <circle cx="41.5" cy="43.2" r="0.9" fill="#2e0800" opacity="0.90" />
-        <circle cx="44.5" cy="43.2" r="0.9" fill="#2e0800" opacity="0.90" />
-        <path d="M41.8 45.5 L42.3 45.5 M43.3 45.5 L43.8 45.5 M44.3 45.5 L44.8 45.5" stroke="#2e0800" strokeWidth="0.5" opacity="0.85" />
         {/* Rock foreground edges */}
         <path d="M-5 56 Q8 50 16 54 Q22 58 30 52 L30 62 L-5 62Z"  fill="#0e0200" />
         <path d="M74 52 Q82 46 90 50 Q97 54 105 50 L105 62 L74 62Z" fill="#0e0200" />
@@ -369,11 +338,11 @@ function DragonLairBackground() {
 
 // ─── Registry ─────────────────────────────────────────────────────────────────
 const BACKGROUNDS = {
-  forest:    ForestBackground,
-  swamp:     SwampBackground,
-  mountains: MountainsBackground,
-  castle:    CastleBackground,
-  dragonLair: DragonLairBackground,
+  forest:     memo(ForestBackground),
+  swamp:      memo(SwampBackground),
+  mountains:  memo(MountainsBackground),
+  castle:     memo(CastleBackground),
+  dragonLair: memo(DragonLairBackground),
 }
 
 export function BattleBackground({ worldId }) {

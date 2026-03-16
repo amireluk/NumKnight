@@ -1,5 +1,5 @@
 import { motion, useAnimation, AnimatePresence } from 'framer-motion'
-import { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 
 // ─────────────────────────────────────────────
 // Shared hit-splash
@@ -7,36 +7,32 @@ import { useEffect, useRef, useState } from 'react'
 const SPLASH_ANGLES = [0, 45, 90, 135, 180, 225, 270, 315]
 const SPLASH_ANGLES_OFFSET = [22.5, 67.5, 112.5, 157.5, 202.5, 247.5, 292.5, 337.5]
 
+// Pre-computed at module load — avoids trig on every hit
+const SPLASH_LINES = SPLASH_ANGLES.map(a => {
+  const r = (a * Math.PI) / 180
+  return [Math.cos(r) * 7, Math.sin(r) * 7, Math.cos(r) * 32, Math.sin(r) * 32]
+})
+const SPLASH_LINES_OFFSET = SPLASH_ANGLES_OFFSET.map(a => {
+  const r = (a * Math.PI) / 180
+  return [Math.cos(r) * 9, Math.sin(r) * 9, Math.cos(r) * 22, Math.sin(r) * 22]
+})
+
 function HitSplash({ color }) {
   return (
     <motion.div
       className="absolute pointer-events-none"
-      style={{ left: 42, top: 62, transform: 'translate(-50%, -50%)', zIndex: 20 }}
+      style={{ left: 42, top: 62, transform: 'translate(-50%, -50%)', zIndex: 20, willChange: 'transform, opacity' }}
       initial={{ scale: 0.05, opacity: 1 }}
       animate={{ scale: [0.05, 1.4, 1.7], opacity: [1, 1, 0] }}
       transition={{ duration: 0.5, times: [0, 0.28, 1], ease: 'easeOut' }}
     >
       <svg width="90" height="90" viewBox="-45 -45 90 90" fill="none">
-        {SPLASH_ANGLES.map((angle) => {
-          const rad = (angle * Math.PI) / 180
-          return (
-            <line key={angle}
-              x1={Math.cos(rad) * 7} y1={Math.sin(rad) * 7}
-              x2={Math.cos(rad) * 32} y2={Math.sin(rad) * 32}
-              stroke={color} strokeWidth="5" strokeLinecap="round"
-            />
-          )
-        })}
-        {SPLASH_ANGLES_OFFSET.map((angle) => {
-          const rad = (angle * Math.PI) / 180
-          return (
-            <line key={angle}
-              x1={Math.cos(rad) * 9} y1={Math.sin(rad) * 9}
-              x2={Math.cos(rad) * 22} y2={Math.sin(rad) * 22}
-              stroke={color} strokeWidth="3" strokeLinecap="round"
-            />
-          )
-        })}
+        {SPLASH_LINES.map(([x1, y1, x2, y2], i) => (
+          <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke={color} strokeWidth="5" strokeLinecap="round" />
+        ))}
+        {SPLASH_LINES_OFFSET.map(([x1, y1, x2, y2], i) => (
+          <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke={color} strokeWidth="3" strokeLinecap="round" />
+        ))}
         <circle cx="0" cy="0" r="9" fill={color} />
         <circle cx="0" cy="0" r="4" fill="white" opacity="0.7" />
       </svg>
@@ -60,14 +56,6 @@ function GoblinBodySVG() {
         fill="#8bc34a" stroke="#1b2a1b" strokeWidth="2.5" />
       <ellipse cx="29" cy="116" rx="12" ry="6" fill="#4a7c1f" stroke="#1b2a1b" strokeWidth="2" />
       <ellipse cx="61" cy="116" rx="12" ry="6" fill="#4a7c1f" stroke="#1b2a1b" strokeWidth="2" />
-      <path d="M19 116 L16 120" stroke="#1b2a1b" strokeWidth="2.5" strokeLinecap="round" />
-      <path d="M25 118 L23 122" stroke="#1b2a1b" strokeWidth="2.5" strokeLinecap="round" />
-      <path d="M31 119 L31 122" stroke="#1b2a1b" strokeWidth="2.5" strokeLinecap="round" />
-      <path d="M37 118 L39 121" stroke="#1b2a1b" strokeWidth="2.5" strokeLinecap="round" />
-      <path d="M53 118 L51 121" stroke="#1b2a1b" strokeWidth="2.5" strokeLinecap="round" />
-      <path d="M59 119 L59 122" stroke="#1b2a1b" strokeWidth="2.5" strokeLinecap="round" />
-      <path d="M65 118 L67 121" stroke="#1b2a1b" strokeWidth="2.5" strokeLinecap="round" />
-      <path d="M71 116 L74 120" stroke="#1b2a1b" strokeWidth="2.5" strokeLinecap="round" />
       <path d="M18 57 Q12 70 12 82 Q12 95 30 96 Q45 98 60 96 Q78 95 78 82 Q78 70 72 57 Q62 52 45 52 Q28 52 18 57Z"
         fill="#8bc34a" stroke="#1b2a1b" strokeWidth="2.5" />
       <path d="M27 63 Q37 59 44 64" stroke="#558b2f" strokeWidth="2" fill="none" strokeLinecap="round" opacity="0.8" />
@@ -117,9 +105,6 @@ function GoblinBodySVG() {
       <path d="M22 52 L24 58 L28 52Z" fill="#f9a825" stroke="#e65100" strokeWidth="0.5" />
       <path d="M61 52 L64 58 L67 52Z" fill="#f9a825" stroke="#e65100" strokeWidth="0.5" />
       <path d="M20 52 Q45 48 70 52" stroke="#558b2f" strokeWidth="2.5" fill="none" strokeLinecap="round" />
-      <circle cx="22" cy="42" r="3" fill="#6ca03a" stroke="#558b2f" strokeWidth="1.5" />
-      <circle cx="68" cy="40" r="2.5" fill="#6ca03a" stroke="#558b2f" strokeWidth="1.5" />
-      <circle cx="19" cy="32" r="2" fill="#6ca03a" stroke="#558b2f" strokeWidth="1" />
     </svg>
   )
 }
@@ -133,7 +118,6 @@ function GoblinClubArmSVG() {
       <circle cx="82" cy="8" r="3.5" fill="#5d4037" stroke="#3e2723" strokeWidth="1.5" />
       <circle cx="64" cy="15" r="3" fill="#5d4037" stroke="#3e2723" strokeWidth="1.5" />
       <circle cx="83" cy="20" r="2.5" fill="#5d4037" stroke="#3e2723" strokeWidth="1.5" />
-      <line x1="71" y1="18" x2="70" y2="52" stroke="#5d4037" strokeWidth="1.5" strokeLinecap="round" opacity="0.5" />
       <path d="M66 54 Q80 56 84 70 Q86 82 78 84 Q70 86 68 76 Q66 64 60 62Z"
         fill="#8bc34a" stroke="#1b2a1b" strokeWidth="2.5" strokeLinejoin="round" />
       <rect x="64" y="46" width="14" height="15" rx="6" fill="#8bc34a" stroke="#1b2a1b" strokeWidth="2" />
@@ -152,11 +136,6 @@ function SkeletonBodySVG() {
       <path d="M26 56 Q10 66 8 84 Q8 95 16 96 Q24 97 26 86 Q28 72 34 64Z"
         fill="#d8cdb4" stroke="#2a1a0a" strokeWidth="2.5" strokeLinejoin="round" />
       <ellipse cx="14" cy="96" rx="9" ry="7" fill="#d8cdb4" stroke="#2a1a0a" strokeWidth="2" />
-      {/* Knuckle lines */}
-      <path d="M7 93 L6 98" stroke="#2a1a0a" strokeWidth="1.5" strokeLinecap="round" />
-      <path d="M12 96 L11 101" stroke="#2a1a0a" strokeWidth="1.5" strokeLinecap="round" />
-      <path d="M17 97 L17 102" stroke="#2a1a0a" strokeWidth="1.5" strokeLinecap="round" />
-      <path d="M22 95 L23 100" stroke="#2a1a0a" strokeWidth="1.5" strokeLinecap="round" />
 
       {/* Left leg femur */}
       <rect x="26" y="92" width="12" height="26" rx="6" fill="#d8cdb4" stroke="#2a1a0a" strokeWidth="2" />
@@ -166,10 +145,6 @@ function SkeletonBodySVG() {
       <rect x="28" y="108" width="8" height="14" rx="4" fill="#d8cdb4" stroke="#2a1a0a" strokeWidth="2" />
       {/* Left foot */}
       <ellipse cx="32" cy="120" rx="12" ry="5" fill="#c8bd9a" stroke="#2a1a0a" strokeWidth="2" />
-      <path d="M22 119 L20 122" stroke="#2a1a0a" strokeWidth="2" strokeLinecap="round" />
-      <path d="M27 121 L25 124" stroke="#2a1a0a" strokeWidth="2" strokeLinecap="round" />
-      <path d="M32 122 L32 125" stroke="#2a1a0a" strokeWidth="2" strokeLinecap="round" />
-      <path d="M37 121 L39 124" stroke="#2a1a0a" strokeWidth="2" strokeLinecap="round" />
 
       {/* Right leg femur */}
       <rect x="52" y="92" width="12" height="26" rx="6" fill="#d8cdb4" stroke="#2a1a0a" strokeWidth="2" />
@@ -179,10 +154,6 @@ function SkeletonBodySVG() {
       <rect x="54" y="108" width="8" height="14" rx="4" fill="#d8cdb4" stroke="#2a1a0a" strokeWidth="2" />
       {/* Right foot */}
       <ellipse cx="58" cy="120" rx="12" ry="5" fill="#c8bd9a" stroke="#2a1a0a" strokeWidth="2" />
-      <path d="M48 119 L46 122" stroke="#2a1a0a" strokeWidth="2" strokeLinecap="round" />
-      <path d="M53 121 L51 124" stroke="#2a1a0a" strokeWidth="2" strokeLinecap="round" />
-      <path d="M58 122 L58 125" stroke="#2a1a0a" strokeWidth="2" strokeLinecap="round" />
-      <path d="M63 121 L65 124" stroke="#2a1a0a" strokeWidth="2" strokeLinecap="round" />
 
       {/* Pelvis */}
       <path d="M28 90 Q38 98 45 97 Q52 98 62 90 Q60 104 52 108 Q45 111 38 108 Q30 104 28 90Z"
@@ -190,10 +161,6 @@ function SkeletonBodySVG() {
 
       {/* Spine */}
       <line x1="45" y1="46" x2="45" y2="90" stroke="#b5a88e" strokeWidth="5" strokeLinecap="round" />
-      {/* Vertebra markers */}
-      <circle cx="45" cy="54" r="3.5" fill="#c8bd9a" stroke="#2a1a0a" strokeWidth="1.5" />
-      <circle cx="45" cy="66" r="3.5" fill="#c8bd9a" stroke="#2a1a0a" strokeWidth="1.5" />
-      <circle cx="45" cy="78" r="3.5" fill="#c8bd9a" stroke="#2a1a0a" strokeWidth="1.5" />
 
       {/* Ribs left (3 pairs) */}
       <path d="M44 52 Q28 55 22 66 Q26 74 36 70 Q42 63 45 58"
@@ -234,8 +201,6 @@ function SkeletonBodySVG() {
       <circle cx="57" cy="20" r="2.5" fill="#8b7fd4" opacity="0.8" />
       {/* Nasal cavity */}
       <path d="M41 30 L45 36 L49 30 Q45 27 41 30Z" fill="#1a1228" />
-      {/* Skull crack */}
-      <path d="M45 4 L42 14 L46 22" stroke="#b5a88e" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   )
 }
@@ -295,12 +260,6 @@ function OrcBodySVG() {
       {/* Armor breastplate */}
       <path d="M20 62 Q32 58 45 60 Q58 58 70 62 Q72 78 65 86 Q55 92 45 90 Q35 92 25 86 Q18 78 20 62Z"
         fill="#5a4a38" stroke="#1a1a0a" strokeWidth="2" />
-      <path d="M28 64 Q45 60 62 64 Q64 72 58 80 Q52 86 45 84 Q38 86 32 80 Q26 72 28 64Z"
-        fill="#6a5a48" opacity="0.5" />
-      {/* Armor rivets */}
-      <circle cx="24" cy="70" r="3" fill="#8a7560" stroke="#1a1a0a" strokeWidth="1.5" />
-      <circle cx="66" cy="70" r="3" fill="#8a7560" stroke="#1a1a0a" strokeWidth="1.5" />
-      <circle cx="45" cy="68" r="3.5" fill="#8a7560" stroke="#1a1a0a" strokeWidth="1.5" />
 
       {/* Neck */}
       <path d="M32 48 Q36 42 45 42 Q54 42 58 48 L58 56 Q54 50 45 50 Q36 50 32 56Z"
@@ -352,9 +311,6 @@ function OrcAxeArmSVG() {
     <svg width="84" height="112" viewBox="0 0 90 120" fill="none" overflow="visible">
       {/* Axe handle */}
       <rect x="68" y="4" width="11" height="56" rx="5" fill="#6b4226" stroke="#2a1a0a" strokeWidth="2" />
-      {/* Handle grip wrap */}
-      <path d="M68 20 Q79 20 79 26 Q79 32 68 32" stroke="#4a2e18" strokeWidth="3" fill="none" />
-      <path d="M68 34 Q79 34 79 40 Q79 46 68 46" stroke="#4a2e18" strokeWidth="3" fill="none" />
       {/* Axe head */}
       <path d="M64 4 Q58 -6 68 -4 Q82 -8 88 6 Q90 16 82 22 Q74 28 66 18 Q72 12 76 6 Q70 0 64 4Z"
         fill="#708090" stroke="#2a1a0a" strokeWidth="2.5" />
@@ -387,8 +343,6 @@ function DarkKnightBodySVG() {
       <ellipse cx="20" cy="78" rx="9" ry="6" fill="#4a5462" stroke="#0a0e12" strokeWidth="2" />
       {/* Gauntlet */}
       <rect x="4" y="92" width="20" height="14" rx="4" fill="#1e242c" stroke="#0a0e12" strokeWidth="2" />
-      <path d="M4 97 L24 97" stroke="#5a6472" strokeWidth="1" opacity="0.5" />
-      <path d="M4 102 L24 102" stroke="#5a6472" strokeWidth="1" opacity="0.5" />
       {/* Fingers */}
       <path d="M6 106 L4 112" stroke="#0a0e12" strokeWidth="3" strokeLinecap="round" />
       <path d="M11 107 L10 113" stroke="#0a0e12" strokeWidth="3" strokeLinecap="round" />
@@ -406,10 +360,6 @@ function DarkKnightBodySVG() {
       {/* Sabatons (armored feet) */}
       <rect x="14" y="115" width="26" height="8" rx="4" fill="#1e242c" stroke="#0a0e12" strokeWidth="2" />
       <rect x="50" y="115" width="26" height="8" rx="4" fill="#1e242c" stroke="#0a0e12" strokeWidth="2" />
-      <line x1="22" y1="115" x2="22" y2="123" stroke="#5a6472" strokeWidth="1" opacity="0.6" />
-      <line x1="29" y1="115" x2="29" y2="123" stroke="#5a6472" strokeWidth="1" opacity="0.6" />
-      <line x1="56" y1="115" x2="56" y2="123" stroke="#5a6472" strokeWidth="1" opacity="0.6" />
-      <line x1="63" y1="115" x2="63" y2="123" stroke="#5a6472" strokeWidth="1" opacity="0.6" />
 
       {/* Body — full plate */}
       <path d="M14 54 Q8 68 8 84 Q8 100 30 102 Q45 104 60 102 Q82 100 82 84 Q82 68 76 54 Q64 48 45 48 Q26 48 14 54Z"
@@ -455,8 +405,6 @@ function DarkKnightSwordArmSVG() {
     <svg width="84" height="112" viewBox="0 0 90 120" fill="none" overflow="visible">
       {/* Sword blade */}
       <rect x="70" y="-8" width="9" height="62" rx="1" fill="#b0bec5" stroke="#0a0e12" strokeWidth="2" />
-      {/* Blade fuller (groove) */}
-      <line x1="74.5" y1="-6" x2="74.5" y2="50" stroke="#d0d8e0" strokeWidth="2" opacity="0.6" />
       {/* Blade point */}
       <path d="M70 54 L74.5 66 L79 54Z" fill="#b0bec5" stroke="#0a0e12" strokeWidth="1.5" />
       {/* Crossguard */}
@@ -475,8 +423,6 @@ function DarkKnightSwordArmSVG() {
         fill="#2e3640" stroke="#0a0e12" strokeWidth="2.5" strokeLinejoin="round" />
       {/* Gauntlet */}
       <rect x="58" y="46" width="18" height="16" rx="5" fill="#2e3640" stroke="#0a0e12" strokeWidth="2" />
-      <path d="M59 52 L76 52" stroke="#5a6472" strokeWidth="1.5" opacity="0.5" />
-      <path d="M59 58 L76 58" stroke="#5a6472" strokeWidth="1.5" opacity="0.5" />
     </svg>
   )
 }
@@ -490,8 +436,6 @@ function DragonBodySVG() {
       {/* Wing (left, behind body) */}
       <path d="M20 50 Q-10 20 -8 60 Q-6 90 20 80 Q10 70 8 58 Q10 40 20 50Z"
         fill="#6b0000" stroke="#1a0000" strokeWidth="2" opacity="0.9" />
-      <path d="M20 50 Q2 30 0 54 Q2 74 20 68" stroke="#8b0000" strokeWidth="1.5" fill="none" opacity="0.7" />
-      <path d="M20 54 Q8 42 6 62 Q8 76 20 72" stroke="#6b0000" strokeWidth="1" fill="none" opacity="0.5" />
 
       {/* Tail */}
       <path d="M24 100 Q10 108 8 118 Q10 122 16 120 Q22 118 26 110 Q28 102 24 100Z"
@@ -531,10 +475,6 @@ function DragonBodySVG() {
       {/* Belly scales */}
       <path d="M26 62 Q45 58 64 62 Q66 78 60 90 Q52 100 45 98 Q38 100 30 90 Q24 78 26 62Z"
         fill="#c47c50" stroke="#c47c50" strokeWidth="1.5" />
-      {/* Belly lines */}
-      <path d="M30 68 Q45 64 60 68" stroke="#a06040" strokeWidth="1.5" fill="none" opacity="0.6" />
-      <path d="M28 76 Q45 72 62 76" stroke="#a06040" strokeWidth="1.5" fill="none" opacity="0.6" />
-      <path d="M30 84 Q45 80 60 84" stroke="#a06040" strokeWidth="1.5" fill="none" opacity="0.6" />
       {/* Back spines */}
       <path d="M35 44 Q32 34 35 30" stroke="#c0392b" strokeWidth="3" strokeLinecap="round" />
       <path d="M42 43 Q40 30 43 26" stroke="#c0392b" strokeWidth="3" strokeLinecap="round" />
@@ -544,9 +484,6 @@ function DragonBodySVG() {
       {/* Neck */}
       <path d="M30 44 Q34 36 45 34 Q56 36 60 44 L60 52 Q55 46 45 46 Q35 46 30 52Z"
         fill="#8b0000" stroke="#1a0000" strokeWidth="2" />
-      {/* Neck scales */}
-      <path d="M32 42 Q45 38 58 42" stroke="#6b0000" strokeWidth="2" fill="none" opacity="0.7" />
-      <path d="M31 47 Q45 43 59 47" stroke="#6b0000" strokeWidth="2" fill="none" opacity="0.7" />
 
       {/* Head — large, reptilian */}
       <path d="M14 22 Q14 -2 45 -2 Q76 -2 76 22 Q76 48 64 56 Q45 64 26 56 Q14 48 14 22Z"
@@ -610,11 +547,11 @@ function DragonClawArmSVG() {
 // Enemy registry
 // ─────────────────────────────────────────────
 const ENEMIES = {
-  goblin:    { Body: GoblinBodySVG,    Weapon: GoblinClubArmSVG,     splashColor: '#fbbf24', pivotX: 66, pivotY: 50 },
-  skeleton:  { Body: SkeletonBodySVG,  Weapon: SkeletonScytheArmSVG, splashColor: '#a78bfa', pivotX: 66, pivotY: 50 },
-  orc:       { Body: OrcBodySVG,       Weapon: OrcAxeArmSVG,         splashColor: '#fb923c', pivotX: 66, pivotY: 50 },
-  darkKnight:{ Body: DarkKnightBodySVG,Weapon: DarkKnightSwordArmSVG,splashColor: '#94a3b8', pivotX: 66, pivotY: 50 },
-  dragon:    { Body: DragonBodySVG,    Weapon: DragonClawArmSVG,     splashColor: '#f87171', pivotX: 66, pivotY: 50 },
+  goblin:    { Body: React.memo(GoblinBodySVG),    Weapon: React.memo(GoblinClubArmSVG),     splashColor: '#fbbf24', pivotX: 66, pivotY: 50 },
+  skeleton:  { Body: React.memo(SkeletonBodySVG),  Weapon: React.memo(SkeletonScytheArmSVG), splashColor: '#a78bfa', pivotX: 66, pivotY: 50 },
+  orc:       { Body: React.memo(OrcBodySVG),       Weapon: React.memo(OrcAxeArmSVG),         splashColor: '#fb923c', pivotX: 66, pivotY: 50 },
+  darkKnight:{ Body: React.memo(DarkKnightBodySVG),Weapon: React.memo(DarkKnightSwordArmSVG),splashColor: '#94a3b8', pivotX: 66, pivotY: 50 },
+  dragon:    { Body: React.memo(DragonBodySVG),    Weapon: React.memo(DragonClawArmSVG),     splashColor: '#f87171', pivotX: 66, pivotY: 50 },
 }
 
 // ─────────────────────────────────────────────
@@ -626,7 +563,6 @@ export function EnemyCharacter({ phase, enemy, hitKey, raging = false }) {
 
   const moveControls = useAnimation()
   const weaponControls = useAnimation()
-  const idleControls = useAnimation()
   const idleTimerRef = useRef(null)
   const [splashKey, setSplashKey] = useState(null)
 
@@ -661,22 +597,15 @@ export function EnemyCharacter({ phase, enemy, hitKey, raging = false }) {
     }
   }, [hitKey, moveControls, weaponControls])
 
-  // Idle variety — random actions every 4–7s during idle (2–3.5s when raging)
+  // Idle weapon wiggle — occasional movement, doubled interval for perf
   useEffect(() => {
     if (idleTimerRef.current) clearTimeout(idleTimerRef.current)
     if (phase !== 'idle') return
     const schedule = () => {
-      const minDelay = raging ? 2000 : 4000
-      const randExtra = raging ? 1500 : 3000
+      const minDelay = raging ? 4000 : 8000
+      const randExtra = raging ? 3000 : 6000
       idleTimerRef.current = setTimeout(() => {
-        const action = Math.floor(Math.random() * 3)
-        if (action === 0) {
-          idleControls.start({ y: [0, -6, 0], transition: { duration: 0.5, ease: 'easeInOut' } })
-        } else if (action === 1) {
-          weaponControls.start({ rotate: [0, -15, 0], transition: { duration: 0.4, ease: 'easeInOut' } })
-        } else {
-          idleControls.start({ x: [0, 4, -4, 0], transition: { duration: 0.6, ease: 'easeInOut' } })
-        }
+        weaponControls.start({ rotate: [0, -15, 0], transition: { duration: 0.4, ease: 'easeInOut' } })
         schedule()
       }, minDelay + Math.random() * randExtra)
     }
@@ -693,9 +622,9 @@ export function EnemyCharacter({ phase, enemy, hitKey, raging = false }) {
             ? { duration: raging ? 1.8 : 3.4, repeat: Infinity, ease: 'easeInOut', delay: 0.4 }
             : { duration: 0.2 }
         }
+        style={{ willChange: 'transform' }}
       >
-        <motion.div animate={idleControls}>
-        <motion.div animate={moveControls} style={{ transform: 'scaleX(-1)' }}>
+        <motion.div animate={moveControls} style={{ transform: 'scaleX(-1)', willChange: 'transform' }}>
           <div style={{ position: 'relative', width: 84, height: 112, overflow: 'visible' }}>
             <Body />
             <motion.div
@@ -717,7 +646,6 @@ export function EnemyCharacter({ phase, enemy, hitKey, raging = false }) {
               {splashKey !== null && <HitSplash key={splashKey} color={splashColor} />}
             </AnimatePresence>
           </div>
-        </motion.div>
         </motion.div>
       </motion.div>
     </div>

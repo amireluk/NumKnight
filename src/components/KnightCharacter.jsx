@@ -1,8 +1,8 @@
 import { motion, useAnimation, AnimatePresence } from 'framer-motion'
-import { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
 // Static body — everything except the sword arm
-export function KnightBodySVG() {
+export const KnightBodySVG = React.memo(function KnightBodySVG() {
   return (
     <svg width="84" height="112" viewBox="0 0 90 120" fill="none">
       {/* Left arm */}
@@ -59,10 +59,10 @@ export function KnightBodySVG() {
       <path d="M35 51 Q45 58 55 51" stroke="#bf7a60" strokeWidth="2.5" fill="none" strokeLinecap="round" />
     </svg>
   )
-}
+})
 
 // Sword arm only — same viewBox, overlaid on top of body
-export function KnightSwordArmSVG() {
+export const KnightSwordArmSVG = React.memo(function KnightSwordArmSVG() {
   return (
     <svg width="84" height="112" viewBox="0 0 90 120" fill="none" overflow="visible">
       {/* Sword blade */}
@@ -76,50 +76,38 @@ export function KnightSwordArmSVG() {
       <rect x="69" y="60" width="17" height="26" rx="7" fill="#90a4ae" stroke="#424242" strokeWidth="2" />
     </svg>
   )
-}
+})
 
 const SPLASH_ANGLES = [0, 45, 90, 135, 180, 225, 270, 315]
 const SPLASH_ANGLES_OFFSET = [22.5, 67.5, 112.5, 157.5, 202.5, 247.5, 292.5, 337.5]
+
+// Pre-computed at module load — avoids trig on every hit
+const SPLASH_LINES = SPLASH_ANGLES.map(a => {
+  const r = (a * Math.PI) / 180
+  return [Math.cos(r) * 7, Math.sin(r) * 7, Math.cos(r) * 32, Math.sin(r) * 32]
+})
+const SPLASH_LINES_OFFSET = SPLASH_ANGLES_OFFSET.map(a => {
+  const r = (a * Math.PI) / 180
+  return [Math.cos(r) * 9, Math.sin(r) * 9, Math.cos(r) * 22, Math.sin(r) * 22]
+})
 
 // Hit splash rendered on the character, at the impact point
 function HitSplash({ color }) {
   return (
     <motion.div
       className="absolute pointer-events-none"
-      style={{
-        // Center of knight torso — symmetric with goblin splash
-        left: 42,
-        top: 62,
-        transform: 'translate(-50%, -50%)',
-        zIndex: 20,
-      }}
+      style={{ left: 42, top: 62, transform: 'translate(-50%, -50%)', zIndex: 20, willChange: 'transform, opacity' }}
       initial={{ scale: 0.05, opacity: 1 }}
       animate={{ scale: [0.05, 1.4, 1.7], opacity: [1, 1, 0] }}
       transition={{ duration: 0.5, times: [0, 0.28, 1], ease: 'easeOut' }}
     >
       <svg width="90" height="90" viewBox="-45 -45 90 90" fill="none">
-        {SPLASH_ANGLES.map((angle) => {
-          const rad = (angle * Math.PI) / 180
-          return (
-            <line
-              key={angle}
-              x1={Math.cos(rad) * 7} y1={Math.sin(rad) * 7}
-              x2={Math.cos(rad) * 32} y2={Math.sin(rad) * 32}
-              stroke={color} strokeWidth="5" strokeLinecap="round"
-            />
-          )
-        })}
-        {SPLASH_ANGLES_OFFSET.map((angle) => {
-          const rad = (angle * Math.PI) / 180
-          return (
-            <line
-              key={angle}
-              x1={Math.cos(rad) * 9} y1={Math.sin(rad) * 9}
-              x2={Math.cos(rad) * 22} y2={Math.sin(rad) * 22}
-              stroke={color} strokeWidth="3" strokeLinecap="round"
-            />
-          )
-        })}
+        {SPLASH_LINES.map(([x1, y1, x2, y2], i) => (
+          <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke={color} strokeWidth="5" strokeLinecap="round" />
+        ))}
+        {SPLASH_LINES_OFFSET.map(([x1, y1, x2, y2], i) => (
+          <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke={color} strokeWidth="3" strokeLinecap="round" />
+        ))}
         <circle cx="0" cy="0" r="9" fill={color} />
         <circle cx="0" cy="0" r="4" fill="white" opacity="0.7" />
       </svg>
@@ -237,8 +225,9 @@ export function KnightCharacter({ phase, hitKey }) {
             ? { duration: 3.0, repeat: Infinity, ease: 'easeInOut' }
             : { duration: 0.2 }
         }
+        style={{ willChange: 'transform' }}
       >
-        <motion.div animate={moveControls}>
+        <motion.div animate={moveControls} style={{ willChange: 'transform' }}>
           {/* Relative container: body + weapon arm overlaid */}
           <div style={{ position: 'relative', width: 84, height: 112, overflow: 'visible' }}>
             <KnightBodySVG />
