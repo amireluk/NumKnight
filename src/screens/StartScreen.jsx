@@ -8,30 +8,34 @@ import { CAMPAIGN } from '../game/campaign.config'
 import { isRunInProgress, hasSavedBattle } from '../game/runState'
 import { playMapTap } from '../game/sounds'
 
-function SwordDivider({ width = 200 }) {
-  const h = 18
-  const bladeEnd = width * 0.76
-  const guardX   = bladeEnd
-  const gripEnd  = width * 0.95
-  const pommelCx = width * 0.975
+// Longsword — hilt left, blade right, scales to container width.
+// ViewBox is 340×28; guard sits at x=24 (~7% from left) so it lines up
+// with the 'N' of a centred NumKnight title. Blade tip at x=336 extends
+// just past the right edge of the text.
+function SwordDivider({ style = {} }) {
+  const mid = 14 // vertical centre of 28-unit-tall viewBox
   return (
-    <svg viewBox={`0 0 ${width} ${h}`} width={width} height={h} style={{ display: 'block', margin: '5px auto 0', overflow: 'visible' }}>
-      {/* Blade */}
-      <polygon points={`0,${h/2} ${bladeEnd},${h/2-2} ${bladeEnd},${h/2+2}`} fill="#b8c4d8" />
-      {/* Blade shine */}
-      <line x1="6" y1={h/2-0.8} x2={bladeEnd-8} y2={h/2-0.8} stroke="white" strokeWidth="0.7" opacity="0.45" />
-      {/* Crossguard */}
-      <rect x={guardX-2} y={h/2-7} width={5} height={14} rx="2" fill="#a08040" />
-      <rect x={guardX-1} y={h/2-6} width={3} height={12} rx="1.5" fill="#c8a050" opacity="0.5" />
-      {/* Grip */}
-      <rect x={guardX+3} y={h/2-3} width={gripEnd-(guardX+3)} height={6} rx="2.5" fill="#6b4820" />
-      {[...Array(5)].map((_, i) => {
-        const x = guardX + 6 + i * ((gripEnd - guardX - 9) / 4)
-        return <line key={i} x1={x} y1={h/2-3} x2={x} y2={h/2+3} stroke="#3a2010" strokeWidth="0.9" opacity="0.55" />
-      })}
+    <svg
+      viewBox="0 0 340 28"
+      style={{ display: 'block', width: '100%', height: 'auto', overflow: 'visible', marginTop: 5, ...style }}
+    >
       {/* Pommel */}
-      <ellipse cx={pommelCx} cy={h/2} rx={width*0.028} ry={5} fill="#a08040" />
-      <ellipse cx={pommelCx} cy={h/2} rx={width*0.018} ry={3.5} fill="#d4a850" opacity="0.6" />
+      <ellipse cx={6} cy={mid} rx={6} ry={7} fill="#b09050" />
+      <ellipse cx={6} cy={mid} rx={3.5} ry={4.5} fill="#d8be6a" opacity={0.65} />
+      {/* Grip */}
+      <rect x={13} y={mid - 4} width={9} height={8} rx={3} fill="#6b4820" />
+      <line x1={16}   y1={mid - 4} x2={16}   y2={mid + 4} stroke="#3a2010" strokeWidth={1.1} opacity={0.55} />
+      <line x1={18.5} y1={mid - 4} x2={18.5} y2={mid + 4} stroke="#3a2010" strokeWidth={1.1} opacity={0.55} />
+      <line x1={21}   y1={mid - 4} x2={21}   y2={mid + 4} stroke="#3a2010" strokeWidth={1.1} opacity={0.55} />
+      {/* Crossguard */}
+      <rect x={21} y={mid - 11} width={6} height={22} rx={2} fill="#a08040" />
+      <rect x={22.5} y={mid - 9} width={3} height={18} rx={1.5} fill="#d0aa58" opacity={0.6} />
+      {/* Blade — tapers from 8px wide at guard to a point */}
+      <polygon points={`27,${mid - 4} 27,${mid + 4} 336,${mid}`} fill="#c2cedf" />
+      {/* Fuller (central groove) */}
+      <line x1={32} y1={mid} x2={316} y2={mid} stroke="#8a9ab8" strokeWidth={1.6} opacity={0.65} />
+      {/* Top bevel shine */}
+      <line x1={31} y1={mid - 2.6} x2={312} y2={mid - 0.5} stroke="white" strokeWidth={1} opacity={0.38} />
     </svg>
   )
 }
@@ -215,7 +219,7 @@ export function StartScreen({ onStart, onContinue, run, onViewLeaderboard, onLog
                 <p className="font-black text-white tracking-widest" style={{ fontSize: 28, lineHeight: 1, textShadow: '0 0 32px rgba(251,191,36,0.45), 0 2px 0 rgba(0,0,0,0.6)', userSelect: 'none' }}>
                   NumKnight
                 </p>
-                <SwordDivider width={140} />
+                <SwordDivider />
               </div>
             </div>
 
