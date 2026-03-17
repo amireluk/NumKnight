@@ -171,7 +171,7 @@ export function StartScreen({ onStart, onContinue, run, onViewLeaderboard, onLog
                 dir="ltr"
                 onClick={() => setView('home')}
                 style={{
-                  position: 'absolute', top: 0, right: 0,
+                  position: 'absolute', top: 0, right: 0, zIndex: 2,
                   background: 'rgba(0,0,0,0.35)', border: '1.5px solid rgba(255,255,255,0.18)',
                   borderRadius: 8, padding: '4px 10px',
                   fontSize: 12, fontWeight: 900, color: 'rgba(255,255,255,0.7)',

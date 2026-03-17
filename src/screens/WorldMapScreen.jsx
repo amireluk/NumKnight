@@ -464,7 +464,7 @@ export function WorldMapScreen({
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.35 }}
       >
-        <LogoBanner logoLongPress={logoLongPress} />
+        <LogoBanner logoLongPress={logoLongPress} showSword={false} />
       </motion.div>
 
       {/* Region bands — Forest at top, Dragon Lair at bottom */}
