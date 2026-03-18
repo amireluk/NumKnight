@@ -2,12 +2,16 @@ import { motion, useAnimation, AnimatePresence } from 'framer-motion'
 import React, { useEffect, useState } from 'react'
 
 const RASTER_KEY = 'numknight_raster_bg'
-// Display size — maintains source image ratio (300:447)
+// Body display size — maintains source image ratio (300:447)
 const RW = 100, RH = 149
-// Arm pivot = shoulder joint centroid in 300×447 canvas → scaled to RW×RH
-// Shoulder centroid at (120, 105) in 300×447 → (40, 35) in 100×149
-// Parent container is flipped scaleX(-1), so local pivot stays at (40, 35)
-const ARM_PIVOT_X = 40, ARM_PIVOT_Y = 35
+// Arm rendered smaller (arm fills canvas but should be ~40% of body height)
+const ARM_W = 40, ARM_H = 60
+// Body shoulder socket in 300×447 → (74, 69) in 100×149
+// Arm shoulder centroid in 300×447 → (16, 14) in 40×60
+// Arm div positioned so its shoulder lines up with body socket
+const ARM_LEFT = 74 - 16  // 58
+const ARM_TOP  = 69 - 14  // 55
+const ARM_PIVOT_X = 16, ARM_PIVOT_Y = 14
 
 // Static body — everything except the sword arm
 export const KnightBodySVG = React.memo(function KnightBodySVG() {
@@ -245,13 +249,13 @@ export function KnightCharacter({ phase, hitKey, useRaster }) {
               <motion.div
                 animate={swordControls}
                 style={{
-                  position: 'absolute', top: 0, left: 0,
-                  width: RW, height: RH, overflow: 'visible',
+                  position: 'absolute', top: ARM_TOP, left: ARM_LEFT,
+                  width: ARM_W, height: ARM_H, overflow: 'visible',
                   transformOrigin: `${ARM_PIVOT_X}px ${ARM_PIVOT_Y}px`,
                 }}
               >
                 <img src={`${import.meta.env.BASE_URL}assets/characters/knight-arm.webp`}
-                  style={{ width: RW, height: RH, display: 'block' }} alt="" />
+                  style={{ width: ARM_W, height: ARM_H, display: 'block' }} alt="" />
               </motion.div>
               <AnimatePresence>
                 {splashKey !== null && <HitSplash key={splashKey} color="#f87171" />}
