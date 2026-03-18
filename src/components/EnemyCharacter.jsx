@@ -21,7 +21,7 @@ function HitSplash({ color }) {
   return (
     <motion.div
       className="absolute pointer-events-none"
-      style={{ left: 42, top: 62, transform: 'translate(-50%, -50%)', zIndex: 20, willChange: 'transform, opacity' }}
+      style={{ left: '50%', top: '40%', transform: 'translate(-50%, -50%)', zIndex: 20, willChange: 'transform, opacity' }}
       initial={{ scale: 0.05, opacity: 1 }}
       animate={{ scale: [0.05, 1.4, 1.7], opacity: [1, 1, 0] }}
       transition={{ duration: 0.5, times: [0, 0.28, 1], ease: 'easeOut' }}
@@ -623,7 +623,7 @@ export function EnemyCharacter({ phase, enemy, hitKey, raging = false }) {
   useEffect(() => {
     if (phase === 'hit') {
       if (rasterSprites) setSprite('attack')
-      moveControls.start({ x: [0, -80, 0], transition: { duration: 0.45, ease: 'easeInOut' } })
+      if (enemy.id !== 'dragon') moveControls.start({ x: [0, -80, 0], transition: { duration: 0.45, ease: 'easeInOut' } })
       if (!rasterSprites) weaponControls.start({ rotate: [0, 62, -12, 0], transition: { duration: 0.45, times: [0, 0.32, 0.62, 1] } })
       if (rasterSprites) { const t = setTimeout(() => setSprite('idle'), 300); return () => clearTimeout(t) }
     }
@@ -681,8 +681,8 @@ export function EnemyCharacter({ phase, enemy, hitKey, raging = false }) {
         <motion.div animate={moveControls} style={{ willChange: 'transform' }}>
           {rasterSprites ? (
             /* Raster: sprite already faces left — no scaleX needed */
-            <div style={{ position: 'relative', width: 'min(100px, 22vw)', overflow: 'visible', display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}>
-              <img key={sprite} src={rasterSprites[sprite]} style={{ height: 'min(180px, 39vw)', width: 'auto', display: 'block', flexShrink: 0 }} alt="" />
+            <div style={{ position: 'relative', width: 'min(130px, 28vw)', height: 'min(150px, 33vw)', flexShrink: 0 }}>
+              <img key={sprite} src={rasterSprites[sprite]} style={{ width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'center bottom', display: 'block' }} alt="" />
               <AnimatePresence>
                 {splashKey !== null && <HitSplash key={splashKey} color={rasterSprites.splashColor} />}
               </AnimatePresence>

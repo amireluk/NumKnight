@@ -108,7 +108,7 @@ function HitSplash({ color }) {
   return (
     <motion.div
       className="absolute pointer-events-none"
-      style={{ left: 42, top: 62, transform: 'translate(-50%, -50%)', zIndex: 20, willChange: 'transform, opacity' }}
+      style={{ left: '50%', top: '40%', transform: 'translate(-50%, -50%)', zIndex: 20, willChange: 'transform, opacity' }}
       initial={{ scale: 0.05, opacity: 1 }}
       animate={{ scale: [0.05, 1.4, 1.7], opacity: [1, 1, 0] }}
       transition={{ duration: 0.5, times: [0, 0.28, 1], ease: 'easeOut' }}
@@ -254,11 +254,11 @@ export function KnightCharacter({ phase, hitKey, useRaster }) {
         <motion.div animate={moveControls} style={{ willChange: 'transform' }}>
           {raster ? (
             /* ── Raster sprite swap mode ── */
-            <div style={{ position: 'relative', width: 'min(100px, 22vw)', overflow: 'visible', display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}>
+            <div style={{ position: 'relative', width: 'min(130px, 28vw)', height: 'min(150px, 33vw)', flexShrink: 0 }}>
               <img
                 key={sprite}
                 src={SPRITES[sprite]}
-                style={{ height: 'min(180px, 39vw)', width: 'auto', display: 'block', flexShrink: 0 }}
+                style={{ width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'center bottom', display: 'block' }}
                 alt=""
               />
               <AnimatePresence>
