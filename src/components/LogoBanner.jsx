@@ -62,17 +62,24 @@ export function SwordDivider({ style = {} }) {
   )
 }
 
-// Full banner: raster logo image (includes text + sword).
-// logoLongPress — spread onto the img for the long-press dev trigger.
-export function LogoBanner({ logoLongPress = {} }) {
+// Full banner: title text + sword below it.
+// logoLongPress — spread onto the <p> for the long-press dev trigger.
+export function LogoBanner({ logoLongPress = {}, showSword = true }) {
   return (
-    <div {...logoLongPress} style={{ width: '100%', userSelect: 'none', WebkitUserSelect: 'none' }}>
-      <img
-        src={`${import.meta.env.BASE_URL}assets/logo.webp?v=${typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : 'dev'}`}
-        alt="NumKnight"
-        draggable={false}
-        style={{ width: '100%', height: 'auto', display: 'block' }}
-      />
+    <div style={{ width: '100%' }}>
+      <p
+        {...logoLongPress}
+        className="font-black text-white tracking-widest text-center"
+        style={{
+          fontSize: 52, lineHeight: 1,
+          textShadow: '0 0 48px rgba(251,191,36,0.45), 0 2px 0 rgba(0,0,0,0.6)',
+          userSelect: 'none', WebkitUserSelect: 'none',
+          position: 'relative', zIndex: 1,
+        }}
+      >
+        NumKnight
+      </p>
+      {showSword && <SwordDivider />}
     </div>
   )
 }
