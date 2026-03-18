@@ -7,10 +7,10 @@ const V = typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : 'dev'
 const RASTER_KEY = 'numknight_raster_bg'
 const BASE = import.meta.env.BASE_URL
 const SPRITES = {
-  idle:   `${BASE}assets/characters/knight-idle.webp?v=${V}`,
-  attack: `${BASE}assets/characters/knight-attack.webp?v=${V}`,
-  hit:    `${BASE}assets/characters/knight-hit.webp?v=${V}`,
-  dead:   `${BASE}assets/characters/knight-dead.webp?v=${V}`,
+  idle:   `${BASE}assets/characters/knight/knight-idle.webp?v=${V}`,
+  attack: `${BASE}assets/characters/knight/knight-attack.webp?v=${V}`,
+  hit:    `${BASE}assets/characters/knight/knight-hit.webp?v=${V}`,
+  dead:   `${BASE}assets/characters/knight/knight-dead.webp?v=${V}`,
 }
 
 // Static body — everything except the sword arm

@@ -6,7 +6,7 @@ import { KnightBodySVG, KnightSwordArmSVG } from '../components/KnightCharacter'
 
 const _V    = typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : 'dev'
 const _BASE = import.meta.env.BASE_URL
-const DEAD_SPRITE = `${_BASE}assets/characters/knight-dead.webp?v=${_V}`
+const DEAD_SPRITE = `${_BASE}assets/characters/knight/knight-dead.webp?v=${_V}`
 
 export function ResultScreen({ worldName, worldId, enemy, totalScore, onRestart, onViewScores, lang, t }) {
   const isRtl = lang === 'he'

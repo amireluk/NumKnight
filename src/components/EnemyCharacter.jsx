@@ -563,10 +563,10 @@ const RASTER_KEY = 'numknight_raster_bg'
 // Raster sprite sets — 4 poses per enemy
 const RASTER_ENEMIES = {
   goblin: {
-    idle:   _img('assets/characters/goblin-idle.webp'),
-    attack: _img('assets/characters/goblin-attack.webp'),
-    hit:    _img('assets/characters/goblin-hit.webp'),
-    dead:   _img('assets/characters/goblin-dead.webp'),
+    idle:   _img('assets/characters/goblin/goblin-idle.webp'),
+    attack: _img('assets/characters/goblin/goblin-attack.webp'),
+    hit:    _img('assets/characters/goblin/goblin-hit.webp'),
+    dead:   _img('assets/characters/goblin/goblin-dead.webp'),
     splashColor: '#fbbf24',
   },
 }
