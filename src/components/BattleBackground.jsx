@@ -355,7 +355,7 @@ const RASTER_FILENAMES = {
 
 // Landscape images use cover+center (sky+ground always visible)
 // Portrait images use fill (slight squish but shows full image)
-const LANDSCAPE = new Set(['dragonLair'])
+const LANDSCAPE = new Set(['forest', 'swamp', 'mountains', 'castle', 'dragonLair'])
 
 export function BattleBackground({ worldId, useRaster }) {
   const Bg = BACKGROUNDS[worldId] ?? ForestBackground
