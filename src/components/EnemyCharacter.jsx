@@ -558,7 +558,7 @@ const ENEMIES = {
 const _VER  = typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : 'dev'
 const _BASE = import.meta.env.BASE_URL
 const _img  = (f) => `${_BASE}${f}?v=${_VER}`
-const RASTER_KEY = 'numknight_useRaster'
+const RASTER_KEY = 'numknight_raster_bg'
 
 // Raster entries: body/arm paths + arm positioning
 // armLeft/armTop: offset so arm shoulder aligns with body socket
@@ -579,7 +579,7 @@ const RASTER_ENEMIES = {
 export function EnemyCharacter({ phase, enemy, hitKey, raging = false }) {
   const cfg = ENEMIES[enemy.id] ?? ENEMIES.goblin
   const { Body, Weapon, splashColor, pivotX, pivotY } = cfg
-  const raster = (localStorage.getItem(RASTER_KEY) === '1') ? (RASTER_ENEMIES[enemy.id] ?? null) : null
+  const raster = (localStorage.getItem(RASTER_KEY) === 'true') ? (RASTER_ENEMIES[enemy.id] ?? null) : null
 
   const moveControls = useAnimation()
   const weaponControls = useAnimation()
