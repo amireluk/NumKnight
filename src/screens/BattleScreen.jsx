@@ -352,7 +352,6 @@ export function BattleScreen({ world, worldIndex, battleIndex, onBattleEnd, onQu
   const [buttonStates, setButtonStates] = useState(IDLE_BUTTON_STATES)
   const [enemyHitKey,  setEnemyHitKey]  = useState(0)
   const [playerHitKey, setPlayerHitKey] = useState(0)
-  const [knightOnTop,  setKnightOnTop]  = useState(true) // knight in front when attacking, enemy in front when hitting
   const [introPlaying, setIntroPlaying] = useState(saved ? false : true)
   // Rage phase
   const [raging, setRaging] = useState(saved?.raging ?? false)
@@ -474,10 +473,6 @@ export function BattleScreen({ world, worldIndex, battleIndex, onBattleEnd, onQu
       timeBonusAcc: timeBonusAccRef.current,
     })
   }, [playerHP, enemyHP, mistakes, timeLeft, shieldStreak, shieldState, raging]) // eslint-disable-line react-hooks/exhaustive-deps
-
-  // Draw order: attacker goes on top
-  useEffect(() => { setKnightOnTop(true)  }, [enemyHitKey])   // knight hit enemy → knight in front
-  useEffect(() => { setKnightOnTop(false) }, [playerHitKey])  // enemy hit knight → enemy in front
 
   // Timer expiry → wrong answer
   useEffect(() => {
@@ -777,7 +772,8 @@ export function BattleScreen({ world, worldIndex, battleIndex, onBattleEnd, onQu
             {/* Characters */}
             <div className="relative flex flex-1 justify-around items-end">
               {/* Knight — slides in from left only on first encounter; stays put on subsequent ones */}
-              <div className="flex flex-col items-center" style={{ zIndex: knightOnTop ? 2 : 1, position: 'relative' }}>
+              {/* zIndex: knight on top while attacking (lunging right over enemy), enemy on top otherwise (it's last in DOM so naturally above) */}
+              <div className="flex flex-col items-center" style={{ zIndex: phase === 'attacking' ? 2 : 1, position: 'relative' }}>
                 <motion.div
                   initial={{ x: battleIndex === 0 ? -220 : 0 }}
                   animate={{ x: 0 }}
@@ -796,7 +792,7 @@ export function BattleScreen({ world, worldIndex, battleIndex, onBattleEnd, onQu
               </div>
 
               {/* Enemy — slides in from right alongside knight */}
-              <div className="flex flex-col items-center" style={{ zIndex: knightOnTop ? 1 : 2, position: 'relative' }}>
+              <div className="flex flex-col items-center" style={{ position: 'relative' }}>
                 <motion.div
                   initial={{ x: 120, opacity: 0 }}
                   animate={{ x: 0, opacity: showTrophy ? 0 : 1 }}
