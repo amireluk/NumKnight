@@ -199,6 +199,12 @@ export function KnightCharacter({ phase, hitKey, useRaster }) {
   const [sprite, setSprite] = useState('idle')
   const raster = useRaster ?? (localStorage.getItem(RASTER_KEY) === 'true')
 
+  // Preload all sprites on mount so swaps are instant
+  useEffect(() => {
+    if (!raster) return
+    Object.values(SPRITES).forEach(src => { new Image().src = src })
+  }, [raster])
+
   // Knight attacks — lunge right + sprite swap (raster) or sword swing (SVG)
   useEffect(() => {
     if (phase === 'attacking') {
