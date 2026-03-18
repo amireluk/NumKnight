@@ -254,11 +254,11 @@ export function KnightCharacter({ phase, hitKey, useRaster }) {
         <motion.div animate={moveControls} style={{ willChange: 'transform' }}>
           {raster ? (
             /* ── Raster sprite swap mode ── */
-            <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'center', overflow: 'visible' }}>
+            <div style={{ position: 'relative', width: 'min(160px, 35vw)', height: 'min(150px, 33vw)', overflow: 'visible' }}>
               <img
                 key={sprite}
                 src={SPRITES[sprite]}
-                style={{ height: 'min(100px, 22vw)', width: 'auto', display: 'block' }}
+                style={{ position: 'absolute', bottom: 0, left: '50%', transform: 'translateX(-50%)', height: 'min(150px, 33vw)', width: 'auto' }}
                 alt=""
               />
               <AnimatePresence>
