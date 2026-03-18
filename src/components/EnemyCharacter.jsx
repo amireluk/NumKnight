@@ -651,9 +651,8 @@ export function EnemyCharacter({ phase, enemy, hitKey, raging = false }) {
         style={{ willChange: 'transform' }}
       >
         <motion.div animate={moveControls} style={{ willChange: 'transform' }}>
-          {/* scaleX(-1) is in its own div so Framer Motion's x animation can't clobber it */}
-          <div style={{ transform: 'scaleX(-1)' }}>
           {rasterSprites ? (
+            /* Raster: sprite already faces left — no scaleX needed */
             <div style={{ position: 'relative', display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}>
               <img key={sprite} src={rasterSprites[sprite]} style={{ maxHeight: 'min(130px, 28vw)', maxWidth: 'min(200px, 44vw)', width: 'auto', height: 'auto', display: 'block' }} alt="" />
               <AnimatePresence>
@@ -661,20 +660,22 @@ export function EnemyCharacter({ phase, enemy, hitKey, raging = false }) {
               </AnimatePresence>
             </div>
           ) : (
-            <div style={{ position: 'relative', width: 84, height: 112, overflow: 'visible' }}>
-              <Body />
-              <motion.div
-                animate={weaponControls}
-                style={{ position: 'absolute', top: 0, left: 0, width: 84, height: 112, overflow: 'visible', transformOrigin: `${pivotX}px ${pivotY}px` }}
-              >
-                <Weapon />
-              </motion.div>
-              <AnimatePresence>
-                {splashKey !== null && <HitSplash key={splashKey} color={splashColor} />}
-              </AnimatePresence>
+            /* SVG: source faces right, flip to face left */
+            <div style={{ transform: 'scaleX(-1)' }}>
+              <div style={{ position: 'relative', width: 84, height: 112, overflow: 'visible' }}>
+                <Body />
+                <motion.div
+                  animate={weaponControls}
+                  style={{ position: 'absolute', top: 0, left: 0, width: 84, height: 112, overflow: 'visible', transformOrigin: `${pivotX}px ${pivotY}px` }}
+                >
+                  <Weapon />
+                </motion.div>
+                <AnimatePresence>
+                  {splashKey !== null && <HitSplash key={splashKey} color={splashColor} />}
+                </AnimatePresence>
+              </div>
             </div>
           )}
-          </div>
         </motion.div>
       </motion.div>
     </div>
