@@ -560,15 +560,13 @@ const _BASE = import.meta.env.BASE_URL
 const _img  = (f) => `${_BASE}${f}?v=${_VER}`
 const RASTER_KEY = 'numknight_raster_bg'
 
-// Raster entries: body/arm paths + arm positioning
-// armLeft/armTop: offset so arm shoulder aligns with body socket
-// pivotX/pivotY:  rotation origin within the arm image (84×112 space)
+// Raster sprite sets — 4 poses per enemy
 const RASTER_ENEMIES = {
   goblin: {
-    body: _img('assets/characters/goblin.webp'),
-    arm:  _img('assets/characters/goblin-arm.webp'),
-    armLeft: -52, armTop: 27,
-    pivotX: 70,   pivotY: 14,
+    idle:   _img('assets/characters/goblin-idle.webp'),
+    attack: _img('assets/characters/goblin-attack.webp'),
+    hit:    _img('assets/characters/goblin-hit.webp'),
+    dead:   _img('assets/characters/goblin-dead.webp'),
     splashColor: '#fbbf24',
   },
 }
@@ -579,59 +577,67 @@ const RASTER_ENEMIES = {
 export function EnemyCharacter({ phase, enemy, hitKey, raging = false }) {
   const cfg = ENEMIES[enemy.id] ?? ENEMIES.goblin
   const { Body, Weapon, splashColor, pivotX, pivotY } = cfg
-  const raster = (localStorage.getItem(RASTER_KEY) === 'true') ? (RASTER_ENEMIES[enemy.id] ?? null) : null
+  const rasterSprites = (localStorage.getItem(RASTER_KEY) === 'true') ? (RASTER_ENEMIES[enemy.id] ?? null) : null
 
   const moveControls = useAnimation()
   const weaponControls = useAnimation()
   const idleTimerRef = useRef(null)
   const [splashKey, setSplashKey] = useState(null)
+  const [sprite, setSprite] = useState('idle')
 
-  // Enemy attacks — lunges left, weapon swings
+  // Preload sprites on mount
+  useEffect(() => {
+    if (!rasterSprites) return
+    Object.values(rasterSprites).forEach(v => { if (typeof v === 'string') new Image().src = v })
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Enemy attacks — lunges left + sprite swap
   useEffect(() => {
     if (phase === 'hit') {
+      if (rasterSprites) setSprite('attack')
       moveControls.start({ x: [0, -80, 0], transition: { duration: 0.45, ease: 'easeInOut' } })
-      weaponControls.start({
-        rotate: [0, 62, -12, 0],
-        transition: { duration: 0.45, times: [0, 0.32, 0.62, 1] },
-      })
+      if (!rasterSprites) weaponControls.start({ rotate: [0, 62, -12, 0], transition: { duration: 0.45, times: [0, 0.32, 0.62, 1] } })
+      if (rasterSprites) { const t = setTimeout(() => setSprite('idle'), 300); return () => clearTimeout(t) }
     }
-    // Death — stumble then topple off right side
     if (phase === 'won') {
-      moveControls.start({
-        x: [0, -18, 160],
-        rotate: [0, -12, -80],
-        opacity: [1, 1, 0],
+      if (rasterSprites) setSprite('dead')
+      moveControls.start(rasterSprites ? {
+        opacity: [1, 1, 0], transition: { duration: 1.0, times: [0, 0.4, 1] },
+      } : {
+        x: [0, -18, 160], rotate: [0, -12, -80], opacity: [1, 1, 0],
         transition: { duration: 0.65, times: [0, 0.25, 1], ease: 'easeIn' },
       })
     }
-  }, [phase, moveControls, weaponControls])
+    if (phase === 'idle' && rasterSprites) setSprite('idle')
+  }, [phase, moveControls, weaponControls, rasterSprites]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Enemy takes a hit — recoil + splash
+  // Enemy takes a hit — recoil + splash + sprite swap
   useEffect(() => {
     if (hitKey > 0) {
+      if (rasterSprites) setSprite('hit')
       moveControls.start({ x: [0, 12, -5, 0], transition: { duration: 0.35 } })
-      weaponControls.start({ rotate: [0, -15, 5, 0], transition: { duration: 0.35 } })
+      if (!rasterSprites) weaponControls.start({ rotate: [0, -15, 5, 0], transition: { duration: 0.35 } })
       setSplashKey(hitKey)
-      const t = setTimeout(() => setSplashKey(null), 550)
-      return () => clearTimeout(t)
+      const t1 = setTimeout(() => setSplashKey(null), 550)
+      const t2 = rasterSprites ? setTimeout(() => setSprite('idle'), 350) : null
+      return () => { clearTimeout(t1); if (t2) clearTimeout(t2) }
     }
-  }, [hitKey, moveControls, weaponControls])
+  }, [hitKey, moveControls, weaponControls, rasterSprites]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Idle weapon wiggle — occasional movement, doubled interval for perf
+  // Idle weapon wiggle (SVG only)
   useEffect(() => {
     if (idleTimerRef.current) clearTimeout(idleTimerRef.current)
-    if (phase !== 'idle') return
+    if (phase !== 'idle' || rasterSprites) return
     const schedule = () => {
       const minDelay = raging ? 4000 : 8000
-      const randExtra = raging ? 3000 : 6000
       idleTimerRef.current = setTimeout(() => {
         weaponControls.start({ rotate: [0, -15, 0], transition: { duration: 0.4, ease: 'easeInOut' } })
         schedule()
-      }, minDelay + Math.random() * randExtra)
+      }, minDelay + Math.random() * (raging ? 3000 : 6000))
     }
     schedule()
     return () => clearTimeout(idleTimerRef.current)
-  }, [phase, raging]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [phase, raging, rasterSprites]) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div className="relative flex flex-col items-center">
@@ -645,37 +651,27 @@ export function EnemyCharacter({ phase, enemy, hitKey, raging = false }) {
         style={{ willChange: 'transform' }}
       >
         <motion.div animate={moveControls} style={{ transform: 'scaleX(-1)', willChange: 'transform' }}>
-          <div style={{ position: 'relative', width: 84, height: 112, overflow: 'visible' }}>
-            {raster ? (
-              <img src={raster.body} width={84} height={112} style={{ position: 'absolute', top: 0, left: 0 }} alt="" />
-            ) : (
+          {rasterSprites ? (
+            <div style={{ position: 'relative', width: 200, height: 124, overflow: 'visible' }}>
+              <img key={sprite} src={rasterSprites[sprite]} style={{ position: 'absolute', bottom: 0, left: 0, width: 200 }} alt="" />
+              <AnimatePresence>
+                {splashKey !== null && <HitSplash key={splashKey} color={rasterSprites.splashColor} />}
+              </AnimatePresence>
+            </div>
+          ) : (
+            <div style={{ position: 'relative', width: 84, height: 112, overflow: 'visible' }}>
               <Body />
-            )}
-            <motion.div
-              animate={weaponControls}
-              style={{
-                position: 'absolute',
-                top:  raster ? raster.armTop  : 0,
-                left: raster ? raster.armLeft : 0,
-                width: 84,
-                height: 112,
-                overflow: 'visible',
-                transformOrigin: raster
-                  ? `${raster.pivotX}px ${raster.pivotY}px`
-                  : `${pivotX}px ${pivotY}px`,
-              }}
-            >
-              {raster ? (
-                <img src={raster.arm} width={84} height={112} alt="" />
-              ) : (
+              <motion.div
+                animate={weaponControls}
+                style={{ position: 'absolute', top: 0, left: 0, width: 84, height: 112, overflow: 'visible', transformOrigin: `${pivotX}px ${pivotY}px` }}
+              >
                 <Weapon />
-              )}
-            </motion.div>
-
-            <AnimatePresence>
-              {splashKey !== null && <HitSplash key={splashKey} color={raster ? raster.splashColor : splashColor} />}
-            </AnimatePresence>
-          </div>
+              </motion.div>
+              <AnimatePresence>
+                {splashKey !== null && <HitSplash key={splashKey} color={splashColor} />}
+              </AnimatePresence>
+            </div>
+          )}
         </motion.div>
       </motion.div>
     </div>
