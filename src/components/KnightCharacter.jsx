@@ -214,11 +214,15 @@ export function KnightCharacter({ phase, hitKey, useRaster }) {
       if (raster) { const t = setTimeout(() => setSprite('idle'), 300); return () => clearTimeout(t) }
     }
     if (phase === 'lost') {
-      if (raster) setSprite('dead')
-      moveControls.start({
-        x: [0, 18, -160], rotate: [0, 10, 80], opacity: [1, 1, 0],
-        transition: { duration: 0.65, times: [0, 0.25, 1], ease: 'easeIn' },
-      })
+      if (raster) {
+        setSprite('dead')
+        moveControls.start({ opacity: [1, 1, 0], transition: { duration: 1.2, times: [0, 0.5, 1] } })
+      } else {
+        moveControls.start({
+          x: [0, 18, -160], rotate: [0, 10, 80], opacity: [1, 1, 0],
+          transition: { duration: 0.65, times: [0, 0.25, 1], ease: 'easeIn' },
+        })
+      }
     }
     if (phase === 'idle' && raster) setSprite('idle')
   }, [phase, moveControls, swordControls, raster]) // eslint-disable-line react-hooks/exhaustive-deps

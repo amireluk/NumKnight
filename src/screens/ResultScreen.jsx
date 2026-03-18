@@ -1,7 +1,12 @@
+/* eslint-disable no-undef */
 import { motion } from 'framer-motion'
 import { EnemyCharacter } from '../components/EnemyCharacter'
 import { BattleBackground } from '../components/BattleBackground'
 import { KnightBodySVG, KnightSwordArmSVG } from '../components/KnightCharacter'
+
+const _V    = typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : 'dev'
+const _BASE = import.meta.env.BASE_URL
+const DEAD_SPRITE = `${_BASE}assets/characters/knight-dead.webp?v=${_V}`
 
 export function ResultScreen({ worldName, worldId, enemy, totalScore, onRestart, onViewScores, lang, t }) {
   const isRtl = lang === 'he'
@@ -54,16 +59,19 @@ export function ResultScreen({ worldName, worldId, enemy, totalScore, onRestart,
           display: 'flex', justifyContent: 'center', alignItems: 'flex-end',
           pointerEvents: 'none', overflow: 'visible',
         }}>
-          <div style={{
-            position: 'relative', width: 84, height: 112, overflow: 'visible',
-            transform: 'rotate(-90deg) scale(0.75)',
-            transformOrigin: 'center center',
-          }}>
-            <KnightBodySVG />
-            <div style={{ position: 'absolute', top: 0, left: 0, overflow: 'visible', transformOrigin: '73px 58px' }}>
-              <KnightSwordArmSVG />
+          {localStorage.getItem('numknight_raster_bg') === 'true' ? (
+            <img src={DEAD_SPRITE} style={{ width: 180, height: 'auto' }} alt="" />
+          ) : (
+            <div style={{
+              position: 'relative', width: 84, height: 112, overflow: 'visible',
+              transform: 'rotate(-90deg) scale(0.75)', transformOrigin: 'center center',
+            }}>
+              <KnightBodySVG />
+              <div style={{ position: 'absolute', top: 0, left: 0, overflow: 'visible', transformOrigin: '73px 58px' }}>
+                <KnightSwordArmSVG />
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
         {/* Enemy standing victorious — moved closer to center */}
