@@ -4,9 +4,10 @@ import React, { useEffect, useState } from 'react'
 const RASTER_KEY = 'numknight_raster_bg'
 // Display size — maintains source image ratio (300:447)
 const RW = 100, RH = 149
-// Arm pivot = shoulder joint in the shared 300×447 canvas, scaled to RW×RH
-// Shoulder centre ≈ (82, 35) in 300×447 → (27, 12) in 100×149
-const ARM_PIVOT_X = 27, ARM_PIVOT_Y = 12
+// Arm pivot = shoulder joint centroid in 300×447 canvas → scaled to RW×RH
+// Shoulder centroid at (120, 105) in 300×447 → (40, 35) in 100×149
+// Parent container is flipped scaleX(-1), so local pivot stays at (40, 35)
+const ARM_PIVOT_X = 40, ARM_PIVOT_Y = 35
 
 // Static body — everything except the sword arm
 export const KnightBodySVG = React.memo(function KnightBodySVG() {
@@ -238,7 +239,7 @@ export function KnightCharacter({ phase, hitKey, useRaster }) {
         <motion.div animate={moveControls} style={{ willChange: 'transform' }}>
           {raster ? (
             /* ── Raster mode: body + arm images on shared canvas ── */
-            <div style={{ position: 'relative', width: RW, height: RH, overflow: 'visible' }}>
+            <div style={{ position: 'relative', width: RW, height: RH, overflow: 'visible', transform: 'scaleX(-1)' }}>
               <img src={`${import.meta.env.BASE_URL}assets/characters/knight.webp`}
                 style={{ width: RW, height: RH, display: 'block' }} alt="" />
               <motion.div
