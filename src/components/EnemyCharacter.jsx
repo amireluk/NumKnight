@@ -569,6 +569,34 @@ const RASTER_ENEMIES = {
     dead:   _img('assets/characters/goblin/goblin-dead.webp'),
     splashColor: '#fbbf24',
   },
+  skeleton: {
+    idle:   _img('assets/characters/skeleton/skeleton-idle.webp'),
+    attack: _img('assets/characters/skeleton/skeleton-attack.webp'),
+    hit:    _img('assets/characters/skeleton/skeleton-hit.webp'),
+    dead:   _img('assets/characters/skeleton/skeleton-dead.webp'),
+    splashColor: '#a78bfa',
+  },
+  orc: {
+    idle:   _img('assets/characters/orc/orc-idle.webp'),
+    attack: _img('assets/characters/orc/orc-attack.webp'),
+    hit:    _img('assets/characters/orc/orc-hit.webp'),
+    dead:   _img('assets/characters/orc/orc-dead.webp'),
+    splashColor: '#fb923c',
+  },
+  darkKnight: {
+    idle:   _img('assets/characters/dark-knight/dark-knight-idle.webp'),
+    attack: _img('assets/characters/dark-knight/dark-knight-attack.webp'),
+    hit:    _img('assets/characters/dark-knight/dark-knight-hit.webp'),
+    dead:   _img('assets/characters/dark-knight/dark-knight-dead.webp'),
+    splashColor: '#94a3b8',
+  },
+  dragon: {
+    idle:   _img('assets/characters/dragon/dragon-idle.webp'),
+    attack: _img('assets/characters/dragon/dragon-attack.webp'),
+    hit:    _img('assets/characters/dragon/dragon-hit.webp'),
+    dead:   _img('assets/characters/dragon/dragon-dead.webp'),
+    splashColor: '#f87171',
+  },
 }
 
 // ─────────────────────────────────────────────
@@ -653,8 +681,8 @@ export function EnemyCharacter({ phase, enemy, hitKey, raging = false }) {
         <motion.div animate={moveControls} style={{ willChange: 'transform' }}>
           {rasterSprites ? (
             /* Raster: sprite already faces left — no scaleX needed */
-            <div style={{ position: 'relative', width: 'min(100px, 22vw)', height: 'min(120px, 26vw)', overflow: 'visible' }}>
-              <img key={sprite} src={rasterSprites[sprite]} style={{ position: 'absolute', bottom: 0, left: '50%', transform: 'translateX(-50%)', height: '100%', width: 'auto' }} alt="" />
+            <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'center', width: 'min(100px, 22vw)', height: 'min(120px, 26vw)', overflow: 'visible', position: 'relative' }}>
+              <img key={sprite} src={rasterSprites[sprite]} style={{ height: '100%', width: 'auto', flexShrink: 0 }} alt="" />
               <AnimatePresence>
                 {splashKey !== null && <HitSplash key={splashKey} color={rasterSprites.splashColor} />}
               </AnimatePresence>
