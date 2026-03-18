@@ -1,4 +1,4 @@
-import { memo } from 'react'
+import { memo, useState } from 'react'
 
 // ─── Forest ───────────────────────────────────────────────────────────────────
 function ForestBackground() {
@@ -358,22 +358,37 @@ const RASTER_FILENAMES = {
 const LANDSCAPE = new Set(['dragonLair'])
 
 export function BattleBackground({ worldId, useRaster }) {
+  const Bg = BACKGROUNDS[worldId] ?? ForestBackground
+
   if (useRaster) {
     const filename = RASTER_FILENAMES[worldId] ?? 'forest'
     const isLandscape = LANDSCAPE.has(worldId)
     return (
-      <img
-        src={`${import.meta.env.BASE_URL}assets/backgrounds/${filename}.webp`}
-        alt=""
-        style={{
-          position: 'absolute', inset: 0,
-          width: '100%', height: '100%',
-          objectFit: isLandscape ? 'cover' : 'fill',
-          objectPosition: 'center center',
-        }}
-      />
+      <>
+        {/* SVG stays mounted underneath — visible while image loads, no flash */}
+        <Bg />
+        <RasterImage filename={filename} isLandscape={isLandscape} />
+      </>
     )
   }
-  const Bg = BACKGROUNDS[worldId] ?? ForestBackground
   return <Bg />
+}
+
+function RasterImage({ filename, isLandscape }) {
+  const [loaded, setLoaded] = useState(false)
+  return (
+    <img
+      src={`${import.meta.env.BASE_URL}assets/backgrounds/${filename}.webp`}
+      alt=""
+      onLoad={() => setLoaded(true)}
+      style={{
+        position: 'absolute', inset: 0,
+        width: '100%', height: '100%',
+        objectFit: isLandscape ? 'cover' : 'fill',
+        objectPosition: 'center center',
+        opacity: loaded ? 1 : 0,
+        transition: 'opacity 0.4s ease',
+      }}
+    />
+  )
 }

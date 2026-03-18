@@ -18,6 +18,7 @@ import { BattleBackground } from '../components/BattleBackground'
 import { BattleIntro } from '../components/BattleIntro'
 
 const DEFAULT_PLAYER_HP = 3
+const RASTER_KEY = 'numknight_raster_bg'
 const IDLE_BUTTON_STATES = ['idle', 'idle', 'idle', 'idle']
 
 const TROPHY_LABEL_DEFAULT = { gold: 'PERFECT!', silver: 'GREAT!', bronze: 'SURVIVED!' }
@@ -98,7 +99,7 @@ function ShieldUpBanner({ t }) {
 }
 
 // In-scene overlay shown when the enemy is defeated
-function TrophyOverlay({ trophy, timeBonus, onContinue, t }) {
+function TrophyOverlay({ trophy, timeBonus, scoreBonus = 0, onContinue, t }) {
   const TROPHY_LABEL = t?.trophyLabel ?? TROPHY_LABEL_DEFAULT
   const BASE_SCORE = { gold: 100, silver: 50, bronze: 25 }
   const baseScore = BASE_SCORE[trophy] ?? 0
@@ -176,6 +177,22 @@ function TrophyOverlay({ trophy, timeBonus, onContinue, t }) {
           }}
         >
           {t?.timeBonusLabel ? t.timeBonusLabel(timeBonus.toLocaleString()) : `${timeBonus.toLocaleString()} time bonus`}
+        </motion.p>
+      )}
+
+      {/* Chronicle bonus */}
+      {scoreBonus > 0 && (
+        <motion.p
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: timeBonus > 0 ? 0.86 : 0.72 }}
+          style={{
+            fontSize: 15, fontWeight: 800, color: '#a78bfa', letterSpacing: '0.05em',
+            background: 'rgba(255,255,255,0.15)', borderRadius: 10,
+            padding: '3px 14px',
+          }}
+        >
+          {t?.chronicleBonusLabel ? t.chronicleBonusLabel(scoreBonus.toLocaleString()) : `📜 +${scoreBonus.toLocaleString()} chronicle bonus`}
         </motion.p>
       )}
 
@@ -295,8 +312,14 @@ function FallingRocks() {
   )
 }
 
-export function BattleScreen({ world, worldIndex, battleIndex, onBattleEnd, onQuit, lang, t }) {
+export function BattleScreen({ world, worldIndex, battleIndex, onBattleEnd, onQuit, scoreBonus = 0, lang, t }) {
   const shakeControls = useAnimation()
+  const [useRaster, setUseRaster] = useState(() => localStorage.getItem(RASTER_KEY) === 'true')
+
+  const toggleRaster = () => setUseRaster((v) => {
+    localStorage.setItem(RASTER_KEY, String(!v))
+    return !v
+  })
 
   const PLAYER_HP = world.playerHP ?? DEFAULT_PLAYER_HP
   const isBoss = world.enemy.id === 'dragon'
@@ -539,7 +562,7 @@ export function BattleScreen({ world, worldIndex, battleIndex, onBattleEnd, onQu
         if (shieldStreak === 1) {
           // Hit 2: pip falls — trigger fall anim immediately, then state update
           logEvent('shield_hit', { streak: 2 })
-          const pip = world.enemy.hp - enemyHP   // current top filled pip index
+          const pip = (world.enemy.maxHp ?? world.enemy.hp) - enemyHP   // current top filled pip index
           setShieldFallPip(pip)
           setShieldFallKey((k) => k + 1)
           setTimeout(() => {
@@ -648,14 +671,14 @@ export function BattleScreen({ world, worldIndex, battleIndex, onBattleEnd, onQu
   return (
     <motion.div
       animate={shakeControls}
-      className="flex flex-col h-dvh max-w-md mx-auto px-3 py-4 gap-4"
+      className="flex flex-col h-dvh max-w-md mx-auto px-1 py-2 gap-2"
       style={{ position: 'relative', overflow: 'hidden', background: 'linear-gradient(to bottom, #1e3a70, #2d5aaa)' }}
     >
       <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', flex: 1, gap: 16 }}>
 
         {/* Battle arena */}
         <div className="flex flex-1 min-h-0" style={{ position: 'relative' }}>
-          <BattleBackground worldId={world.id} />
+          <BattleBackground worldId={world.id} useRaster={useRaster} />
 
           {/* Region + round — below the ✕ button */}
           <div style={{
@@ -704,6 +727,21 @@ export function BattleScreen({ world, worldIndex, battleIndex, onBattleEnd, onQu
               ✕
             </button>
           )}
+
+          {/* Raster / vector toggle — top-right */}
+          <button
+            onClick={toggleRaster}
+            title={useRaster ? 'Switch to vector' : 'Switch to image'}
+            style={{
+              position: 'absolute', top: 8, right: 10, zIndex: 5,
+              background: 'rgba(0,0,0,0.35)', border: '1.5px solid rgba(255,255,255,0.18)',
+              borderRadius: 8, padding: '4px 10px',
+              fontSize: 11, fontWeight: 900, color: 'rgba(255,255,255,0.7)',
+              cursor: 'pointer', letterSpacing: '0.04em',
+            }}
+          >
+            {useRaster ? 'SVG' : 'IMG'}
+          </button>
 
           {/* Shield-up banner */}
           <AnimatePresence>
@@ -776,7 +814,7 @@ export function BattleScreen({ world, worldIndex, battleIndex, onBattleEnd, onQu
               className="mb-6"
               style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}
             >
-              <HPBar current={enemyHP} max={world.enemy.hp} color="red" shieldState={shieldState} shieldFlashKey={shieldFlashKey} shieldFallKey={shieldFallKey} shieldFallPip={shieldFallPip} />
+              <HPBar current={enemyHP} max={world.enemy.maxHp ?? world.enemy.hp} color="red" shieldState={shieldState} shieldFlashKey={shieldFlashKey} shieldFallKey={shieldFallKey} shieldFallPip={shieldFallPip} />
             </motion.div>
           </div>
         </div>
@@ -849,6 +887,7 @@ export function BattleScreen({ world, worldIndex, battleIndex, onBattleEnd, onQu
         <TrophyOverlay
           trophy={getTrophy(wonMistakesRef.current)}
           timeBonus={wonTimeBonusRef.current}
+          scoreBonus={scoreBonus}
           onContinue={() => onBattleEnd({ won: true, mistakes: wonMistakesRef.current, timeBonus: wonTimeBonusRef.current })}
           t={t}
         />
