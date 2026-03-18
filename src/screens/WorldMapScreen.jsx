@@ -321,7 +321,7 @@ function RegionBand({ world, worldIndex, status, trophy, score, delay, onTap, is
 
       {/* Active: knight + enemy centered */}
       {isCurrent && (
-        <div style={{
+        <div dir="ltr" style={{
           position: 'absolute', inset: 0, zIndex: 2, pointerEvents: 'none',
           display: 'flex', flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'center', gap: 12,
         }}>

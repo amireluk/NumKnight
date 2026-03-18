@@ -76,7 +76,7 @@ export function ResultScreen({ worldName, worldId, enemy, totalScore, onRestart,
 
         {/* Enemy standing victorious — moved closer to center */}
         {enemy && (
-          <div style={{
+          <div dir="ltr" style={{
             position: 'absolute', inset: 0, zIndex: 3,
             display: 'flex', alignItems: 'flex-end', justifyContent: 'flex-end',
             paddingBottom: 20, paddingRight: '26%',

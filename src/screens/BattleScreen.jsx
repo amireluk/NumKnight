@@ -769,8 +769,8 @@ export function BattleScreen({ world, worldIndex, battleIndex, onBattleEnd, onQu
               <HPBar current={playerHP} max={PLAYER_HP} color="green" damageFlashKey={flashHitKey} />
             </motion.div>
 
-            {/* Characters */}
-            <div className="relative flex flex-1 justify-around items-end">
+            {/* Characters — dir=ltr so RTL language never flips character positions */}
+            <div dir="ltr" className="relative flex flex-1 justify-around items-end">
               {/* Knight — slides in from left only on first encounter; stays put on subsequent ones */}
               {/* zIndex: knight on top while attacking (lunging right over enemy), enemy on top otherwise (it's last in DOM so naturally above) */}
               <div className="flex flex-col items-center" style={{ zIndex: phase === 'attacking' ? 2 : 1, position: 'relative' }}>
