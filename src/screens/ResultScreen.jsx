@@ -74,16 +74,6 @@ export function ResultScreen({ worldName, worldId, enemy, totalScore, onRestart,
           )}
         </div>
 
-        {/* Enemy standing victorious — moved closer to center */}
-        {enemy && (
-          <div dir="ltr" style={{
-            position: 'absolute', inset: 0, zIndex: 3,
-            display: 'flex', alignItems: 'flex-end', justifyContent: 'flex-end',
-            paddingBottom: 20, paddingRight: '26%',
-          }}>
-            <EnemyCharacter phase="idle" enemy={enemy} hitKey={0} />
-          </div>
-        )}
       </motion.div>
 
       {/* Score panel */}
