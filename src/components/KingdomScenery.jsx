@@ -70,7 +70,7 @@ export function StrollingKnight() {
         opacity: visible ? 1 : 0,
       }}>
         <div style={{
-          transform: `scale(0.36) scaleX(${facingRight ? 1 : -1})`,
+          transform: `scale(0.72) scaleX(${facingRight ? 1 : -1})`,
           transformOrigin: 'center bottom',
           display: 'inline-block',
           filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.5))',
