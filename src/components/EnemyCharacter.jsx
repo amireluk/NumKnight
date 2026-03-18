@@ -681,7 +681,7 @@ export function EnemyCharacter({ phase, enemy, hitKey, raging = false }) {
         <motion.div animate={moveControls} style={{ willChange: 'transform' }}>
           {rasterSprites ? (
             /* Raster: sprite already faces left — no scaleX needed */
-            <div style={{ position: 'relative', overflow: 'visible', display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}>
+            <div style={{ position: 'relative', width: 'min(100px, 22vw)', overflow: 'visible', display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}>
               <img key={sprite} src={rasterSprites[sprite]} style={{ height: 'min(180px, 39vw)', width: 'auto', display: 'block', flexShrink: 0 }} alt="" />
               <AnimatePresence>
                 {splashKey !== null && <HitSplash key={splashKey} color={rasterSprites.splashColor} />}
