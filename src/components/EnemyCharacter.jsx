@@ -554,12 +554,32 @@ const ENEMIES = {
   dragon:    { Body: React.memo(DragonBodySVG),    Weapon: React.memo(DragonClawArmSVG),     splashColor: '#f87171', pivotX: 66, pivotY: 50 },
 }
 
+/* eslint-disable no-undef */
+const _VER  = typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : 'dev'
+const _BASE = import.meta.env.BASE_URL
+const _img  = (f) => `${_BASE}${f}?v=${_VER}`
+const RASTER_KEY = 'numknight_useRaster'
+
+// Raster entries: body/arm paths + arm positioning
+// armLeft/armTop: offset so arm shoulder aligns with body socket
+// pivotX/pivotY:  rotation origin within the arm image (84×112 space)
+const RASTER_ENEMIES = {
+  goblin: {
+    body: _img('assets/characters/goblin.webp'),
+    arm:  _img('assets/characters/goblin-arm.webp'),
+    armLeft: -52, armTop: 27,
+    pivotX: 70,   pivotY: 14,
+    splashColor: '#fbbf24',
+  },
+}
+
 // ─────────────────────────────────────────────
 // Animated enemy wrapper (shared for all)
 // ─────────────────────────────────────────────
 export function EnemyCharacter({ phase, enemy, hitKey, raging = false }) {
   const cfg = ENEMIES[enemy.id] ?? ENEMIES.goblin
   const { Body, Weapon, splashColor, pivotX, pivotY } = cfg
+  const raster = (localStorage.getItem(RASTER_KEY) === '1') ? (RASTER_ENEMIES[enemy.id] ?? null) : null
 
   const moveControls = useAnimation()
   const weaponControls = useAnimation()
@@ -626,24 +646,34 @@ export function EnemyCharacter({ phase, enemy, hitKey, raging = false }) {
       >
         <motion.div animate={moveControls} style={{ transform: 'scaleX(-1)', willChange: 'transform' }}>
           <div style={{ position: 'relative', width: 84, height: 112, overflow: 'visible' }}>
-            <Body />
+            {raster ? (
+              <img src={raster.body} width={84} height={112} style={{ position: 'absolute', top: 0, left: 0 }} alt="" />
+            ) : (
+              <Body />
+            )}
             <motion.div
               animate={weaponControls}
               style={{
                 position: 'absolute',
-                top: 0,
-                left: 0,
+                top:  raster ? raster.armTop  : 0,
+                left: raster ? raster.armLeft : 0,
                 width: 84,
                 height: 112,
                 overflow: 'visible',
-                transformOrigin: `${pivotX}px ${pivotY}px`,
+                transformOrigin: raster
+                  ? `${raster.pivotX}px ${raster.pivotY}px`
+                  : `${pivotX}px ${pivotY}px`,
               }}
             >
-              <Weapon />
+              {raster ? (
+                <img src={raster.arm} width={84} height={112} alt="" />
+              ) : (
+                <Weapon />
+              )}
             </motion.div>
 
             <AnimatePresence>
-              {splashKey !== null && <HitSplash key={splashKey} color={splashColor} />}
+              {splashKey !== null && <HitSplash key={splashKey} color={raster ? raster.splashColor : splashColor} />}
             </AnimatePresence>
           </div>
         </motion.div>
