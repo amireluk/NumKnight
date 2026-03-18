@@ -345,7 +345,29 @@ const BACKGROUNDS = {
   dragonLair: memo(DragonLairBackground),
 }
 
-export function BattleBackground({ worldId }) {
+const RASTER_FILENAMES = {
+  forest:     'forest',
+  swamp:      'swamp',
+  mountains:  'mountains',
+  castle:     'castle',
+  dragonLair: 'dragon-lair',
+}
+
+export function BattleBackground({ worldId, useRaster }) {
+  if (useRaster) {
+    const filename = RASTER_FILENAMES[worldId] ?? 'forest'
+    return (
+      <img
+        src={`${import.meta.env.BASE_URL}assets/backgrounds/${filename}.webp`}
+        alt=""
+        style={{
+          position: 'absolute', inset: 0,
+          width: '100%', height: '100%',
+          objectFit: 'cover', objectPosition: 'center 65%',
+        }}
+      />
+    )
+  }
   const Bg = BACKGROUNDS[worldId] ?? ForestBackground
   return <Bg />
 }
