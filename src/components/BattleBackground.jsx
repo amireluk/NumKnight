@@ -353,9 +353,14 @@ const RASTER_FILENAMES = {
   dragonLair: 'dragon-lair',
 }
 
+// Landscape images use cover+center (sky+ground always visible)
+// Portrait images use fill (slight squish but shows full image)
+const LANDSCAPE = new Set(['dragonLair'])
+
 export function BattleBackground({ worldId, useRaster }) {
   if (useRaster) {
     const filename = RASTER_FILENAMES[worldId] ?? 'forest'
+    const isLandscape = LANDSCAPE.has(worldId)
     return (
       <img
         src={`${import.meta.env.BASE_URL}assets/backgrounds/${filename}.webp`}
@@ -363,7 +368,8 @@ export function BattleBackground({ worldId, useRaster }) {
         style={{
           position: 'absolute', inset: 0,
           width: '100%', height: '100%',
-          objectFit: 'cover', objectPosition: 'center 65%',
+          objectFit: isLandscape ? 'cover' : 'fill',
+          objectPosition: 'center center',
         }}
       />
     )
