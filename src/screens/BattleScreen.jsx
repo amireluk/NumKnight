@@ -499,7 +499,7 @@ export function BattleScreen({ world, worldIndex, battleIndex, onBattleEnd, onQu
       setPlayerHitKey((k) => k + 1)
       setFlashHitKey((k) => k + 1)
       shakeControls.start({ x: [0, -12, 11, -8, 7, -4, 3, 0], transition: { duration: 0.5 } })
-      bgControls.start({ x: [0, -18, 10, -6, 3, 0], transition: { duration: 0.45 } })
+      bgControls.start({ scale: 1.12, x: [0, -45, 22, -12, 5, 0], transition: { duration: 0.45 } })
       const newPlayerHP = Math.max(0, playerHPRef.current - (world.enemyDamage ?? 1))
       setPlayerHP(newPlayerHP)
       logEvent('player_hit', { damage: world.enemyDamage ?? 1, prevHp: playerHPRef.current, playerHp: newPlayerHP })
@@ -581,7 +581,7 @@ export function BattleScreen({ world, worldIndex, battleIndex, onBattleEnd, onQu
         setTimeout(() => {
           playSwordSwing()
           setEnemyHitKey((k) => k + 1)
-          bgControls.start({ x: [0, 18, -10, 6, -3, 0], transition: { duration: 0.45 } })
+          bgControls.start({ scale: 1.12, x: [0, 45, -22, 12, -5, 0], transition: { duration: 0.45 } })
           const newEnemyHP = Math.max(0, enemyHP - 1)
           setEnemyHP(newEnemyHP)
           logEvent('enemy_hit', { prevHp: enemyHP, enemyHp: newEnemyHP, enemyMaxHp: world.enemy.hp })
@@ -614,7 +614,7 @@ export function BattleScreen({ world, worldIndex, battleIndex, onBattleEnd, onQu
       setTimeout(() => {
         playSwordSwing()
         setEnemyHitKey((k) => k + 1)
-        bgControls.start({ x: [0, 18, -10, 6, -3, 0], transition: { duration: 0.45 } })
+        bgControls.start({ scale: 1.12, x: [0, 45, -22, 12, -5, 0], transition: { duration: 0.45 } })
         const newEnemyHP = Math.max(0, enemyHP - 1)
         setEnemyHP(newEnemyHP)
         logEvent('enemy_hit', { prevHp: enemyHP, enemyHp: newEnemyHP, enemyMaxHp: world.enemy.hp })
@@ -652,7 +652,7 @@ export function BattleScreen({ world, worldIndex, battleIndex, onBattleEnd, onQu
         setPlayerHitKey((k) => k + 1)
         setFlashHitKey((k) => k + 1)
         shakeControls.start({ x: [0, -12, 11, -8, 7, -4, 3, 0], transition: { duration: 0.5 } })
-        bgControls.start({ x: [0, -18, 10, -6, 3, 0], transition: { duration: 0.45 } })
+        bgControls.start({ scale: 1.12, x: [0, -45, 22, -12, 5, 0], transition: { duration: 0.45 } })
         const newPlayerHP = Math.max(0, playerHP - (world.enemyDamage ?? 1))
         setPlayerHP(newPlayerHP)
         logEvent('player_hit', { damage: world.enemyDamage ?? 1, prevHp: playerHP, playerHp: newPlayerHP })
@@ -683,7 +683,7 @@ export function BattleScreen({ world, worldIndex, battleIndex, onBattleEnd, onQu
 
         {/* Battle arena */}
         <div className="flex flex-1 min-h-0" style={{ position: 'relative', overflow: 'hidden' }}>
-          <motion.div animate={bgControls} style={{ position: 'absolute', inset: 0, scale: 1.06 }}>
+          <motion.div animate={bgControls} initial={{ x: 0, scale: 1.12 }} style={{ position: 'absolute', inset: 0 }}>
             <BattleBackground worldId={world.id} useRaster={useRaster} />
           </motion.div>
 
