@@ -2,18 +2,16 @@
 import { motion, useAnimation, AnimatePresence } from 'framer-motion'
 import React, { useEffect, useState } from 'react'
 
+/* eslint-disable no-undef */
 const V = typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : 'dev'
 const RASTER_KEY = 'numknight_raster_bg'
-// Body display size — maintains source image ratio (300:447)
-const RW = 100, RH = 149
-// Arm rendered smaller (arm fills canvas but should be ~40% of body height)
-const ARM_W = 40, ARM_H = 60
-// Body shoulder socket in 300×447 → (74, 69) in 100×149
-// Arm shoulder centroid in 300×447 → (16, 14) in 40×60
-// Arm div positioned so its shoulder lines up with body socket
-const ARM_LEFT = 74 - 16  // 58
-const ARM_TOP  = 69 - 14  // 55
-const ARM_PIVOT_X = 16, ARM_PIVOT_Y = 14
+const BASE = import.meta.env.BASE_URL
+const SPRITES = {
+  idle:   `${BASE}assets/characters/knight-idle.webp?v=${V}`,
+  attack: `${BASE}assets/characters/knight-attack.webp?v=${V}`,
+  hit:    `${BASE}assets/characters/knight-hit.webp?v=${V}`,
+  dead:   `${BASE}assets/characters/knight-dead.webp?v=${V}`,
+}
 
 // Static body — everything except the sword arm
 export const KnightBodySVG = React.memo(function KnightBodySVG() {
@@ -198,38 +196,39 @@ export function KnightCharacter({ phase, hitKey, useRaster }) {
   const moveControls = useAnimation()
   const swordControls = useAnimation()
   const [splashKey, setSplashKey] = useState(null)
+  const [sprite, setSprite] = useState('idle')
   const raster = useRaster ?? (localStorage.getItem(RASTER_KEY) === 'true')
 
-  // Knight attacks — lunge right + sword swing
+  // Knight attacks — lunge right + sprite swap (raster) or sword swing (SVG)
   useEffect(() => {
     if (phase === 'attacking') {
+      if (raster) setSprite('attack')
       moveControls.start({ x: [0, 80, 0], transition: { duration: 0.45, ease: 'easeInOut' } })
-      swordControls.start({
-        rotate: [0, 62, -12, 0],
-        transition: { duration: 0.45, times: [0, 0.32, 0.62, 1] },
-      })
+      if (!raster) swordControls.start({ rotate: [0, 62, -12, 0], transition: { duration: 0.45, times: [0, 0.32, 0.62, 1] } })
+      if (raster) { const t = setTimeout(() => setSprite('idle'), 300); return () => clearTimeout(t) }
     }
-    // Death — stumble then topple off left side
     if (phase === 'lost') {
+      if (raster) setSprite('dead')
       moveControls.start({
-        x: [0, 18, -160],
-        rotate: [0, 10, 80],
-        opacity: [1, 1, 0],
+        x: [0, 18, -160], rotate: [0, 10, 80], opacity: [1, 1, 0],
         transition: { duration: 0.65, times: [0, 0.25, 1], ease: 'easeIn' },
       })
     }
-  }, [phase, moveControls, swordControls])
+    if (phase === 'idle' && raster) setSprite('idle')
+  }, [phase, moveControls, swordControls, raster]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Knight takes a hit — recoil + splash (triggered at moment of impact)
+  // Knight takes a hit — recoil + splash + sprite swap
   useEffect(() => {
     if (hitKey > 0) {
+      if (raster) setSprite('hit')
       moveControls.start({ x: [0, -12, 5, 0], transition: { duration: 0.35 } })
-      swordControls.start({ rotate: [0, -15, 5, 0], transition: { duration: 0.35 } })
+      if (!raster) swordControls.start({ rotate: [0, -15, 5, 0], transition: { duration: 0.35 } })
       setSplashKey(hitKey)
-      const t = setTimeout(() => setSplashKey(null), 550)
-      return () => clearTimeout(t)
+      const t1 = setTimeout(() => setSplashKey(null), 550)
+      const t2 = raster ? setTimeout(() => setSprite('idle'), 350) : null
+      return () => { clearTimeout(t1); if (t2) clearTimeout(t2) }
     }
-  }, [hitKey, moveControls, swordControls])
+  }, [hitKey, moveControls, swordControls, raster]) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div className="relative flex flex-col items-center">
@@ -244,21 +243,14 @@ export function KnightCharacter({ phase, hitKey, useRaster }) {
       >
         <motion.div animate={moveControls} style={{ willChange: 'transform' }}>
           {raster ? (
-            /* ── Raster mode: body + arm images on shared canvas ── */
-            <div style={{ position: 'relative', width: RW, height: RH, overflow: 'visible', transform: 'scaleX(-1)' }}>
-              <img src={`${import.meta.env.BASE_URL}assets/characters/knight.webp?v=${V}`}
-                style={{ width: RW, height: RH, display: 'block' }} alt="" />
-              <motion.div
-                animate={swordControls}
-                style={{
-                  position: 'absolute', top: ARM_TOP, left: ARM_LEFT,
-                  width: ARM_W, height: ARM_H, overflow: 'visible',
-                  transformOrigin: `${ARM_PIVOT_X}px ${ARM_PIVOT_Y}px`,
-                }}
-              >
-                <img src={`${import.meta.env.BASE_URL}assets/characters/knight-arm.webp?v=${V}`}
-                  style={{ width: ARM_W, height: ARM_H, display: 'block' }} alt="" />
-              </motion.div>
+            /* ── Raster sprite swap mode ── */
+            <div style={{ position: 'relative', width: 200, height: 120, overflow: 'visible' }}>
+              <img
+                key={sprite}
+                src={SPRITES[sprite]}
+                style={{ position: 'absolute', bottom: 0, left: 0, width: 200 }}
+                alt=""
+              />
               <AnimatePresence>
                 {splashKey !== null && <HitSplash key={splashKey} color="#f87171" />}
               </AnimatePresence>
