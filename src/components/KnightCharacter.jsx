@@ -1,6 +1,8 @@
+/* eslint-disable no-undef */
 import { motion, useAnimation, AnimatePresence } from 'framer-motion'
 import React, { useEffect, useState } from 'react'
 
+const V = typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : 'dev'
 const RASTER_KEY = 'numknight_raster_bg'
 // Body display size — maintains source image ratio (300:447)
 const RW = 100, RH = 149
@@ -244,7 +246,7 @@ export function KnightCharacter({ phase, hitKey, useRaster }) {
           {raster ? (
             /* ── Raster mode: body + arm images on shared canvas ── */
             <div style={{ position: 'relative', width: RW, height: RH, overflow: 'visible', transform: 'scaleX(-1)' }}>
-              <img src={`${import.meta.env.BASE_URL}assets/characters/knight.webp`}
+              <img src={`${import.meta.env.BASE_URL}assets/characters/knight.webp?v=${V}`}
                 style={{ width: RW, height: RH, display: 'block' }} alt="" />
               <motion.div
                 animate={swordControls}
@@ -254,7 +256,7 @@ export function KnightCharacter({ phase, hitKey, useRaster }) {
                   transformOrigin: `${ARM_PIVOT_X}px ${ARM_PIVOT_Y}px`,
                 }}
               >
-                <img src={`${import.meta.env.BASE_URL}assets/characters/knight-arm.webp`}
+                <img src={`${import.meta.env.BASE_URL}assets/characters/knight-arm.webp?v=${V}`}
                   style={{ width: ARM_W, height: ARM_H, display: 'block' }} alt="" />
               </motion.div>
               <AnimatePresence>

@@ -1,4 +1,6 @@
+/* eslint-disable no-undef */
 import { memo, useState } from 'react'
+const V = typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : 'dev'
 
 // ─── Forest ───────────────────────────────────────────────────────────────────
 function ForestBackground() {
@@ -378,7 +380,7 @@ function RasterImage({ filename, isLandscape }) {
   const [loaded, setLoaded] = useState(false)
   return (
     <img
-      src={`${import.meta.env.BASE_URL}assets/backgrounds/${filename}.webp`}
+      src={`${import.meta.env.BASE_URL}assets/backgrounds/${filename}.webp?v=${V}`}
       alt=""
       onLoad={() => setLoaded(true)}
       style={{
