@@ -325,7 +325,7 @@ function RegionBand({ world, worldIndex, status, trophy, score, delay, onTap, is
           position: 'absolute', inset: 0, zIndex: 2, pointerEvents: 'none',
           display: 'flex', alignItems: 'flex-end', justifyContent: 'center', gap: 12,
         }}>
-          <div style={{ transform: 'scale(0.46)', transformOrigin: 'center bottom' }}>
+          <div style={{ transform: 'scale(0.46) scaleX(-1)', transformOrigin: 'center bottom' }}>
             <KnightCharacter phase="idle" hitKey={0} />
           </div>
           <div style={{ transform: 'scale(0.46)', transformOrigin: 'center bottom' }}>
