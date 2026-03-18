@@ -258,7 +258,7 @@ export function KnightCharacter({ phase, hitKey, useRaster }) {
               <img
                 key={sprite}
                 src={SPRITES[sprite]}
-                style={{ height: 'min(120px, 26vw)', width: 'auto', display: 'block', flexShrink: 0 }}
+                style={{ height: 'min(180px, 39vw)', width: 'auto', display: 'block', flexShrink: 0 }}
                 alt=""
               />
               <AnimatePresence>
