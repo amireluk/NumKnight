@@ -21,7 +21,7 @@ function HitSplash({ color }) {
   return (
     <motion.div
       className="absolute pointer-events-none"
-      style={{ left: '50%', top: '40%', transform: 'translate(-50%, -50%)', zIndex: 20, willChange: 'transform, opacity' }}
+      style={{ left: '50%', bottom: 0, transform: 'translate(-50%, 50%)', zIndex: 20, willChange: 'transform, opacity' }}
       initial={{ scale: 0.05, opacity: 1 }}
       animate={{ scale: [0.05, 1.4, 1.7], opacity: [1, 1, 0] }}
       transition={{ duration: 0.5, times: [0, 0.28, 1], ease: 'easeOut' }}
@@ -681,11 +681,11 @@ export function EnemyCharacter({ phase, enemy, hitKey, raging = false }) {
         <motion.div animate={moveControls} style={{ willChange: 'transform' }}>
           {rasterSprites ? (
             /* Raster: sprite already faces left — no scaleX needed */
-            <div style={{ position: 'relative', flexShrink: 0 }}>
-              <img src={rasterSprites[sprite]} style={{ height: 'min(150px, 33vw)', width: 'auto', display: 'block' }} alt="" />
+            <div style={{ position: 'relative', zIndex: 0, width: 'min(170px, 37vw)', flexShrink: 0, overflow: 'visible', display: 'flex', justifyContent: 'center', alignItems: 'flex-end' }}>
               <AnimatePresence>
                 {splashKey !== null && <HitSplash key={splashKey} color={rasterSprites.splashColor} />}
               </AnimatePresence>
+              <img src={rasterSprites[sprite]} style={{ height: 'min(150px, 33vw)', width: 'auto', maxWidth: 'none', display: 'block', flexShrink: 0 }} alt="" />
             </div>
           ) : (
             /* SVG: source faces right, flip to face left */

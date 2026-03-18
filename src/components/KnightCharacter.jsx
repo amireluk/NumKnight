@@ -108,7 +108,7 @@ function HitSplash({ color }) {
   return (
     <motion.div
       className="absolute pointer-events-none"
-      style={{ left: '50%', top: '40%', transform: 'translate(-50%, -50%)', zIndex: 20, willChange: 'transform, opacity' }}
+      style={{ left: '50%', bottom: 0, transform: 'translate(-50%, 50%)', zIndex: 20, willChange: 'transform, opacity' }}
       initial={{ scale: 0.05, opacity: 1 }}
       animate={{ scale: [0.05, 1.4, 1.7], opacity: [1, 1, 0] }}
       transition={{ duration: 0.5, times: [0, 0.28, 1], ease: 'easeOut' }}
@@ -254,15 +254,15 @@ export function KnightCharacter({ phase, hitKey, useRaster }) {
         <motion.div animate={moveControls} style={{ willChange: 'transform' }}>
           {raster ? (
             /* ── Raster sprite swap mode ── */
-            <div style={{ position: 'relative', flexShrink: 0 }}>
-              <img
-                src={SPRITES[sprite]}
-                style={{ height: 'min(150px, 33vw)', width: 'auto', display: 'block' }}
-                alt=""
-              />
+            <div style={{ position: 'relative', zIndex: 0, width: 'min(120px, 26vw)', flexShrink: 0, overflow: 'visible', display: 'flex', justifyContent: 'center', alignItems: 'flex-end' }}>
               <AnimatePresence>
                 {splashKey !== null && <HitSplash key={splashKey} color="#f87171" />}
               </AnimatePresence>
+              <img
+                src={SPRITES[sprite]}
+                style={{ height: 'min(150px, 33vw)', width: 'auto', maxWidth: 'none', display: 'block', flexShrink: 0 }}
+                alt=""
+              />
             </div>
           ) : (
             /* ── SVG mode ── */
