@@ -650,10 +650,12 @@ export function EnemyCharacter({ phase, enemy, hitKey, raging = false }) {
         }
         style={{ willChange: 'transform' }}
       >
-        <motion.div animate={moveControls} style={{ transform: 'scaleX(-1)', willChange: 'transform' }}>
+        <motion.div animate={moveControls} style={{ willChange: 'transform' }}>
+          {/* scaleX(-1) is in its own div so Framer Motion's x animation can't clobber it */}
+          <div style={{ transform: 'scaleX(-1)' }}>
           {rasterSprites ? (
-            <div style={{ position: 'relative', width: 'min(160px, 35vw)', height: 'min(150px, 33vw)', overflow: 'visible' }}>
-              <img key={sprite} src={rasterSprites[sprite]} style={{ position: 'absolute', bottom: 0, left: '50%', transform: 'translateX(-50%)', height: 'min(150px, 33vw)', width: 'auto' }} alt="" />
+            <div style={{ position: 'relative', display: 'flex', alignItems: 'flex-end', justifyContent: 'center', width: 'min(160px, 35vw)', height: 'min(150px, 33vw)', overflow: 'visible' }}>
+              <img key={sprite} src={rasterSprites[sprite]} style={{ height: 'min(150px, 33vw)', width: 'auto', display: 'block' }} alt="" />
               <AnimatePresence>
                 {splashKey !== null && <HitSplash key={splashKey} color={rasterSprites.splashColor} />}
               </AnimatePresence>
@@ -672,6 +674,7 @@ export function EnemyCharacter({ phase, enemy, hitKey, raging = false }) {
               </AnimatePresence>
             </div>
           )}
+          </div>
         </motion.div>
       </motion.div>
     </div>
