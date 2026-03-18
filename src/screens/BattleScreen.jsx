@@ -778,7 +778,7 @@ export function BattleScreen({ world, worldIndex, battleIndex, onBattleEnd, onQu
                   animate={{ x: 0 }}
                   transition={{ duration: 0.45, ease: 'easeOut' }}
                 >
-                  <KnightCharacter phase={phase} hitKey={playerHitKey} />
+                  <KnightCharacter phase={phase} hitKey={playerHitKey} useRaster={useRaster} />
                 </motion.div>
                 {/* Shadow: instant on round 2+, fades in on first encounter */}
                 <motion.div

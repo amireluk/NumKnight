@@ -1,6 +1,13 @@
 import { motion, useAnimation, AnimatePresence } from 'framer-motion'
 import React, { useEffect, useState } from 'react'
 
+const RASTER_KEY = 'numknight_raster_bg'
+// Display size — maintains source image ratio (300:447)
+const RW = 100, RH = 149
+// Arm pivot = shoulder joint in the shared 300×447 canvas, scaled to RW×RH
+// Shoulder centre ≈ (82, 35) in 300×447 → (27, 12) in 100×149
+const ARM_PIVOT_X = 27, ARM_PIVOT_Y = 12
+
 // Static body — everything except the sword arm
 export const KnightBodySVG = React.memo(function KnightBodySVG() {
   return (
@@ -180,10 +187,11 @@ export function FallenKnightScene() {
   )
 }
 
-export function KnightCharacter({ phase, hitKey }) {
+export function KnightCharacter({ phase, hitKey, useRaster }) {
   const moveControls = useAnimation()
   const swordControls = useAnimation()
   const [splashKey, setSplashKey] = useState(null)
+  const raster = useRaster ?? (localStorage.getItem(RASTER_KEY) === 'true')
 
   // Knight attacks — lunge right + sword swing
   useEffect(() => {
@@ -228,34 +236,45 @@ export function KnightCharacter({ phase, hitKey }) {
         style={{ willChange: 'transform' }}
       >
         <motion.div animate={moveControls} style={{ willChange: 'transform' }}>
-          {/* Relative container: body + weapon arm overlaid */}
-          <div style={{ position: 'relative', width: 84, height: 112, overflow: 'visible' }}>
-            <KnightBodySVG />
-            {/*
-              Sword arm rotates around the shoulder (SVG 78,62).
-              SVG viewBox 0 0 90 120 is rendered at 84×112 → scale = 84/90 = 0.9333
-              Shoulder in div-pixels: 78×0.9333 = 72.8 ≈ 73px, 62×0.9333 = 57.9 ≈ 58px
-            */}
-            <motion.div
-              animate={swordControls}
-              style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                width: 84,
-                height: 112,
-                overflow: 'visible',
-                transformOrigin: '73px 58px',
-              }}
-            >
-              <KnightSwordArmSVG />
-            </motion.div>
-
-            {/* Hit splash — appears at impact point on knight's right (goblin-facing) side */}
-            <AnimatePresence>
-              {splashKey !== null && <HitSplash key={splashKey} color="#f87171" />}
-            </AnimatePresence>
-          </div>
+          {raster ? (
+            /* ── Raster mode: body + arm images on shared canvas ── */
+            <div style={{ position: 'relative', width: RW, height: RH, overflow: 'visible' }}>
+              <img src={`${import.meta.env.BASE_URL}assets/characters/knight.webp`}
+                style={{ width: RW, height: RH, display: 'block' }} alt="" />
+              <motion.div
+                animate={swordControls}
+                style={{
+                  position: 'absolute', top: 0, left: 0,
+                  width: RW, height: RH, overflow: 'visible',
+                  transformOrigin: `${ARM_PIVOT_X}px ${ARM_PIVOT_Y}px`,
+                }}
+              >
+                <img src={`${import.meta.env.BASE_URL}assets/characters/knight-arm.webp`}
+                  style={{ width: RW, height: RH, display: 'block' }} alt="" />
+              </motion.div>
+              <AnimatePresence>
+                {splashKey !== null && <HitSplash key={splashKey} color="#f87171" />}
+              </AnimatePresence>
+            </div>
+          ) : (
+            /* ── SVG mode ── */
+            <div style={{ position: 'relative', width: 84, height: 112, overflow: 'visible' }}>
+              <KnightBodySVG />
+              <motion.div
+                animate={swordControls}
+                style={{
+                  position: 'absolute', top: 0, left: 0,
+                  width: 84, height: 112, overflow: 'visible',
+                  transformOrigin: '73px 58px',
+                }}
+              >
+                <KnightSwordArmSVG />
+              </motion.div>
+              <AnimatePresence>
+                {splashKey !== null && <HitSplash key={splashKey} color="#f87171" />}
+              </AnimatePresence>
+            </div>
+          )}
         </motion.div>
       </motion.div>
     </div>
