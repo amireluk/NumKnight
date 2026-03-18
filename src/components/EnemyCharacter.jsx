@@ -654,8 +654,8 @@ export function EnemyCharacter({ phase, enemy, hitKey, raging = false }) {
           {/* scaleX(-1) is in its own div so Framer Motion's x animation can't clobber it */}
           <div style={{ transform: 'scaleX(-1)' }}>
           {rasterSprites ? (
-            <div style={{ position: 'relative', display: 'flex', alignItems: 'flex-end', justifyContent: 'center', width: 'min(160px, 35vw)', height: 'min(150px, 33vw)', overflow: 'visible' }}>
-              <img key={sprite} src={rasterSprites[sprite]} style={{ height: 'min(150px, 33vw)', width: 'auto', display: 'block' }} alt="" />
+            <div style={{ position: 'relative', display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}>
+              <img key={sprite} src={rasterSprites[sprite]} style={{ maxHeight: 'min(130px, 28vw)', maxWidth: 'min(200px, 44vw)', width: 'auto', height: 'auto', display: 'block' }} alt="" />
               <AnimatePresence>
                 {splashKey !== null && <HitSplash key={splashKey} color={rasterSprites.splashColor} />}
               </AnimatePresence>
