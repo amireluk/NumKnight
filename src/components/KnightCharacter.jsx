@@ -108,9 +108,9 @@ function HitSplash({ color }) {
   return (
     <motion.div
       className="absolute pointer-events-none"
-      style={{ left: '50%', bottom: 0, transform: 'translate(-50%, 50%)', zIndex: 20, willChange: 'transform, opacity' }}
-      initial={{ scale: 0.05, opacity: 1 }}
-      animate={{ scale: [0.05, 1.4, 1.7], opacity: [1, 1, 0] }}
+      style={{ left: '65%', top: '30%', transform: 'translate(-50%, -50%)', zIndex: 20, willChange: 'transform, opacity' }}
+      initial={{ scale: 0.03, opacity: 1 }}
+      animate={{ scale: [0.03, 0.84, 1.02], opacity: [1, 1, 0] }}
       transition={{ duration: 0.5, times: [0, 0.28, 1], ease: 'easeOut' }}
     >
       <svg width="90" height="90" viewBox="-45 -45 90 90" fill="none">
