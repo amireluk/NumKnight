@@ -45,6 +45,36 @@ def remove_background(img_rgba: Image.Image, tolerance: int = 30) -> Image.Image
     return Image.fromarray(result, 'RGBA')
 
 
+def clean_edges(img: Image.Image, erode_px: int = 2) -> Image.Image:
+    """Binarize alpha then erode to remove chroma-key fringe."""
+    arr = np.array(img, dtype=np.uint8)
+    binary = (arr[:, :, 3] > 0).astype(np.uint8)
+    for _ in range(erode_px):
+        e = binary.copy()
+        e[:-1, :] = np.minimum(e[:-1, :], binary[1:, :])
+        e[1:,  :] = np.minimum(e[1:,  :], binary[:-1, :])
+        e[:, :-1] = np.minimum(e[:, :-1], binary[:, 1:])
+        e[:, 1:]  = np.minimum(e[:, 1:],  binary[:, :-1])
+        binary = e
+    arr[:, :, 3] = binary * 255
+    return Image.fromarray(arr, 'RGBA')
+
+
+def normalize_heights(out_folder: str, pose_names: list) -> None:
+    """Pad idle/attack/hit sprites at the top so all share the same canvas height."""
+    standing = [n for n in pose_names if not n.endswith('-dead')]
+    imgs = {n: Image.open(os.path.join(out_folder, f'{n}.webp')) for n in standing}
+    target_h = max(img.size[1] for img in imgs.values())
+    for name, img in imgs.items():
+        w, h = img.size
+        if h == target_h:
+            continue
+        padded = Image.new('RGBA', (w, target_h), (0, 0, 0, 0))
+        padded.paste(img, (0, target_h - h))
+        padded.save(os.path.join(out_folder, f'{name}.webp'), 'WEBP', quality=95)
+        print(f'  normalized {name}: {h}px → {target_h}px (padded top {target_h-h}px)')
+
+
 def crop_to_content(img: Image.Image, padding: int = 2) -> Image.Image:
     """Crop transparent padding, leave a small border."""
     bbox = img.getbbox()
@@ -76,12 +106,18 @@ def process_sheet(sheet_path, out_folder, pose_names):
         # Remove background
         cell_nobg = remove_background(cell, tolerance=28)
 
+        # Clean fringe: binarize + erode 2px
+        cell_clean = clean_edges(cell_nobg, erode_px=2)
+
         # Crop to content
-        cell_cropped = crop_to_content(cell_nobg, padding=2)
+        cell_cropped = crop_to_content(cell_clean, padding=2)
 
         out_path = os.path.join(out_folder, f'{name}.webp')
         cell_cropped.save(out_path, 'WEBP', quality=95)
         print(f'  {name}: {cell.size} → {cell_cropped.size} → {out_path}')
+
+    # Normalize idle/attack/hit heights so scale stays consistent in-game
+    normalize_heights(out_folder, pose_names)
 
 
 for sheet_path, out_folder, pose_names in SHEETS:
