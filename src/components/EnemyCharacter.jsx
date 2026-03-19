@@ -685,7 +685,9 @@ export function EnemyCharacter({ phase, enemy, hitKey, raging = false }) {
               <AnimatePresence>
                 {splashKey !== null && <HitSplash key={splashKey} color={rasterSprites.splashColor} />}
               </AnimatePresence>
-              <img src={rasterSprites[sprite]} style={{ height: 'min(150px, 33vw)', width: 'auto', maxWidth: 'none', display: 'block', flexShrink: 0 }} alt="" />
+              <div style={enemy.id === 'dragon' ? { transform: 'scale(2)', transformOrigin: 'center bottom', display: 'inline-block' } : undefined}>
+                <img src={rasterSprites[sprite]} style={{ height: 'min(150px, 33vw)', width: 'auto', maxWidth: 'none', display: 'block', flexShrink: 0 }} alt="" />
+              </div>
             </div>
           ) : (
             /* SVG: source faces right, flip to face left */

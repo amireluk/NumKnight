@@ -792,7 +792,7 @@ export function BattleScreen({ world, worldIndex, battleIndex, onBattleEnd, onQu
               </div>
 
               {/* Enemy — slides in from right alongside knight */}
-              <div className="flex flex-col items-center" style={{ position: 'relative' }}>
+              <div className="flex flex-col items-center" style={{ zIndex: phase === 'hit' ? 2 : 1, position: 'relative' }}>
                 <motion.div
                   initial={{ x: 120, opacity: 0 }}
                   animate={{ x: 0, opacity: showTrophy ? 0 : 1 }}
