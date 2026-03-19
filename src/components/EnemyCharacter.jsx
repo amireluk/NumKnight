@@ -554,6 +554,9 @@ const ENEMIES = {
   dragon:    { Body: React.memo(DragonBodySVG),    Weapon: React.memo(DragonClawArmSVG),     splashColor: '#f87171', pivotX: 66, pivotY: 50 },
 }
 
+// Per-enemy visual scale applied to raster sprites
+const RASTER_SCALE = { goblin: 0.8, orc: 1.2, darkKnight: 1.2, dragon: 1.7 }
+
 /* eslint-disable no-undef */
 const _VER  = typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : 'dev'
 const _BASE = import.meta.env.BASE_URL
@@ -685,7 +688,7 @@ export function EnemyCharacter({ phase, enemy, hitKey, raging = false }) {
               <AnimatePresence>
                 {splashKey !== null && <HitSplash key={splashKey} color={rasterSprites.splashColor} />}
               </AnimatePresence>
-              <div style={enemy.id === 'dragon' ? { transform: 'scale(1.7)', transformOrigin: 'center bottom', display: 'inline-block' } : undefined}>
+              <div style={RASTER_SCALE[enemy.id] ? { transform: `scale(${RASTER_SCALE[enemy.id]})`, transformOrigin: 'center bottom', display: 'inline-block' } : undefined}>
                 <img src={rasterSprites[sprite]} style={{ height: 'min(150px, 33vw)', width: 'auto', maxWidth: 'none', display: 'block', flexShrink: 0 }} alt="" />
               </div>
             </div>

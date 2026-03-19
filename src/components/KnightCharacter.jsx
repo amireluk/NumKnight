@@ -224,7 +224,7 @@ export function KnightCharacter({ phase, hitKey, useRaster }) {
         })
       }
     }
-    if (phase === 'idle' && raster) setSprite('idle')
+    if ((phase === 'idle' || phase === 'won') && raster) setSprite('idle')
   }, [phase, moveControls, swordControls, raster]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Knight takes a hit — recoil + splash + sprite swap
@@ -260,7 +260,7 @@ export function KnightCharacter({ phase, hitKey, useRaster }) {
               </AnimatePresence>
               <img
                 src={SPRITES[sprite]}
-                style={{ height: 'min(150px, 33vw)', width: 'auto', maxWidth: 'none', display: 'block', flexShrink: 0 }}
+                style={{ height: 'min(150px, 33vw)', width: 'auto', maxWidth: 'none', display: 'block', flexShrink: 0, transform: sprite === 'attack' ? 'translateX(min(54px, 11.84vw))' : undefined }}
                 alt=""
               />
             </div>

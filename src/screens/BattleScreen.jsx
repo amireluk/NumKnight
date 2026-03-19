@@ -803,17 +803,6 @@ export function BattleScreen({ world, worldIndex, battleIndex, onBattleEnd, onQu
                   style={{ position: 'relative' }}
                 >
                   <EnemyCharacter phase={phase} enemy={world.enemy} hitKey={enemyHitKey} raging={raging} />
-                  {/* Dragon HP bar overlaid on sprite */}
-                  {isBoss && (
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={introPlaying ? { opacity: 0 } : { opacity: 1 }}
-                      transition={{ duration: 0.35, delay: 0.1 }}
-                      style={{ position: 'absolute', top: 6, left: '50%', transform: 'translateX(-50%)', zIndex: 10, pointerEvents: 'none' }}
-                    >
-                      <HPBar current={enemyHP} max={world.enemy.maxHp ?? world.enemy.hp} color="red" shieldState={shieldState} shieldFlashKey={shieldFlashKey} shieldFallKey={shieldFallKey} shieldFallPip={shieldFallPip} />
-                    </motion.div>
-                  )}
                 </motion.div>
                 {/* Shadow fades in as enemy lands */}
                 <motion.div
@@ -826,18 +815,16 @@ export function BattleScreen({ world, worldIndex, battleIndex, onBattleEnd, onQu
               </div>
             </div>
 
-            {/* Enemy HP bar (hidden for dragon — rendered over sprite instead) */}
-            {!isBoss && (
-              <motion.div
-                initial={{ y: -60, opacity: 0 }}
-                animate={introPlaying ? {} : { y: 0, opacity: 1 }}
-                transition={{ duration: 0.35, delay: 0.1 }}
-                className="mb-6"
-                style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}
-              >
-                <HPBar current={enemyHP} max={world.enemy.maxHp ?? world.enemy.hp} color="red" shieldState={shieldState} shieldFlashKey={shieldFlashKey} shieldFallKey={shieldFallKey} shieldFallPip={shieldFallPip} />
-              </motion.div>
-            )}
+            {/* Enemy HP bar */}
+            <motion.div
+              initial={{ y: -60, opacity: 0 }}
+              animate={introPlaying ? {} : { y: 0, opacity: 1 }}
+              transition={{ duration: 0.35, delay: 0.1 }}
+              className="mb-6"
+              style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}
+            >
+              <HPBar current={enemyHP} max={world.enemy.maxHp ?? world.enemy.hp} color="red" shieldState={shieldState} shieldFlashKey={shieldFlashKey} shieldFallKey={shieldFallKey} shieldFallPip={shieldFallPip} />
+            </motion.div>
           </div>
         </div>
 
