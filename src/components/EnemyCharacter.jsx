@@ -626,7 +626,7 @@ export function EnemyCharacter({ phase, enemy, hitKey, raging = false }) {
   useEffect(() => {
     if (phase === 'hit') {
       if (rasterSprites) setSprite('attack')
-      if (enemy.id !== 'dragon') moveControls.start({ x: [0, rasterSprites ? -15 : -80, 0], transition: { duration: 0.45, ease: 'easeInOut' } })
+      if (enemy.id !== 'dragon') moveControls.start({ x: [0, rasterSprites ? -55 : -80, 0], transition: { duration: 0.45, ease: 'easeInOut' } })
       if (!rasterSprites) weaponControls.start({ rotate: [0, 62, -12, 0], transition: { duration: 0.45, times: [0, 0.32, 0.62, 1] } })
       if (rasterSprites) { const t = setTimeout(() => setSprite('idle'), 300); return () => clearTimeout(t) }
     }
@@ -685,8 +685,7 @@ export function EnemyCharacter({ phase, enemy, hitKey, raging = false }) {
           {rasterSprites ? (
             /* Raster: sprite already faces left — no scaleX needed */
             <div style={{ position: 'relative', zIndex: 0, width: 'min(170px, 37vw)', flexShrink: 0, overflow: 'visible', display: 'flex', justifyContent: 'center', alignItems: 'flex-end' }}>
-              {/* HitSplash disabled temporarily */}
-              {false && splashKey !== null && <HitSplash key={splashKey} color={rasterSprites.splashColor} />}
+              {splashKey !== null && <HitSplash key={splashKey} color={rasterSprites.splashColor} />}
               <div style={RASTER_SCALE[enemy.id] ? { transform: `scale(${RASTER_SCALE[enemy.id]})`, transformOrigin: 'center bottom', display: 'inline-block' } : undefined}>
                 <img src={rasterSprites[sprite]} style={{ height: 'min(150px, 33vw)', width: 'auto', maxWidth: 'none', display: 'block', flexShrink: 0 }} alt="" />
               </div>
@@ -702,8 +701,7 @@ export function EnemyCharacter({ phase, enemy, hitKey, raging = false }) {
                 >
                   <Weapon />
                 </motion.div>
-                {/* HitSplash disabled temporarily */}
-                {false && splashKey !== null && <HitSplash key={splashKey} color={splashColor} />}
+                {splashKey !== null && <HitSplash key={splashKey} color={splashColor} />}
               </div>
             </div>
           )}

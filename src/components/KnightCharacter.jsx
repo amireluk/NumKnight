@@ -255,8 +255,7 @@ export function KnightCharacter({ phase, hitKey, useRaster }) {
           {raster ? (
             /* ── Raster sprite swap mode ── */
             <div style={{ position: 'relative', zIndex: 0, width: 'min(120px, 26vw)', flexShrink: 0, overflow: 'visible', display: 'flex', justifyContent: 'center', alignItems: 'flex-end' }}>
-              {/* HitSplash disabled temporarily */}
-              {false && splashKey !== null && <HitSplash key={splashKey} color="#f87171" />}
+              {splashKey !== null && <HitSplash key={splashKey} color="#f87171" />}
               <img
                 src={SPRITES[sprite]}
                 style={{ height: 'min(150px, 33vw)', width: 'auto', maxWidth: 'none', display: 'block', flexShrink: 0, transform: sprite === 'attack' ? 'translateX(min(54px, 11.84vw))' : undefined }}
@@ -277,8 +276,7 @@ export function KnightCharacter({ phase, hitKey, useRaster }) {
               >
                 <KnightSwordArmSVG />
               </motion.div>
-              {/* HitSplash disabled temporarily */}
-              {false && splashKey !== null && <HitSplash key={splashKey} color="#f87171" />}
+              {splashKey !== null && <HitSplash key={splashKey} color="#f87171" />}
             </div>
           )}
         </motion.div>
