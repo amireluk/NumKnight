@@ -411,7 +411,7 @@ function RegionBand({ world, worldIndex, status, trophy, score, delay, onTap, is
 
 export function WorldMapScreen({
   worlds, currentWorldIndex, trophies, worldScores,
-  isTransition, difficulty, isDevMode, onFight, onRestart, onBack, onLogoLongPress, lang, t,
+  isTransition, difficulty, isDevMode, onFight, onRestart, onBack, onLogoLongPress, useRaster, onToggleRaster, lang, t,
 }) {
   const isRtl = lang === 'he'
   const logoLongPress = useLongPress(onLogoLongPress ?? (() => {}))
@@ -455,6 +455,22 @@ export function WorldMapScreen({
       >
         ✕
       </motion.button>
+
+      {/* Toggle — top-right */}
+      {onToggleRaster && (
+        <button
+          onClick={onToggleRaster}
+          style={{
+            position: 'absolute', top: 14, right: 14, zIndex: 30,
+            background: 'rgba(0,0,0,0.35)', border: '1.5px solid rgba(255,255,255,0.18)',
+            borderRadius: 8, padding: '4px 10px',
+            fontSize: 12, fontWeight: 900, color: 'rgba(255,255,255,0.7)',
+            cursor: 'pointer', letterSpacing: '0.04em',
+          }}
+        >
+          {useRaster ? 'SVG' : 'IMG'}
+        </button>
+      )}
 
       {/* Header */}
       <motion.div

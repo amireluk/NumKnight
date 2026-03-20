@@ -7,6 +7,7 @@ import { AreaClearedScreen } from './screens/AreaClearedScreen'
 import { LeaderboardScreen } from './screens/LeaderboardScreen'
 import { VictoryScreen } from './screens/VictoryScreen'
 import { StartScreen } from './screens/StartScreen'
+import { CampfireScreen } from './screens/CampfireScreen'
 import { DesignScreen } from './screens/DesignScreen'
 import { EASY, MEDIUM, HARD, DEV } from './game/campaign.config'
 import { createNewRun, loadRun, saveRun, clearRun, isRunInProgress, clearBattleState } from './game/runState'
@@ -39,9 +40,25 @@ export default function App() {
   const [worldScore, setWorldScore] = useState(() => loadRun()?.currentWorldScore ?? 0)
   // Holds score context passed to leaderboard
   const [pendingScore, setPendingScore] = useState(null)
+  const [activeBoost, setActiveBoost] = useState(null)
   const [showLog, setShowLog] = useState(false)
+  const RASTER_KEY = 'numknight_raster_bg'
+  const [useRaster, setUseRaster] = useState(() => localStorage.getItem(RASTER_KEY) === 'true')
+  const toggleRaster = () => setUseRaster(v => { const n = !v; localStorage.setItem(RASTER_KEY, String(n)); return n })
 
   const world = worlds[run.worldIndex]
+
+  // Apply campfire boost to the world before passing to BattleScreen
+  const battleWorld = (() => {
+    if (!world) return world
+    if (activeBoost === 'weakSpot' && world.enemy.id === 'dragon') {
+      return { ...world, enemy: { ...world.enemy, hp: Math.max(1, world.enemy.hp - 1), maxHp: world.enemy.hp } }
+    }
+    if (activeBoost === 'steadyNerves' && world.timer) {
+      return { ...world, timer: world.timer + 3 }
+    }
+    return world
+  })()
 
   useEffect(() => { saveRun({ ...run, currentWorldScore: worldScore }) }, [run, worldScore])
 
@@ -51,6 +68,14 @@ export default function App() {
     setDifficulty(saved.difficulty ?? 'medium')
     setRun(saved)
     setWorldScore(saved.currentWorldScore ?? 0)
+    const savedWorlds = CONFIGS[saved.difficulty ?? 'medium'] ?? MEDIUM
+    const savedWorld = savedWorlds[saved.worldIndex]
+    const isDragonLair = savedWorld?.enemy?.id === 'dragon'
+    const campfireUsed = saved.campfireUsed ?? false
+    if (isDragonLair && !campfireUsed) {
+      setScreen('campfire')
+      return
+    }
     setBattleKey((k) => k + 1)
     setScreen('battle')
   }
@@ -72,13 +97,15 @@ export default function App() {
     setWorldScore(0)
     setMapIsTransition(false)
     setPendingScore(null)
+    setActiveBoost(null)
     setScreen('map')
   }
 
   const handleBattleEnd = ({ won, mistakes, timeBonus = 0 }) => {
     if (won) {
       const trophy = getTrophy(mistakes)
-      const battleScore = calcBattleScore(trophy, timeBonus)
+      const rawScore = calcBattleScore(trophy, timeBonus)
+      const battleScore = activeBoost === 'chronicle' ? rawScore + 100 : rawScore
       const newTrophies = [...run.trophies, trophy]
       const newWorldScore = worldScore + battleScore
       const newTotalScore = (run.totalScore ?? 0) + battleScore
@@ -126,11 +153,28 @@ export default function App() {
   }
 
   const handleFight = (worldIndex) => {
+    const targetIndex = (IS_DEV_MODE && worldIndex != null) ? worldIndex : run.worldIndex
     if (IS_DEV_MODE && worldIndex != null) {
       setRun((r) => ({ ...r, worldIndex, battleIndex: 0 }))
       setWorldScore(0)
     }
     setMapIsTransition(false)
+    const targetWorld = worlds[targetIndex]
+    const isDragonLair = targetWorld?.enemy?.id === 'dragon'
+    const campfireUsed = run.campfireUsed ?? false
+    if (isDragonLair && !campfireUsed) {
+      setScreen('campfire')
+      return
+    }
+    setBattleKey((k) => k + 1)
+    setScreen('battle')
+  }
+
+  const handleBoostChosen = (boost) => {
+    setActiveBoost(boost)
+    const updatedRun = { ...run, campfireUsed: true }
+    setRun(updatedRun)
+    saveRun(updatedRun)
     setBattleKey((k) => k + 1)
     setScreen('battle')
   }
@@ -158,6 +202,7 @@ export default function App() {
     setMapIsTransition(false)
     setWorldScore(0)
     setPendingScore(null)
+    setActiveBoost(null)
     setBattleKey((k) => k + 1)
     setScreen('start')
   }
@@ -188,7 +233,7 @@ export default function App() {
           initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
           transition={{ duration: 0.25 }} className="w-full"
         >
-          <BattleScreen key={battleKey} world={world} worldIndex={run.worldIndex} battleIndex={run.battleIndex} onBattleEnd={handleBattleEnd} onQuit={handleQuitBattle} lang={lang} t={t} />
+          <BattleScreen key={battleKey} world={battleWorld} worldIndex={run.worldIndex} battleIndex={run.battleIndex} onBattleEnd={handleBattleEnd} onQuit={handleQuitBattle} scoreBonus={activeBoost === 'chronicle' ? 100 : 0} useRaster={useRaster} onToggleRaster={toggleRaster} lang={lang} t={t} />
         </motion.div>
       )}
 
@@ -203,6 +248,7 @@ export default function App() {
             worldScore={clearedData.worldScore}
             totalScore={clearedData.totalScore}
             onContinue={handleClearContinue}
+            useRaster={useRaster} onToggleRaster={toggleRaster}
             lang={lang} t={t}
           />
         </motion.div>
@@ -220,6 +266,7 @@ export default function App() {
             totalScore={pendingScore?.totalScore ?? 0}
             onRestart={handleRestart}
             onViewScores={handleViewScores}
+            useRaster={useRaster} onToggleRaster={toggleRaster}
             lang={lang} t={t}
           />
         </motion.div>
@@ -234,6 +281,7 @@ export default function App() {
             playerName={playerName}
             totalScore={pendingScore?.totalScore ?? 0}
             onContinue={handleVictoryContinue}
+            useRaster={useRaster} onToggleRaster={toggleRaster}
             lang={lang} t={t}
           />
         </motion.div>
@@ -251,8 +299,18 @@ export default function App() {
             difficulty={difficulty}
             playerName={playerName}
             onBack={handleRestart}
+            useRaster={useRaster} onToggleRaster={toggleRaster}
             lang={lang} t={t}
           />
+        </motion.div>
+      )}
+
+      {screen === 'campfire' && (
+        <motion.div key="campfire"
+          initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+          transition={{ duration: 0.4 }} className="w-full"
+        >
+          <CampfireScreen onBoostChosen={handleBoostChosen} onBack={() => setScreen('map')} useRaster={useRaster} onToggleRaster={toggleRaster} lang={lang} t={t} />
         </motion.div>
       )}
 
@@ -273,6 +331,7 @@ export default function App() {
             onRestart={handleRestart}
             onBack={() => setScreen('start')}
             onLogoLongPress={() => setShowLog(true)}
+            useRaster={useRaster} onToggleRaster={toggleRaster}
             lang={lang} t={t}
           />
         </motion.div>

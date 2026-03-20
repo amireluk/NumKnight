@@ -24,7 +24,7 @@ const PILL_SIDE_VISIBLE = 50  // px of ±1 slot shown on each side
 const PILL_CONTAINER_W = PILL_W + 2 * (PILL_GAP + PILL_SIDE_VISIBLE)  // 200px
 const PILL_BASE_X = (PILL_CONTAINER_W - PILL_W) / 2 - 2 * (PILL_W + PILL_GAP)  // centers slot[2]
 
-export function LeaderboardScreen({ totalScore, endWorld, cleared, difficulty, playerName, onBack, lang, t }) {
+export function LeaderboardScreen({ totalScore, endWorld, cleared, difficulty, playerName, onBack, useRaster, onToggleRaster, lang, t }) {
   const isRtl = lang === 'he'
 
   const [[allScores, newScoreIndex]] = useState(() => {
@@ -138,6 +138,7 @@ export function LeaderboardScreen({ totalScore, endWorld, cleared, difficulty, p
       dir={isRtl ? 'rtl' : 'ltr'}
       className="flex flex-col h-dvh max-w-md mx-auto py-5 gap-4"
       style={{
+        position: 'relative',
         overflow: 'hidden',
         background:
           'radial-gradient(ellipse at 50% 30%, rgba(251,191,36,0.12) 0%, transparent 65%), ' +
@@ -146,6 +147,22 @@ export function LeaderboardScreen({ totalScore, endWorld, cleared, difficulty, p
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
+      {/* Toggle — top-right */}
+      {onToggleRaster && (
+        <button
+          onClick={onToggleRaster}
+          style={{
+            position: 'absolute', top: 8, right: 10, zIndex: 30,
+            background: 'rgba(0,0,0,0.35)', border: '1.5px solid rgba(255,255,255,0.18)',
+            borderRadius: 8, padding: '4px 10px',
+            fontSize: 12, fontWeight: 900, color: 'rgba(255,255,255,0.7)',
+            cursor: 'pointer', letterSpacing: '0.04em',
+          }}
+        >
+          {useRaster ? 'SVG' : 'IMG'}
+        </button>
+      )}
+
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -14 }}

@@ -238,7 +238,15 @@ const BURST_COLORS = {
   bronze: ['#cd7c3a', '#e9a96a', '#fff', '#b45309', '#fde68a'],
 }
 
-export function AreaClearedScreen({ world, worldTrophies, worldScore, totalScore, onContinue, lang, t }) {
+const BTN = {
+  position: 'absolute', top: 8, zIndex: 30,
+  background: 'rgba(0,0,0,0.35)', border: '1.5px solid rgba(255,255,255,0.18)',
+  borderRadius: 8, padding: '4px 10px',
+  fontSize: 12, fontWeight: 900, color: 'rgba(255,255,255,0.7)',
+  cursor: 'pointer', letterSpacing: '0.04em',
+}
+
+export function AreaClearedScreen({ world, worldTrophies, worldScore, totalScore, onContinue, useRaster, onToggleRaster, lang, t }) {
   const isRtl = lang === 'he'
   const Scene     = WORLD_SCENES[world.id] ?? ForestScene
   const prevTotal = totalScore - worldScore
@@ -322,12 +330,18 @@ export function AreaClearedScreen({ world, worldTrophies, worldScore, totalScore
       dir={isRtl ? 'rtl' : 'ltr'}
       className="flex flex-col items-center h-dvh max-w-md mx-auto px-4 py-5 gap-4"
       style={{
+        position: 'relative',
         overflow: 'hidden',
         background:
           'radial-gradient(ellipse at 50% 38%, rgba(251,191,36,0.11) 0%, transparent 65%), ' +
           'linear-gradient(to bottom, #1e3a70, #2d5aaa)',
       }}
     >
+      {/* X button — top-left */}
+      {onContinue && <button onClick={onContinue} style={{ ...BTN, left: 10 }}>✕</button>}
+      {/* Toggle — top-right */}
+      {onToggleRaster && <button onClick={onToggleRaster} style={{ ...BTN, right: 10 }}>{useRaster ? 'SVG' : 'IMG'}</button>}
+
       {/* 1. Region name */}
       <motion.div
         className="text-center"

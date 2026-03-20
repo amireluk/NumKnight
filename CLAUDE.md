@@ -1,5 +1,11 @@
 # NumKnight — Dev Notes for Claude
 
+## Sprite processing pipeline
+See `prompts/pipeline.md` for the full Python pipeline (split → chroma-key → binarize → erode → autocrop → normalize → save).
+Per-character settings (bg colour, flip_poses, green_bg) are documented in that file.
+
+---
+
 ## ⚠️ Always bump the version after making changes
 The version lives in `package.json` → `"version"` field (patch digit = third number).
 Increment it at the end of every session that changes code.
@@ -205,6 +211,16 @@ Weapon arm pivot: `transformOrigin: '66px 50px'` (shoulder — same for all).
 3. **Hills** — SVG `position:absolute bottom:0 height:48%` with `overflow="visible"` so crests render into sky; `preserveAspectRatio="none"` stretches to fill width
 
 The arena div has **no** `overflow:hidden` so weapon/wing sprites aren't clipped.
+
+### Raster background images (`public/assets/backgrounds/*.webp`)
+- All 5 backgrounds are **landscape** (wider than tall) — intentionally wider than any phone screen
+- Rendered with `objectFit: cover` + `objectPosition: center center` inside a portrait container
+- This means the **height always fills the screen** and the left/right edges are cropped
+- Wider source image = more cropping on narrow phones; narrower = less padding on wide tablets
+- **Recommended generation size: 4:3 landscape** (e.g. 1600×1200) — wide enough to cover tablet widths without wasting too much on sides
+- Center-dense composition is critical: key visuals must be in the **central ~50%** of the image width since the sides will be cropped on most phones
+- Ground line should sit at ~55–62% from top so character torsos read against terrain, not sky
+- See `prompts/backgrounds.md` for AI generation prompts
 
 ---
 

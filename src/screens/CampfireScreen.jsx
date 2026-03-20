@@ -238,7 +238,15 @@ function BoostCard({ boost, onConfirm, index }) {
 
 // ── Main screen ───────────────────────────────────────────────────────────────
 
-export function CampfireScreen({ onBoostChosen, lang, t }) {
+const BTN = {
+  position: 'absolute', top: 8, zIndex: 30,
+  background: 'rgba(0,0,0,0.35)', border: '1.5px solid rgba(255,255,255,0.18)',
+  borderRadius: 8, padding: '4px 10px',
+  fontSize: 12, fontWeight: 900, color: 'rgba(255,255,255,0.7)',
+  cursor: 'pointer', letterSpacing: '0.04em',
+}
+
+export function CampfireScreen({ onBoostChosen, onBack, useRaster, onToggleRaster, lang, t }) {
   const boosts = [
     {
       id: 'weakSpot',
@@ -272,6 +280,11 @@ export function CampfireScreen({ onBoostChosen, lang, t }) {
         display: 'flex', flexDirection: 'column',
       }}
     >
+      {/* X button — top-left */}
+      {onBack && <button onClick={onBack} style={{ ...BTN, left: 10 }}>✕</button>}
+      {/* Toggle — top-right */}
+      {onToggleRaster && <button onClick={onToggleRaster} style={{ ...BTN, right: 10 }}>{useRaster ? 'SVG' : 'IMG'}</button>}
+
       {/* ── Scene ─────────────────────────────────────── */}
       <div style={{ position: 'relative', flex: '0 0 40%', minHeight: 0 }}>
         <Stars />
