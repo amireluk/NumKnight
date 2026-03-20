@@ -587,10 +587,10 @@ const RASTER_ENEMIES = {
     splashColor: '#fb923c',
   },
   darkKnight: {
-    idle:   _img('assets/characters/black-knight/black-knight-idle.webp'),
-    attack: _img('assets/characters/black-knight/black-knight-attack.webp'),
-    hit:    _img('assets/characters/black-knight/black-knight-hit.webp'),
-    dead:   _img('assets/characters/black-knight/black-knight-dead.webp'),
+    idle:   _img('assets/characters/dark-knight/dark-knight-idle.webp'),
+    attack: _img('assets/characters/dark-knight/dark-knight-attack.webp'),
+    hit:    _img('assets/characters/dark-knight/dark-knight-hit.webp'),
+    dead:   _img('assets/characters/dark-knight/dark-knight-dead.webp'),
     splashColor: '#94a3b8',
   },
   dragon: {
@@ -631,10 +631,8 @@ export function EnemyCharacter({ phase, enemy, hitKey, raging = false }) {
       if (rasterSprites) { const t = setTimeout(() => setSprite('idle'), 300); return () => clearTimeout(t) }
     }
     if (phase === 'won') {
-      if (rasterSprites) setSprite('dead')
-      moveControls.start(rasterSprites ? {
-        opacity: [1, 1, 0], transition: { duration: 1.0, times: [0, 0.4, 1] },
-      } : {
+      if (rasterSprites) { setSprite('dead'); return }
+      moveControls.start({
         x: [0, -18, 160], rotate: [0, -12, -80], opacity: [1, 1, 0],
         transition: { duration: 0.65, times: [0, 0.25, 1], ease: 'easeIn' },
       })
