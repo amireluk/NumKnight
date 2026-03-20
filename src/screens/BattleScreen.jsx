@@ -766,7 +766,7 @@ export function BattleScreen({ world, worldIndex, battleIndex, onBattleEnd, onQu
             <div dir="ltr" className="relative flex flex-1 justify-around items-end">
               {/* Knight — slides in from left only on first encounter; stays put on subsequent ones */}
               {/* zIndex: knight on top while attacking (lunging right over enemy), enemy on top otherwise (it's last in DOM so naturally above) */}
-              <div className="flex flex-col items-center" style={{ zIndex: phase === 'attacking' ? 2 : 1, position: 'relative' }}>
+              <div className="flex flex-col items-center" style={{ zIndex: phase === 'attacking' ? 2 : 1, position: 'relative', marginBottom: useRaster ? 11 : 0 }}>
                 <motion.div
                   initial={{ x: battleIndex === 0 ? -220 : 0 }}
                   animate={{ x: 0 }}
@@ -785,7 +785,7 @@ export function BattleScreen({ world, worldIndex, battleIndex, onBattleEnd, onQu
               </div>
 
               {/* Enemy — slides in from right alongside knight */}
-              <div className="flex flex-col items-center" style={{ zIndex: phase === 'hit' ? 2 : 1, position: 'relative' }}>
+              <div className="flex flex-col items-center" style={{ zIndex: phase === 'hit' ? 2 : 1, position: 'relative', marginBottom: useRaster ? 11 : 0 }}>
                 <motion.div
                   initial={{ x: 120, opacity: 0 }}
                   animate={{ x: 0, opacity: showTrophy ? 0 : 1 }}

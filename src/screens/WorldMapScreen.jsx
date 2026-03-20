@@ -38,7 +38,29 @@ function getBestTrophy(trophies, worlds, worldIndex) {
   return null
 }
 
-// ── Region panoramic strips (360×100, xMidYMid slice) ───────────────────────
+// ── Region background images ──────────────────────────────────────────────────
+
+const _VER = typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : 'dev'
+const BG_FILE = {
+  forest:     'forest',
+  swamp:      'swamp',
+  mountains:  'mountains',
+  castle:     'castle',
+  dragonLair: 'dragon-lair',
+}
+
+function RegionBg({ worldId }) {
+  const file = BG_FILE[worldId] ?? 'forest'
+  return (
+    <img
+      src={`${import.meta.env.BASE_URL}assets/backgrounds/${file}.webp?v=${_VER}`}
+      alt=""
+      style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }}
+    />
+  )
+}
+
+// ── Legacy SVG strips (kept for reference, no longer used) ───────────────────
 
 function ForestStrip() {
   return (
@@ -260,7 +282,6 @@ export const REGION_STRIPS = {
 // ── Region band ──────────────────────────────────────────────────────────────
 
 function RegionBand({ world, worldIndex, status, trophy, score, delay, onTap, isDevMode, t }) {
-  const Strip       = REGION_STRIPS[world.id] ?? ForestStrip
   const isLocked    = status === 'locked'
   const isCurrent   = status === 'current'
   const isCompleted = status === 'completed'
@@ -291,7 +312,7 @@ function RegionBand({ world, worldIndex, status, trophy, score, delay, onTap, is
       }}
     >
       {/* Scene background */}
-      <Strip />
+      <RegionBg worldId={world.id} />
 
       {/* Locked overlay */}
       {isLocked && (
@@ -322,7 +343,7 @@ function RegionBand({ world, worldIndex, status, trophy, score, delay, onTap, is
       {/* Active: knight + enemy centered */}
       {isCurrent && (
         <div dir="ltr" style={{
-          position: 'absolute', inset: 0, zIndex: 2, pointerEvents: 'none',
+          position: 'absolute', inset: '0 0 4px 0', zIndex: 2, pointerEvents: 'none',
           display: 'flex', flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'center', gap: 12,
         }}>
           <div style={{ transform: 'scale(0.46)', transformOrigin: 'center bottom' }}>

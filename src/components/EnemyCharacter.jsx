@@ -17,11 +17,20 @@ const SPLASH_LINES_OFFSET = SPLASH_ANGLES_OFFSET.map(a => {
   return [Math.cos(r) * 9, Math.sin(r) * 9, Math.cos(r) * 22, Math.sin(r) * 22]
 })
 
-function HitSplash({ color }) {
+// x/y: CSS left/top of the splash centre relative to the sprite container
+const WEAPON_SPLASH_POS = {
+  goblin:     { x: '0%', y: '50%' },
+  skeleton:   { x: '0%', y: '35%' },
+  orc:        { x: '0%', y: '35%' },
+  darkKnight: { x: '0%', y: '40%' },
+  dragon:     { x: '0%', y: '25%' },
+}
+
+function HitSplash({ color, x = '0%', y = '35%' }) {
   return (
     <motion.div
       className="absolute pointer-events-none"
-      style={{ left: '30%', top: '30%', transform: 'translate(-50%, -50%)', zIndex: 20, willChange: 'transform, opacity' }}
+      style={{ left: x, top: y, transform: 'translate(-50%, -50%)', zIndex: 20, willChange: 'transform, opacity' }}
       initial={{ scale: 0.03, opacity: 1 }}
       animate={{ scale: [0.03, 0.84, 1.02], opacity: [1, 1, 0] }}
       transition={{ duration: 0.5, times: [0, 0.28, 1], ease: 'easeOut' }}
@@ -615,6 +624,8 @@ export function EnemyCharacter({ phase, enemy, hitKey, raging = false }) {
   const idleTimerRef = useRef(null)
   const [splashKey, setSplashKey] = useState(null)
   const [sprite, setSprite] = useState('idle')
+  const phaseRef = useRef(phase)
+  phaseRef.current = phase
 
   // Preload sprites on mount
   useEffect(() => {
@@ -648,7 +659,7 @@ export function EnemyCharacter({ phase, enemy, hitKey, raging = false }) {
       if (!rasterSprites) weaponControls.start({ rotate: [0, -15, 5, 0], transition: { duration: 0.35 } })
       setSplashKey(hitKey)
       const t1 = setTimeout(() => setSplashKey(null), 550)
-      const t2 = rasterSprites ? setTimeout(() => setSprite('idle'), 350) : null
+      const t2 = rasterSprites ? setTimeout(() => { if (phaseRef.current !== 'won') setSprite('idle') }, 350) : null
       return () => { clearTimeout(t1); if (t2) clearTimeout(t2) }
     }
   }, [hitKey, moveControls, weaponControls, rasterSprites]) // eslint-disable-line react-hooks/exhaustive-deps
@@ -683,7 +694,7 @@ export function EnemyCharacter({ phase, enemy, hitKey, raging = false }) {
           {rasterSprites ? (
             /* Raster: sprite already faces left — no scaleX needed */
             <div style={{ position: 'relative', zIndex: 0, width: 'min(170px, 37vw)', flexShrink: 0, overflow: 'visible', display: 'flex', justifyContent: 'center', alignItems: 'flex-end' }}>
-              {splashKey !== null && <HitSplash key={splashKey} color={rasterSprites.splashColor} />}
+              {splashKey !== null && <HitSplash key={splashKey} color={rasterSprites.splashColor} {...(WEAPON_SPLASH_POS[enemy.id] ?? {})} />}
               <div style={RASTER_SCALE[enemy.id] ? { transform: `scale(${RASTER_SCALE[enemy.id]})`, transformOrigin: 'center bottom', display: 'inline-block' } : undefined}>
                 <img src={rasterSprites[sprite]} style={{ height: 'min(150px, 33vw)', width: 'auto', maxWidth: 'none', display: 'block', flexShrink: 0 }} alt="" />
               </div>

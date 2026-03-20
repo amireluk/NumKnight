@@ -104,11 +104,11 @@ const SPLASH_LINES_OFFSET = SPLASH_ANGLES_OFFSET.map(a => {
 })
 
 // Hit splash rendered on the character, at the impact point
-function HitSplash({ color }) {
+function HitSplash({ color, x = '100%', y = '42%' }) {
   return (
     <motion.div
       className="absolute pointer-events-none"
-      style={{ left: '65%', top: '30%', transform: 'translate(-50%, -50%)', zIndex: 20, willChange: 'transform, opacity' }}
+      style={{ left: x, top: y, transform: 'translate(-50%, -50%)', zIndex: 20, willChange: 'transform, opacity' }}
       initial={{ scale: 0.03, opacity: 1 }}
       animate={{ scale: [0.03, 0.84, 1.02], opacity: [1, 1, 0] }}
       transition={{ duration: 0.5, times: [0, 0.28, 1], ease: 'easeOut' }}

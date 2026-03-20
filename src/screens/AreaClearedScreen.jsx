@@ -35,7 +35,29 @@ function animateCount(from, to, ms, onTick, onDone) {
   return () => cancelAnimationFrame(raf)
 }
 
-// ── Per-region SVG illustrations ─────────────────────────────────────────────
+// ── Region background images ──────────────────────────────────────────────────
+
+const _VER = typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : 'dev'
+const BG_FILE = {
+  forest:     'forest',
+  swamp:      'swamp',
+  mountains:  'mountains',
+  castle:     'castle',
+  dragonLair: 'dragon-lair',
+}
+
+function RegionBg({ worldId }) {
+  const file = BG_FILE[worldId] ?? 'forest'
+  return (
+    <img
+      src={`${import.meta.env.BASE_URL}assets/backgrounds/${file}.webp?v=${_VER}`}
+      alt=""
+      style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', display: 'block' }}
+    />
+  )
+}
+
+// ── Legacy SVG illustrations (kept for reference, no longer used) ─────────────
 
 function ForestScene() {
   return (
@@ -248,7 +270,6 @@ const BTN = {
 
 export function AreaClearedScreen({ world, worldTrophies, worldScore, totalScore, onContinue, useRaster, onToggleRaster, lang, t }) {
   const isRtl = lang === 'he'
-  const Scene     = WORLD_SCENES[world.id] ?? ForestScene
   const prevTotal = totalScore - worldScore
 
   const [battleDisplay, setBattleDisplay] = useState(0)
@@ -364,7 +385,7 @@ export function AreaClearedScreen({ world, worldTrophies, worldScore, totalScore
         transition={{ type: 'spring', stiffness: 180, damping: 15, delay: 0.1 }}
         style={{ width: '100%', maxHeight: '30vh', borderRadius: 20, overflow: 'hidden', boxShadow: '0 0 32px rgba(0,0,0,0.6)', flexShrink: 0 }}
       >
-        <Scene />
+        <RegionBg worldId={world.id} />
       </motion.div>
 
       {/* 3. Combined trophy + score panel — same width as scene */}
