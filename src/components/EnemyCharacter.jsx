@@ -17,14 +17,8 @@ const SPLASH_LINES_OFFSET = SPLASH_ANGLES_OFFSET.map(a => {
   return [Math.cos(r) * 9, Math.sin(r) * 9, Math.cos(r) * 22, Math.sin(r) * 22]
 })
 
-// x/y: CSS left/top of the splash centre relative to the sprite container
-const WEAPON_SPLASH_POS = {
-  goblin:     { x: '0%', y: '50%' },
-  skeleton:   { x: '0%', y: '35%' },
-  orc:        { x: '0%', y: '35%' },
-  darkKnight: { x: '0%', y: '40%' },
-  dragon:     { x: '0%', y: '25%' },
-}
+// Enemy takes a hit from the knight — splash at middle height of knight sprite
+const KNIGHT_SWORD_HIT_POS = { x: '0%', y: '50%' }
 
 function HitSplash({ color, x = '0%', y = '35%' }) {
   return (
@@ -694,7 +688,7 @@ export function EnemyCharacter({ phase, enemy, hitKey, raging = false }) {
           {rasterSprites ? (
             /* Raster: sprite already faces left — no scaleX needed */
             <div style={{ position: 'relative', zIndex: 0, width: 'min(170px, 37vw)', flexShrink: 0, overflow: 'visible', display: 'flex', justifyContent: 'center', alignItems: 'flex-end' }}>
-              {splashKey !== null && <HitSplash key={splashKey} color={rasterSprites.splashColor} {...(WEAPON_SPLASH_POS[enemy.id] ?? {})} />}
+              {splashKey !== null && <HitSplash key={splashKey} color={rasterSprites.splashColor} {...KNIGHT_SWORD_HIT_POS} />}
               <div style={RASTER_SCALE[enemy.id] ? { transform: `scale(${RASTER_SCALE[enemy.id]})`, transformOrigin: 'center bottom', display: 'inline-block' } : undefined}>
                 <img src={rasterSprites[sprite]} style={{ height: 'min(150px, 33vw)', width: 'auto', maxWidth: 'none', display: 'block', flexShrink: 0 }} alt="" />
               </div>

@@ -90,6 +90,17 @@ export const KnightSwordArmSVG = React.memo(function KnightSwordArmSVG() {
   )
 })
 
+// Knight takes a hit from an enemy — splash at the enemy's weapon tip height
+// x='100%' = right edge of knight sprite (where enemy attacks from)
+// dragon: null = no splash
+const ENEMY_WEAPON_HIT_POS = {
+  goblin:     { x: '100%', y: '90%' },  // club swings low
+  skeleton:   { x: '100%', y: '50%' },  // scythe mid height
+  orc:        { x: '100%', y: '67%' },  // axe 2/3 down
+  darkKnight: { x: '100%', y: '50%' },  // sword mid height
+  dragon:     null,                      // no splash on player
+}
+
 const SPLASH_ANGLES = [0, 45, 90, 135, 180, 225, 270, 315]
 const SPLASH_ANGLES_OFFSET = [22.5, 67.5, 112.5, 157.5, 202.5, 247.5, 292.5, 337.5]
 
@@ -104,7 +115,7 @@ const SPLASH_LINES_OFFSET = SPLASH_ANGLES_OFFSET.map(a => {
 })
 
 // Hit splash rendered on the character, at the impact point
-function HitSplash({ color, x = '100%', y = '42%' }) {
+function HitSplash({ color, x = '100%', y = '40%' }) {
   return (
     <motion.div
       className="absolute pointer-events-none"
@@ -192,7 +203,7 @@ export function FallenKnightScene() {
   )
 }
 
-export function KnightCharacter({ phase, hitKey, useRaster }) {
+export function KnightCharacter({ phase, hitKey, useRaster, enemyId }) {
   const moveControls = useAnimation()
   const swordControls = useAnimation()
   const [splashKey, setSplashKey] = useState(null)
@@ -255,7 +266,7 @@ export function KnightCharacter({ phase, hitKey, useRaster }) {
           {raster ? (
             /* ── Raster sprite swap mode ── */
             <div style={{ position: 'relative', zIndex: 0, width: 'min(120px, 26vw)', flexShrink: 0, overflow: 'visible', display: 'flex', justifyContent: 'center', alignItems: 'flex-end' }}>
-              {splashKey !== null && <HitSplash key={splashKey} color="#f87171" />}
+              {splashKey !== null && ENEMY_WEAPON_HIT_POS[enemyId] !== null && <HitSplash key={splashKey} color="#f87171" {...(ENEMY_WEAPON_HIT_POS[enemyId] ?? {})} />}
               <img
                 src={SPRITES[sprite]}
                 style={{ height: 'min(150px, 33vw)', width: 'auto', maxWidth: 'none', display: 'block', flexShrink: 0, transform: sprite === 'attack' ? 'translateX(min(54px, 11.84vw))' : undefined }}
@@ -276,7 +287,7 @@ export function KnightCharacter({ phase, hitKey, useRaster }) {
               >
                 <KnightSwordArmSVG />
               </motion.div>
-              {splashKey !== null && <HitSplash key={splashKey} color="#f87171" />}
+              {splashKey !== null && ENEMY_WEAPON_HIT_POS[enemyId] !== null && <HitSplash key={splashKey} color="#f87171" {...(ENEMY_WEAPON_HIT_POS[enemyId] ?? {})} />}
             </div>
           )}
         </motion.div>

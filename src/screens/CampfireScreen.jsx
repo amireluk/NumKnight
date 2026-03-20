@@ -140,25 +140,27 @@ function Flames() {
   )
 }
 
-function Embers() {
-  const embers = Array.from({ length: 10 }, (_, i) => ({
+function Embers({ big = false }) {
+  const count = big ? 14 : 10
+  const embers = Array.from({ length: count }, (_, i) => ({
     id: i,
     x: -6 + (i * 4.1) % 14,
     delay: (i * 0.38) % 2.6,
-    duration: 1.7 + (i * 0.22) % 1.1,
-    size: 1.5 + (i % 3) * 0.7,
+    duration: (big ? 2.2 : 1.7) + (i * 0.22) % 1.1,
+    size: big ? 3 + (i % 3) * 1.4 : 1.5 + (i % 3) * 0.7,
     drift: (i % 2 === 0 ? 1 : -1) * (3 + (i * 1.9) % 7),
     color: i % 3 === 0 ? '#fde68a' : i % 3 === 1 ? '#fb923c' : '#fbbf24',
   }))
+  const rise = big ? -130 : -65
   return (
-    <div style={{ position: 'absolute', bottom: 48, left: '50%', transform: 'translateX(-50%)', pointerEvents: 'none' }}>
+    <div style={{ position: 'absolute', bottom: big ? 8 : 48, left: '50%', transform: 'translateX(-50%)', pointerEvents: 'none' }}>
       {embers.map((e) => (
         <motion.div
           key={e.id}
           initial={{ x: e.x, y: 0, opacity: 0.9 }}
-          animate={{ x: e.x + e.drift, y: -65, opacity: 0 }}
+          animate={{ x: e.x + e.drift, y: rise, opacity: 0 }}
           transition={{ delay: e.delay, duration: e.duration, repeat: Infinity, ease: 'easeOut' }}
-          style={{ position: 'absolute', width: e.size, height: e.size, borderRadius: '50%', background: e.color }}
+          style={{ position: 'absolute', width: e.size, height: e.size * (big ? 2.5 : 1), borderRadius: big ? 2 : '50%', background: e.color }}
         />
       ))}
     </div>
@@ -317,8 +319,8 @@ export function CampfireScreen({ onBoostChosen, onBack, useRaster, onToggleRaste
         <div style={{
           position: 'absolute',
           bottom: useRaster ? '12%' : '14%',
-          left: useRaster ? '13%' : '50%',
-          transform: useRaster ? 'translateX(10px)' : 'translateX(10px)',
+          left: useRaster ? '16%' : '50%',
+          transform: 'translateX(10px)',
           width: 180, height: 140,
           background: 'radial-gradient(ellipse at 40% 80%, rgba(251,146,60,0.22) 0%, rgba(251,146,60,0.06) 45%, transparent 70%)',
           pointerEvents: 'none',
@@ -332,13 +334,12 @@ export function CampfireScreen({ onBoostChosen, onBack, useRaster, onToggleRaste
           style={{
             position: 'absolute',
             bottom: useRaster ? '18%' : '8%',
-            left: useRaster ? '13%' : '50%',
+            left: useRaster ? '16%' : '50%',
             transform: useRaster ? 'none' : 'translateX(-50%)',
             zIndex: 2,
           }}
         >
-          <Flames />
-          <Embers />
+          {useRaster ? <Embers big /> : <><Flames /><Embers /></>}
         </motion.div>
       </div>
 
