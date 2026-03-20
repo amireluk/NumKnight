@@ -49,18 +49,7 @@ const BG_FILE = {
   dragonLair: 'dragon-lair',
 }
 
-function RegionBg({ worldId }) {
-  const file = BG_FILE[worldId] ?? 'forest'
-  return (
-    <img
-      src={`${import.meta.env.BASE_URL}assets/backgrounds/${file}.webp?v=${_VER}`}
-      alt=""
-      style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }}
-    />
-  )
-}
-
-// ── Legacy SVG strips (kept for reference, no longer used) ───────────────────
+// ── SVG strips ───────────────────────────────────────────────────────────────
 
 function ForestStrip() {
   return (
@@ -279,9 +268,24 @@ export const REGION_STRIPS = {
   dragonLair: DragonLairStrip,
 }
 
+function RegionBg({ worldId, useRaster }) {
+  if (!useRaster) {
+    const Strip = REGION_STRIPS[worldId] ?? REGION_STRIPS.forest
+    return <Strip />
+  }
+  const file = BG_FILE[worldId] ?? 'forest'
+  return (
+    <img
+      src={`${import.meta.env.BASE_URL}assets/backgrounds/${file}.webp?v=${_VER}`}
+      alt=""
+      style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }}
+    />
+  )
+}
+
 // ── Region band ──────────────────────────────────────────────────────────────
 
-function RegionBand({ world, worldIndex, status, trophy, score, delay, onTap, isDevMode, t }) {
+function RegionBand({ world, worldIndex, status, trophy, score, delay, onTap, isDevMode, t, useRaster }) {
   const isLocked    = status === 'locked'
   const isCurrent   = status === 'current'
   const isCompleted = status === 'completed'
@@ -312,7 +316,7 @@ function RegionBand({ world, worldIndex, status, trophy, score, delay, onTap, is
       }}
     >
       {/* Scene background */}
-      <RegionBg worldId={world.id} />
+      <RegionBg worldId={world.id} useRaster={useRaster} />
 
       {/* Locked overlay */}
       {isLocked && (
@@ -340,15 +344,17 @@ function RegionBand({ world, worldIndex, status, trophy, score, delay, onTap, is
         </div>
       )}
 
-      {/* Active: knight + enemy centered */}
+      {/* Active: enemy centered (img mode) or knight + enemy (svg mode) */}
       {isCurrent && (
         <div dir="ltr" style={{
           position: 'absolute', inset: '0 0 4px 0', zIndex: 2, pointerEvents: 'none',
           display: 'flex', flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'center', gap: 12,
         }}>
-          <div style={{ transform: 'scale(0.46)', transformOrigin: 'center bottom' }}>
-            <KnightCharacter phase="idle" hitKey={0} />
-          </div>
+          {!useRaster && (
+            <div style={{ transform: 'scale(0.46)', transformOrigin: 'center bottom' }}>
+              <KnightCharacter phase="idle" hitKey={0} />
+            </div>
+          )}
           <div style={{ transform: 'scale(0.46)', transformOrigin: 'center bottom' }}>
             <EnemyCharacter phase="idle" enemy={world.enemy} hitKey={0} />
           </div>
@@ -525,6 +531,7 @@ export function WorldMapScreen({
               onTap={onFight}
               isDevMode={isDevMode}
               t={t}
+              useRaster={useRaster}
             />
           )
         })}
