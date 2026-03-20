@@ -89,11 +89,24 @@ def crop_to_content(img: Image.Image, padding: int = 2) -> Image.Image:
     return img.crop((l, t, r, b))
 
 
+def crop_bottom_bar(img: Image.Image, black_threshold: int = 20) -> Image.Image:
+    """Remove solid black bar from the bottom of the image (AI watermark strip)."""
+    arr = np.array(img)
+    h = arr.shape[0]
+    for row in range(h - 1, -1, -1):
+        if arr[row, :, :3].max() > black_threshold:
+            cropped = img.crop((0, 0, img.width, row + 1))
+            print(f'  cropped black bar: {h}px → {row + 1}px (removed {h - row - 1}px)')
+            return cropped
+    return img
+
+
 def process_sheet(sheet_path, out_folder, pose_names):
     print(f'\nProcessing: {os.path.basename(sheet_path)}')
     os.makedirs(out_folder, exist_ok=True)
 
     sheet = Image.open(sheet_path).convert('RGBA')
+    sheet = crop_bottom_bar(sheet)
     W, H = sheet.size
     cell_w, cell_h = W // 2, H // 2
     print(f'  sheet={W}×{H}, cell={cell_w}×{cell_h}')

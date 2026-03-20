@@ -26,6 +26,7 @@ export const T = {
     ptsLabel: (n) => `${n} pts`,
     timeBonusLabel: (n) => `${n} time bonus`,
     timeBonus: 'time bonus',
+    chronicleBonusLabel: (n) => `📜 +${n} chronicle bonus`,
     tapToContinue: 'TAP TO CONTINUE',
 
     // Boss mechanic
@@ -80,6 +81,18 @@ export const T = {
       castle: 'Castle',
       dragonLair: 'Dragon Lair',
     },
+
+    // CampfireScreen
+    campfireTitle: 'The Dragon Lair Awaits',
+    campfireSubtitle: 'Choose one boon before you enter',
+    campfireEnter: 'ENTER THE LAIR →',
+    campfireHint: 'TAP A BOON TO ENTER THE LAIR',
+    boostWeakSpotName: "Dragon's Weakness",
+    boostWeakSpotDesc: '−1 Dragon HP',
+    boostSteadyNervesName: 'Steady Nerves',
+    boostSteadyNervesDesc: '+3 seconds on every question timer',
+    boostChronicleName: "Hero's Chronicle",
+    boostChronicleDesc: '+100 bonus points per battle won',
   },
 
   he: {
@@ -107,6 +120,7 @@ export const T = {
     ptsLabel: (n) => `נק׳ ${n}`,
     timeBonusLabel: (n) => `בונוס זמן ${n}`,
     timeBonus: 'בונוס זמן',
+    chronicleBonusLabel: (n) => `📜 +${n} בונוס כרוניקה`,
     tapToContinue: 'לחץ להמשך',
 
     // Boss mechanic
@@ -161,5 +175,17 @@ export const T = {
       castle: 'טירה',
       dragonLair: 'מאורת הדרקון',
     },
+
+    // CampfireScreen
+    campfireTitle: 'מאורת הדרקון מחכה',
+    campfireSubtitle: 'בחר ברכה לפני הכניסה',
+    campfireEnter: 'כנס למאורה →',
+    campfireHint: 'לחץ על ברכה כדי להיכנס למאורה',
+    boostWeakSpotName: 'נקודת חולשה',
+    boostWeakSpotDesc: '1− HP לדרקון',
+    boostSteadyNervesName: 'עצבים של ברזל',
+    boostSteadyNervesDesc: '+3 שניות לכל שאלה',
+    boostChronicleName: 'ספר הגיבורים',
+    boostChronicleDesc: '+100 נקודות בונוס לכל קרב',
   },
 }

@@ -18,7 +18,6 @@ import { BattleBackground } from '../components/BattleBackground'
 import { BattleIntro } from '../components/BattleIntro'
 
 const DEFAULT_PLAYER_HP = 3
-const RASTER_KEY = 'numknight_raster_bg'
 const IDLE_BUTTON_STATES = ['idle', 'idle', 'idle', 'idle']
 
 const TROPHY_LABEL_DEFAULT = { gold: 'PERFECT!', silver: 'GREAT!', bronze: 'SURVIVED!' }
@@ -312,15 +311,9 @@ function FallingRocks() {
   )
 }
 
-export function BattleScreen({ world, worldIndex, battleIndex, onBattleEnd, onQuit, scoreBonus = 0, lang, t }) {
+export function BattleScreen({ world, worldIndex, battleIndex, onBattleEnd, onQuit, scoreBonus = 0, useRaster = false, onToggleRaster, lang, t }) {
   const shakeControls = useAnimation()
   const bgControls = useAnimation()
-  const [useRaster, setUseRaster] = useState(() => localStorage.getItem(RASTER_KEY) === 'true')
-
-  const toggleRaster = () => setUseRaster((v) => {
-    localStorage.setItem(RASTER_KEY, String(!v))
-    return !v
-  })
 
   const PLAYER_HP = world.playerHP ?? DEFAULT_PLAYER_HP
   const isBoss = world.enemy.id === 'dragon'
@@ -737,7 +730,7 @@ export function BattleScreen({ world, worldIndex, battleIndex, onBattleEnd, onQu
 
           {/* Raster / vector toggle — top-right */}
           <button
-            onClick={toggleRaster}
+            onClick={onToggleRaster}
             title={useRaster ? 'Switch to vector' : 'Switch to image'}
             style={{
               position: 'absolute', top: 8, right: 10, zIndex: 5,

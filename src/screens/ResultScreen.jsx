@@ -8,19 +8,33 @@ const _V    = typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : 'dev'
 const _BASE = import.meta.env.BASE_URL
 const DEAD_SPRITE = `${_BASE}assets/characters/knight/knight-dead.webp?v=${_V}`
 
-export function ResultScreen({ worldName, worldId, enemy, totalScore, onRestart, onViewScores, lang, t }) {
+const BTN = {
+  position: 'absolute', top: 8, zIndex: 30,
+  background: 'rgba(0,0,0,0.35)', border: '1.5px solid rgba(255,255,255,0.18)',
+  borderRadius: 8, padding: '4px 10px',
+  fontSize: 12, fontWeight: 900, color: 'rgba(255,255,255,0.7)',
+  cursor: 'pointer', letterSpacing: '0.04em',
+}
+
+export function ResultScreen({ worldName, worldId, enemy, totalScore, onRestart, onViewScores, useRaster, onToggleRaster, lang, t }) {
   const isRtl = lang === 'he'
   return (
     <div
       dir={isRtl ? 'rtl' : 'ltr'}
       className="flex flex-col h-dvh max-w-md mx-auto px-6 py-5 gap-4"
       style={{
+        position: 'relative',
         overflow: 'hidden',
         background:
           'radial-gradient(ellipse at 50% 40%, rgba(239,68,68,0.07) 0%, transparent 65%), ' +
           'linear-gradient(to bottom, #1e3a70, #2d5aaa)',
       }}
     >
+      {/* X button — top-left */}
+      {onRestart && <button onClick={onRestart} style={{ ...BTN, left: 10 }}>✕</button>}
+      {/* Toggle — top-right */}
+      {onToggleRaster && <button onClick={onToggleRaster} style={{ ...BTN, right: 10 }}>{useRaster ? 'SVG' : 'IMG'}</button>}
+
       {/* Title */}
       <motion.div
         initial={{ opacity: 0, y: -14 }}
@@ -59,7 +73,7 @@ export function ResultScreen({ worldName, worldId, enemy, totalScore, onRestart,
           display: 'flex', justifyContent: 'center', alignItems: 'flex-end',
           pointerEvents: 'none', overflow: 'visible',
         }}>
-          {localStorage.getItem('numknight_raster_bg') === 'true' ? (
+          {useRaster ? (
             <img src={DEAD_SPRITE} style={{ width: 180, height: 'auto' }} alt="" />
           ) : (
             <div style={{
