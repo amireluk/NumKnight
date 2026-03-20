@@ -2,6 +2,10 @@ import { useState, useEffect, useMemo } from 'react'
 import { motion } from 'framer-motion'
 import { KnightBodySVG, KnightSwordArmSVG } from '../components/KnightCharacter'
 
+/* eslint-disable no-undef */
+const _V = typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : 'dev'
+const _BASE = import.meta.env.BASE_URL
+
 const CONFETTI_COLORS = ['#fbbf24', '#f59e0b', '#fde68a', '#86efac', '#93c5fd', '#f9a8d4', '#c084fc', '#fff']
 
 function ConfettiRain() {
@@ -150,18 +154,26 @@ export function VictoryScreen({ playerName, totalScore, onContinue, useRaster, o
           display: 'flex', alignItems: 'flex-end',
         }}
       >
-        <div style={{
-          position: 'relative',
-          width: 84, height: 112,
-          overflow: 'visible',
-          transform: 'scale(1.9) scaleX(-1)',
-          transformOrigin: 'center bottom',
-        }}>
-          <KnightBodySVG />
-          <div style={{ position: 'absolute', top: 0, left: 0, overflow: 'visible', transformOrigin: '73px 58px' }}>
-            <KnightSwordArmSVG />
+        {useRaster ? (
+          <img
+            src={`${_BASE}assets/characters/knight/knight-victory.webp?v=${_V}`}
+            alt=""
+            style={{ height: 116, width: 'auto', display: 'block' }}
+          />
+        ) : (
+          <div style={{
+            position: 'relative',
+            width: 84, height: 112,
+            overflow: 'visible',
+            transform: 'scale(1.9) scaleX(-1)',
+            transformOrigin: 'center bottom',
+          }}>
+            <KnightBodySVG />
+            <div style={{ position: 'absolute', top: 0, left: 0, overflow: 'visible', transformOrigin: '73px 58px' }}>
+              <KnightSwordArmSVG />
+            </div>
           </div>
-        </div>
+        )}
       </motion.div>
 
       {/* Title — always in DOM, letters animate in */}

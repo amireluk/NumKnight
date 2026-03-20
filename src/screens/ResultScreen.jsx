@@ -7,6 +7,7 @@ import { KnightBodySVG, KnightSwordArmSVG } from '../components/KnightCharacter'
 const _V    = typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : 'dev'
 const _BASE = import.meta.env.BASE_URL
 const DEAD_SPRITE = `${_BASE}assets/characters/knight/knight-dead.webp?v=${_V}`
+const BG_FILE = { forest: 'forest', swamp: 'swamp', mountains: 'mountains', castle: 'castle', dragonLair: 'dragon-lair' }
 
 const BTN = {
   position: 'absolute', top: 8, zIndex: 30,
@@ -62,7 +63,15 @@ export function ResultScreen({ worldName, worldId, enemy, totalScore, onRestart,
           borderRadius: 16, border: '1px solid rgba(255,255,255,0.08)',
         }}
       >
-        <BattleBackground worldId={worldId} />
+        {useRaster ? (
+          <img
+            src={`${_BASE}assets/backgrounds/${BG_FILE[worldId] ?? 'forest'}.webp?v=${_V}`}
+            alt=""
+            style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }}
+          />
+        ) : (
+          <BattleBackground worldId={worldId} />
+        )}
 
         {/* Dim overlay for drama */}
         <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.25)', zIndex: 1 }} />

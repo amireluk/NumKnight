@@ -1,19 +1,8 @@
 import { motion, useAnimation, AnimatePresence } from 'framer-motion'
 import React, { useEffect, useRef, useState } from 'react'
 
-// ─────────────────────────────────────────────
-// Hit flash — red overlay on the sprite
-// ─────────────────────────────────────────────
-function HitFlash() {
-  return (
-    <motion.div
-      style={{ position: 'absolute', inset: 0, background: 'rgba(220,38,38,0.52)', pointerEvents: 'none', zIndex: 10 }}
-      initial={{ opacity: 1 }}
-      animate={{ opacity: 0 }}
-      transition={{ duration: 0.38, ease: 'easeOut' }}
-    />
-  )
-}
+const HIT_FILTER   = 'brightness(1.6) sepia(1) saturate(8) hue-rotate(-10deg)'
+const CLEAR_FILTER = 'brightness(1) sepia(0) saturate(1) hue-rotate(0deg)'
 
 // ─────────────────────────────────────────────
 // GOBLIN
@@ -588,7 +577,7 @@ export function EnemyCharacter({ phase, enemy, hitKey, raging = false }) {
   const moveControls = useAnimation()
   const weaponControls = useAnimation()
   const idleTimerRef = useRef(null)
-  const [splashKey, setSplashKey] = useState(null)
+  const [flashing, setFlashing] = useState(false)
   const [sprite, setSprite] = useState('idle')
   const phaseRef = useRef(phase)
   phaseRef.current = phase
@@ -623,8 +612,8 @@ export function EnemyCharacter({ phase, enemy, hitKey, raging = false }) {
       if (rasterSprites) setSprite('hit')
       moveControls.start({ x: [0, 12, -5, 0], transition: { duration: 0.35 } })
       if (!rasterSprites) weaponControls.start({ rotate: [0, -15, 5, 0], transition: { duration: 0.35 } })
-      setSplashKey(hitKey)
-      const t1 = setTimeout(() => setSplashKey(null), 550)
+      setFlashing(true)
+      const t1 = setTimeout(() => setFlashing(false), 80)
       const t2 = rasterSprites ? setTimeout(() => { if (phaseRef.current !== 'won') setSprite('idle') }, 350) : null
       return () => { clearTimeout(t1); if (t2) clearTimeout(t2) }
     }
@@ -660,15 +649,26 @@ export function EnemyCharacter({ phase, enemy, hitKey, raging = false }) {
           {rasterSprites ? (
             /* Raster: sprite already faces left — no scaleX needed */
             <div style={{ position: 'relative', zIndex: 0, width: 'min(170px, 37vw)', flexShrink: 0, overflow: 'visible', display: 'flex', justifyContent: 'center', alignItems: 'flex-end' }}>
-              {splashKey !== null && <HitFlash key={splashKey} />}
               <div style={RASTER_SCALE[enemy.id] ? { transform: `scale(${RASTER_SCALE[enemy.id]})`, transformOrigin: 'center bottom', display: 'inline-block' } : undefined}>
-                <img src={rasterSprites[sprite]} style={{ height: 'min(150px, 33vw)', width: 'auto', maxWidth: 'none', display: 'block', flexShrink: 0 }} alt="" />
+                <img
+                  src={rasterSprites[sprite]}
+                  style={{
+                    height: 'min(150px, 33vw)', width: 'auto', maxWidth: 'none', display: 'block', flexShrink: 0,
+                    filter: flashing ? HIT_FILTER : CLEAR_FILTER,
+                    transition: flashing ? 'filter 0s' : 'filter 0.4s ease-out',
+                  }}
+                  alt=""
+                />
               </div>
             </div>
           ) : (
             /* SVG: source faces right, flip to face left */
             <div style={{ transform: 'scaleX(-1)' }}>
-              <div style={{ position: 'relative', width: 84, height: 112, overflow: 'visible' }}>
+              <div style={{
+                position: 'relative', width: 84, height: 112, overflow: 'visible',
+                filter: flashing ? HIT_FILTER : CLEAR_FILTER,
+                transition: flashing ? 'filter 0s' : 'filter 0.4s ease-out',
+              }}>
                 <Body />
                 <motion.div
                   animate={weaponControls}
@@ -676,7 +676,6 @@ export function EnemyCharacter({ phase, enemy, hitKey, raging = false }) {
                 >
                   <Weapon />
                 </motion.div>
-                {splashKey !== null && <HitFlash key={splashKey} />}
               </div>
             </div>
           )}

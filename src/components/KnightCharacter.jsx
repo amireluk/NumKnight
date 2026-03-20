@@ -90,17 +90,8 @@ export const KnightSwordArmSVG = React.memo(function KnightSwordArmSVG() {
   )
 })
 
-// Hit flash — red overlay on the sprite
-function HitFlash() {
-  return (
-    <motion.div
-      style={{ position: 'absolute', inset: 0, background: 'rgba(220,38,38,0.52)', pointerEvents: 'none', zIndex: 10 }}
-      initial={{ opacity: 1 }}
-      animate={{ opacity: 0 }}
-      transition={{ duration: 0.38, ease: 'easeOut' }}
-    />
-  )
-}
+const HIT_FILTER   = 'brightness(1.6) sepia(1) saturate(8) hue-rotate(-10deg)'
+const CLEAR_FILTER = 'brightness(1) sepia(0) saturate(1) hue-rotate(0deg)'
 
 // ─── Fallen scene (used on ResultScreen) ──────────────────────────────────────
 // Knight lies on its back via CSS rotate(-90deg) — exact same SVG parts as in battle
@@ -170,7 +161,7 @@ export function FallenKnightScene() {
 export function KnightCharacter({ phase, hitKey, useRaster }) {
   const moveControls = useAnimation()
   const swordControls = useAnimation()
-  const [splashKey, setSplashKey] = useState(null)
+  const [flashing, setFlashing] = useState(false)
   const [sprite, setSprite] = useState('idle')
   const raster = useRaster ?? (localStorage.getItem(RASTER_KEY) === 'true')
 
@@ -202,14 +193,14 @@ export function KnightCharacter({ phase, hitKey, useRaster }) {
     if ((phase === 'idle' || phase === 'won') && raster) setSprite('idle')
   }, [phase, moveControls, swordControls, raster]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Knight takes a hit — recoil + splash + sprite swap
+  // Knight takes a hit — recoil + red flash + sprite swap
   useEffect(() => {
     if (hitKey > 0) {
       if (raster) setSprite('hit')
       moveControls.start({ x: [0, -12, 5, 0], transition: { duration: 0.35 } })
       if (!raster) swordControls.start({ rotate: [0, -15, 5, 0], transition: { duration: 0.35 } })
-      setSplashKey(hitKey)
-      const t1 = setTimeout(() => setSplashKey(null), 550)
+      setFlashing(true)
+      const t1 = setTimeout(() => setFlashing(false), 80)
       const t2 = raster ? setTimeout(() => setSprite('idle'), 350) : null
       return () => { clearTimeout(t1); if (t2) clearTimeout(t2) }
     }
@@ -230,16 +221,24 @@ export function KnightCharacter({ phase, hitKey, useRaster }) {
           {raster ? (
             /* ── Raster sprite swap mode ── */
             <div style={{ position: 'relative', zIndex: 0, width: 'min(120px, 26vw)', flexShrink: 0, overflow: 'visible', display: 'flex', justifyContent: 'center', alignItems: 'flex-end' }}>
-              {splashKey !== null && <HitFlash key={splashKey} />}
               <img
                 src={SPRITES[sprite]}
-                style={{ height: 'min(150px, 33vw)', width: 'auto', maxWidth: 'none', display: 'block', flexShrink: 0, transform: sprite === 'attack' ? 'translateX(min(54px, 11.84vw))' : undefined }}
+                style={{
+                  height: 'min(150px, 33vw)', width: 'auto', maxWidth: 'none', display: 'block', flexShrink: 0,
+                  transform: sprite === 'attack' ? 'translateX(min(54px, 11.84vw))' : undefined,
+                  filter: flashing ? HIT_FILTER : CLEAR_FILTER,
+                  transition: flashing ? 'filter 0s' : 'filter 0.4s ease-out',
+                }}
                 alt=""
               />
             </div>
           ) : (
             /* ── SVG mode ── */
-            <div style={{ position: 'relative', width: 84, height: 112, overflow: 'visible' }}>
+            <div style={{
+              position: 'relative', width: 84, height: 112, overflow: 'visible',
+              filter: flashing ? HIT_FILTER : CLEAR_FILTER,
+              transition: flashing ? 'filter 0s' : 'filter 0.4s ease-out',
+            }}>
               <KnightBodySVG />
               <motion.div
                 animate={swordControls}
@@ -251,7 +250,6 @@ export function KnightCharacter({ phase, hitKey, useRaster }) {
               >
                 <KnightSwordArmSVG />
               </motion.div>
-              {splashKey !== null && <HitFlash key={splashKey} />}
             </div>
           )}
         </motion.div>

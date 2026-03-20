@@ -388,13 +388,6 @@ export function AreaClearedScreen({ world, worldTrophies, worldScore, totalScore
         style={{ width: '100%', maxHeight: '30vh', borderRadius: 20, overflow: 'hidden', boxShadow: '0 0 32px rgba(0,0,0,0.6)', flexShrink: 0, position: 'relative' }}
       >
         <RegionBg worldId={world.id} />
-        {useRaster && world.enemy && (
-          <img
-            src={`${import.meta.env.BASE_URL}assets/characters/${ENEMY_FOLDER[world.enemy.id] ?? world.enemy.id}/${ENEMY_SLUG[world.enemy.id] ?? world.enemy.id}-dead.webp?v=${_VER}`}
-            alt=""
-            style={{ position: 'absolute', bottom: 0, left: '50%', transform: 'translateX(-50%)', height: 'min(100px, 22vw)', width: 'auto', objectFit: 'contain' }}
-          />
-        )}
       </motion.div>
 
       {/* 3. Combined trophy + score panel — same width as scene */}
