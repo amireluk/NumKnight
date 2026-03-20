@@ -1,5 +1,9 @@
 import { motion } from 'framer-motion'
 
+/* eslint-disable no-undef */
+const _V = typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : 'dev'
+const _BASE = import.meta.env.BASE_URL
+
 // ── Scene pieces ──────────────────────────────────────────────────────────────
 
 function Stars() {
@@ -287,36 +291,55 @@ export function CampfireScreen({ onBoostChosen, onBack, useRaster, onToggleRaste
 
       {/* ── Scene ─────────────────────────────────────── */}
       <div style={{ position: 'relative', flex: '0 0 40%', minHeight: 0 }}>
-        <Stars />
-        <HorizonGlow />
-        <Mountains />
-        <Ground />
-        <FireGlow />
-
-        {/* Knight + fire on the ground */}
+        {useRaster ? (
+          <img
+            src={`${_BASE}assets/characters/knight/knight-camp.webp?v=${_V}`}
+            alt=""
+            style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }}
+          />
+        ) : (
+          <>
+            <Stars />
+            <HorizonGlow />
+            <Mountains />
+            <Ground />
+            <motion.div
+              initial={{ opacity: 0, x: -24 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.7, ease: 'easeOut' }}
+              style={{ position: 'absolute', bottom: '8%', left: '50%', transform: 'translateX(-80px)' }}
+            >
+              <SeatedKnight />
+            </motion.div>
+          </>
+        )}
+        {/* FireGlow — tracks fire position */}
         <div style={{
-          position: 'absolute', bottom: '8%', left: 0, right: 0,
-          display: 'flex', justifyContent: 'center', alignItems: 'flex-end',
-          gap: 20, paddingInline: 32,
-        }}>
-          <motion.div
-            initial={{ opacity: 0, x: -24 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.7, ease: 'easeOut' }}
-          >
-            <SeatedKnight />
-          </motion.div>
+          position: 'absolute',
+          bottom: useRaster ? '12%' : '14%',
+          left: useRaster ? '13%' : '50%',
+          transform: useRaster ? 'translateX(10px)' : 'translateX(10px)',
+          width: 180, height: 140,
+          background: 'radial-gradient(ellipse at 40% 80%, rgba(251,146,60,0.22) 0%, rgba(251,146,60,0.06) 45%, transparent 70%)',
+          pointerEvents: 'none',
+        }} />
 
-          <motion.div
-            initial={{ opacity: 0, scale: 0.6 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5, delay: 0.25, ease: 'easeOut' }}
-            style={{ position: 'relative' }}
-          >
-            <Flames />
-            <Embers />
-          </motion.div>
-        </div>
+        {/* Fire — positioned on top of campfire in image */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.6 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5, delay: 0.25, ease: 'easeOut' }}
+          style={{
+            position: 'absolute',
+            bottom: useRaster ? '18%' : '8%',
+            left: useRaster ? '13%' : '50%',
+            transform: useRaster ? 'none' : 'translateX(-50%)',
+            zIndex: 2,
+          }}
+        >
+          <Flames />
+          <Embers />
+        </motion.div>
       </div>
 
       {/* ── Title ─────────────────────────────────────── */}
