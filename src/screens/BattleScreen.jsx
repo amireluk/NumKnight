@@ -514,7 +514,7 @@ export function BattleScreen({ world, worldIndex, battleIndex, onBattleEnd, onQu
       } else {
         loadNextRound()
       }
-    }, 280)
+    }, 225)
   }, [timedOut]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const { problem, options } = round
@@ -557,7 +557,7 @@ export function BattleScreen({ world, worldIndex, battleIndex, onBattleEnd, onQu
             setShieldState('cracked')
             setEnemyHitKey((k) => k + 1)
             loadNextRound()
-          }, 280)
+          }, 225)
           return
         }
 
@@ -573,7 +573,7 @@ export function BattleScreen({ world, worldIndex, battleIndex, onBattleEnd, onQu
             setShieldState('broken')
             setEnemyHitKey((k) => k + 1)
             loadNextRound()
-          }, 280)
+          }, 225)
           return
         }
 
@@ -606,7 +606,7 @@ export function BattleScreen({ world, worldIndex, battleIndex, onBattleEnd, onQu
           } else {
             loadNextRound()
           }
-        }, 280)
+        }, 225)
         return
       }
       // ─────────────────────────────────────────────────────────────────
@@ -630,7 +630,7 @@ export function BattleScreen({ world, worldIndex, battleIndex, onBattleEnd, onQu
         } else {
           loadNextRound()
         }
-      }, 280)
+      }, 225)
 
     } else {
       logEvent('wrong', { q: `${problem.a}×${problem.b}`, selected, correct: problem.answer })
@@ -667,7 +667,7 @@ export function BattleScreen({ world, worldIndex, battleIndex, onBattleEnd, onQu
         } else {
           loadNextRound()
         }
-      }, 280)
+      }, 225)
     }
   }
 

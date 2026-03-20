@@ -587,10 +587,10 @@ const RASTER_ENEMIES = {
     splashColor: '#fb923c',
   },
   darkKnight: {
-    idle:   _img('assets/characters/dark-knight/dark-knight-idle.webp'),
-    attack: _img('assets/characters/dark-knight/dark-knight-attack.webp'),
-    hit:    _img('assets/characters/dark-knight/dark-knight-hit.webp'),
-    dead:   _img('assets/characters/dark-knight/dark-knight-dead.webp'),
+    idle:   _img('assets/characters/black-knight/black-knight-idle.webp'),
+    attack: _img('assets/characters/black-knight/black-knight-attack.webp'),
+    hit:    _img('assets/characters/black-knight/black-knight-hit.webp'),
+    dead:   _img('assets/characters/black-knight/black-knight-dead.webp'),
     splashColor: '#94a3b8',
   },
   dragon: {
@@ -626,7 +626,7 @@ export function EnemyCharacter({ phase, enemy, hitKey, raging = false }) {
   useEffect(() => {
     if (phase === 'hit') {
       if (rasterSprites) setSprite('attack')
-      if (enemy.id !== 'dragon') moveControls.start({ x: [0, -80, 0], transition: { duration: 0.45, ease: 'easeInOut' } })
+      if (enemy.id !== 'dragon') moveControls.start({ x: [0, rasterSprites ? -15 : -80, 0], transition: { duration: 0.45, ease: 'easeInOut' } })
       if (!rasterSprites) weaponControls.start({ rotate: [0, 62, -12, 0], transition: { duration: 0.45, times: [0, 0.32, 0.62, 1] } })
       if (rasterSprites) { const t = setTimeout(() => setSprite('idle'), 300); return () => clearTimeout(t) }
     }
@@ -685,9 +685,8 @@ export function EnemyCharacter({ phase, enemy, hitKey, raging = false }) {
           {rasterSprites ? (
             /* Raster: sprite already faces left — no scaleX needed */
             <div style={{ position: 'relative', zIndex: 0, width: 'min(170px, 37vw)', flexShrink: 0, overflow: 'visible', display: 'flex', justifyContent: 'center', alignItems: 'flex-end' }}>
-              <AnimatePresence>
-                {splashKey !== null && <HitSplash key={splashKey} color={rasterSprites.splashColor} />}
-              </AnimatePresence>
+              {/* HitSplash disabled temporarily */}
+              {false && splashKey !== null && <HitSplash key={splashKey} color={rasterSprites.splashColor} />}
               <div style={RASTER_SCALE[enemy.id] ? { transform: `scale(${RASTER_SCALE[enemy.id]})`, transformOrigin: 'center bottom', display: 'inline-block' } : undefined}>
                 <img src={rasterSprites[sprite]} style={{ height: 'min(150px, 33vw)', width: 'auto', maxWidth: 'none', display: 'block', flexShrink: 0 }} alt="" />
               </div>
@@ -703,9 +702,8 @@ export function EnemyCharacter({ phase, enemy, hitKey, raging = false }) {
                 >
                   <Weapon />
                 </motion.div>
-                <AnimatePresence>
-                  {splashKey !== null && <HitSplash key={splashKey} color={splashColor} />}
-                </AnimatePresence>
+                {/* HitSplash disabled temporarily */}
+                {false && splashKey !== null && <HitSplash key={splashKey} color={splashColor} />}
               </div>
             </div>
           )}

@@ -209,7 +209,7 @@ export function KnightCharacter({ phase, hitKey, useRaster }) {
   useEffect(() => {
     if (phase === 'attacking') {
       if (raster) setSprite('attack')
-      moveControls.start({ x: [0, 80, 0], transition: { duration: 0.45, ease: 'easeInOut' } })
+      moveControls.start({ x: [0, raster ? 15 : 80, 0], transition: { duration: 0.45, ease: 'easeInOut' } })
       if (!raster) swordControls.start({ rotate: [0, 62, -12, 0], transition: { duration: 0.45, times: [0, 0.32, 0.62, 1] } })
       if (raster) { const t = setTimeout(() => setSprite('idle'), 300); return () => clearTimeout(t) }
     }
@@ -255,9 +255,8 @@ export function KnightCharacter({ phase, hitKey, useRaster }) {
           {raster ? (
             /* ── Raster sprite swap mode ── */
             <div style={{ position: 'relative', zIndex: 0, width: 'min(120px, 26vw)', flexShrink: 0, overflow: 'visible', display: 'flex', justifyContent: 'center', alignItems: 'flex-end' }}>
-              <AnimatePresence>
-                {splashKey !== null && <HitSplash key={splashKey} color="#f87171" />}
-              </AnimatePresence>
+              {/* HitSplash disabled temporarily */}
+              {false && splashKey !== null && <HitSplash key={splashKey} color="#f87171" />}
               <img
                 src={SPRITES[sprite]}
                 style={{ height: 'min(150px, 33vw)', width: 'auto', maxWidth: 'none', display: 'block', flexShrink: 0, transform: sprite === 'attack' ? 'translateX(min(54px, 11.84vw))' : undefined }}
@@ -278,9 +277,8 @@ export function KnightCharacter({ phase, hitKey, useRaster }) {
               >
                 <KnightSwordArmSVG />
               </motion.div>
-              <AnimatePresence>
-                {splashKey !== null && <HitSplash key={splashKey} color="#f87171" />}
-              </AnimatePresence>
+              {/* HitSplash disabled temporarily */}
+              {false && splashKey !== null && <HitSplash key={splashKey} color="#f87171" />}
             </div>
           )}
         </motion.div>
