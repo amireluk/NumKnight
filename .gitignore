@@ -3,3 +3,5 @@ dist
 .env
 .env.local
 ref/
+public/assets/characters/_raw/
+public/assets/backgrounds/_raw/
