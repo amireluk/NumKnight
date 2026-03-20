@@ -2,44 +2,16 @@ import { motion, useAnimation, AnimatePresence } from 'framer-motion'
 import React, { useEffect, useRef, useState } from 'react'
 
 // ─────────────────────────────────────────────
-// Shared hit-splash
+// Hit flash — red overlay on the sprite
 // ─────────────────────────────────────────────
-const SPLASH_ANGLES = [0, 45, 90, 135, 180, 225, 270, 315]
-const SPLASH_ANGLES_OFFSET = [22.5, 67.5, 112.5, 157.5, 202.5, 247.5, 292.5, 337.5]
-
-// Pre-computed at module load — avoids trig on every hit
-const SPLASH_LINES = SPLASH_ANGLES.map(a => {
-  const r = (a * Math.PI) / 180
-  return [Math.cos(r) * 7, Math.sin(r) * 7, Math.cos(r) * 32, Math.sin(r) * 32]
-})
-const SPLASH_LINES_OFFSET = SPLASH_ANGLES_OFFSET.map(a => {
-  const r = (a * Math.PI) / 180
-  return [Math.cos(r) * 9, Math.sin(r) * 9, Math.cos(r) * 22, Math.sin(r) * 22]
-})
-
-// Enemy takes a hit from the knight — splash at middle height of knight sprite
-const KNIGHT_SWORD_HIT_POS = { x: '0%', y: '50%' }
-
-function HitSplash({ color, x = '0%', y = '35%' }) {
+function HitFlash() {
   return (
     <motion.div
-      className="absolute pointer-events-none"
-      style={{ left: x, top: y, transform: 'translate(-50%, -50%)', zIndex: 20, willChange: 'transform, opacity' }}
-      initial={{ scale: 0.03, opacity: 1 }}
-      animate={{ scale: [0.03, 0.84, 1.02], opacity: [1, 1, 0] }}
-      transition={{ duration: 0.5, times: [0, 0.28, 1], ease: 'easeOut' }}
-    >
-      <svg width="90" height="90" viewBox="-45 -45 90 90" fill="none">
-        {SPLASH_LINES.map(([x1, y1, x2, y2], i) => (
-          <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke={color} strokeWidth="5" strokeLinecap="round" />
-        ))}
-        {SPLASH_LINES_OFFSET.map(([x1, y1, x2, y2], i) => (
-          <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke={color} strokeWidth="3" strokeLinecap="round" />
-        ))}
-        <circle cx="0" cy="0" r="9" fill={color} />
-        <circle cx="0" cy="0" r="4" fill="white" opacity="0.7" />
-      </svg>
-    </motion.div>
+      style={{ position: 'absolute', inset: 0, background: 'rgba(220,38,38,0.52)', pointerEvents: 'none', zIndex: 10 }}
+      initial={{ opacity: 1 }}
+      animate={{ opacity: 0 }}
+      transition={{ duration: 0.38, ease: 'easeOut' }}
+    />
   )
 }
 
@@ -688,7 +660,7 @@ export function EnemyCharacter({ phase, enemy, hitKey, raging = false }) {
           {rasterSprites ? (
             /* Raster: sprite already faces left — no scaleX needed */
             <div style={{ position: 'relative', zIndex: 0, width: 'min(170px, 37vw)', flexShrink: 0, overflow: 'visible', display: 'flex', justifyContent: 'center', alignItems: 'flex-end' }}>
-              {splashKey !== null && <HitSplash key={splashKey} color={rasterSprites.splashColor} {...KNIGHT_SWORD_HIT_POS} />}
+              {splashKey !== null && <HitFlash key={splashKey} />}
               <div style={RASTER_SCALE[enemy.id] ? { transform: `scale(${RASTER_SCALE[enemy.id]})`, transformOrigin: 'center bottom', display: 'inline-block' } : undefined}>
                 <img src={rasterSprites[sprite]} style={{ height: 'min(150px, 33vw)', width: 'auto', maxWidth: 'none', display: 'block', flexShrink: 0 }} alt="" />
               </div>
@@ -704,7 +676,7 @@ export function EnemyCharacter({ phase, enemy, hitKey, raging = false }) {
                 >
                   <Weapon />
                 </motion.div>
-                {splashKey !== null && <HitSplash key={splashKey} color={splashColor} />}
+                {splashKey !== null && <HitFlash key={splashKey} />}
               </div>
             </div>
           )}

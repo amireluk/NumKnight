@@ -90,51 +90,15 @@ export const KnightSwordArmSVG = React.memo(function KnightSwordArmSVG() {
   )
 })
 
-// Knight takes a hit from an enemy — splash at the enemy's weapon tip height
-// x='100%' = right edge of knight sprite (where enemy attacks from)
-// dragon: null = no splash
-const ENEMY_WEAPON_HIT_POS = {
-  goblin:     { x: '100%', y: '90%' },  // club swings low
-  skeleton:   { x: '100%', y: '50%' },  // scythe mid height
-  orc:        { x: '100%', y: '67%' },  // axe 2/3 down
-  darkKnight: { x: '100%', y: '50%' },  // sword mid height
-  dragon:     null,                      // no splash on player
-}
-
-const SPLASH_ANGLES = [0, 45, 90, 135, 180, 225, 270, 315]
-const SPLASH_ANGLES_OFFSET = [22.5, 67.5, 112.5, 157.5, 202.5, 247.5, 292.5, 337.5]
-
-// Pre-computed at module load — avoids trig on every hit
-const SPLASH_LINES = SPLASH_ANGLES.map(a => {
-  const r = (a * Math.PI) / 180
-  return [Math.cos(r) * 7, Math.sin(r) * 7, Math.cos(r) * 32, Math.sin(r) * 32]
-})
-const SPLASH_LINES_OFFSET = SPLASH_ANGLES_OFFSET.map(a => {
-  const r = (a * Math.PI) / 180
-  return [Math.cos(r) * 9, Math.sin(r) * 9, Math.cos(r) * 22, Math.sin(r) * 22]
-})
-
-// Hit splash rendered on the character, at the impact point
-function HitSplash({ color, x = '100%', y = '40%' }) {
+// Hit flash — red overlay on the sprite
+function HitFlash() {
   return (
     <motion.div
-      className="absolute pointer-events-none"
-      style={{ left: x, top: y, transform: 'translate(-50%, -50%)', zIndex: 20, willChange: 'transform, opacity' }}
-      initial={{ scale: 0.03, opacity: 1 }}
-      animate={{ scale: [0.03, 0.84, 1.02], opacity: [1, 1, 0] }}
-      transition={{ duration: 0.5, times: [0, 0.28, 1], ease: 'easeOut' }}
-    >
-      <svg width="90" height="90" viewBox="-45 -45 90 90" fill="none">
-        {SPLASH_LINES.map(([x1, y1, x2, y2], i) => (
-          <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke={color} strokeWidth="5" strokeLinecap="round" />
-        ))}
-        {SPLASH_LINES_OFFSET.map(([x1, y1, x2, y2], i) => (
-          <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke={color} strokeWidth="3" strokeLinecap="round" />
-        ))}
-        <circle cx="0" cy="0" r="9" fill={color} />
-        <circle cx="0" cy="0" r="4" fill="white" opacity="0.7" />
-      </svg>
-    </motion.div>
+      style={{ position: 'absolute', inset: 0, background: 'rgba(220,38,38,0.52)', pointerEvents: 'none', zIndex: 10 }}
+      initial={{ opacity: 1 }}
+      animate={{ opacity: 0 }}
+      transition={{ duration: 0.38, ease: 'easeOut' }}
+    />
   )
 }
 
@@ -203,7 +167,7 @@ export function FallenKnightScene() {
   )
 }
 
-export function KnightCharacter({ phase, hitKey, useRaster, enemyId }) {
+export function KnightCharacter({ phase, hitKey, useRaster }) {
   const moveControls = useAnimation()
   const swordControls = useAnimation()
   const [splashKey, setSplashKey] = useState(null)
@@ -266,7 +230,7 @@ export function KnightCharacter({ phase, hitKey, useRaster, enemyId }) {
           {raster ? (
             /* ── Raster sprite swap mode ── */
             <div style={{ position: 'relative', zIndex: 0, width: 'min(120px, 26vw)', flexShrink: 0, overflow: 'visible', display: 'flex', justifyContent: 'center', alignItems: 'flex-end' }}>
-              {splashKey !== null && ENEMY_WEAPON_HIT_POS[enemyId] !== null && <HitSplash key={splashKey} color="#f87171" {...(ENEMY_WEAPON_HIT_POS[enemyId] ?? {})} />}
+              {splashKey !== null && <HitFlash key={splashKey} />}
               <img
                 src={SPRITES[sprite]}
                 style={{ height: 'min(150px, 33vw)', width: 'auto', maxWidth: 'none', display: 'block', flexShrink: 0, transform: sprite === 'attack' ? 'translateX(min(54px, 11.84vw))' : undefined }}
@@ -287,7 +251,7 @@ export function KnightCharacter({ phase, hitKey, useRaster, enemyId }) {
               >
                 <KnightSwordArmSVG />
               </motion.div>
-              {splashKey !== null && ENEMY_WEAPON_HIT_POS[enemyId] !== null && <HitSplash key={splashKey} color="#f87171" {...(ENEMY_WEAPON_HIT_POS[enemyId] ?? {})} />}
+              {splashKey !== null && <HitFlash key={splashKey} />}
             </div>
           )}
         </motion.div>
