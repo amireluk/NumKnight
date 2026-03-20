@@ -392,7 +392,7 @@ export function AreaClearedScreen({ world, worldTrophies, worldScore, totalScore
           <img
             src={`${import.meta.env.BASE_URL}assets/characters/${ENEMY_FOLDER[world.enemy.id] ?? world.enemy.id}/${ENEMY_SLUG[world.enemy.id] ?? world.enemy.id}-dead.webp?v=${_VER}`}
             alt=""
-            style={{ position: 'absolute', bottom: 0, left: '50%', transform: 'translateX(-50%)', height: 'min(150px, 33vw)', width: 'auto', objectFit: 'contain' }}
+            style={{ position: 'absolute', bottom: 0, left: '50%', transform: 'translateX(-50%)', height: 'min(100px, 22vw)', width: 'auto', objectFit: 'contain' }}
           />
         )}
       </motion.div>

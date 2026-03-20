@@ -319,7 +319,7 @@ export function CampfireScreen({ onBoostChosen, onBack, useRaster, onToggleRaste
         <div style={{
           position: 'absolute',
           bottom: useRaster ? '12%' : '14%',
-          left: useRaster ? '16%' : '50%',
+          left: useRaster ? '20%' : '50%',
           transform: 'translateX(10px)',
           width: 180, height: 140,
           background: 'radial-gradient(ellipse at 40% 80%, rgba(251,146,60,0.22) 0%, rgba(251,146,60,0.06) 45%, transparent 70%)',
@@ -334,12 +334,12 @@ export function CampfireScreen({ onBoostChosen, onBack, useRaster, onToggleRaste
           style={{
             position: 'absolute',
             bottom: useRaster ? '18%' : '8%',
-            left: useRaster ? '16%' : '50%',
+            left: useRaster ? '20%' : '50%',
             transform: useRaster ? 'none' : 'translateX(-50%)',
             zIndex: 2,
           }}
         >
-          {useRaster ? <Embers big /> : <><Flames /><Embers /></>}
+          {useRaster ? <Embers /> : <><Flames /><Embers /></>}
         </motion.div>
       </div>
 

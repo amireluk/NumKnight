@@ -344,18 +344,16 @@ function RegionBand({ world, worldIndex, status, trophy, score, delay, onTap, is
         </div>
       )}
 
-      {/* Active: enemy centered (img mode) or knight + enemy (svg mode) */}
-      {isCurrent && (
+      {/* Active: knight + enemy (svg mode only) */}
+      {isCurrent && !useRaster && (
         <div dir="ltr" style={{
           position: 'absolute', inset: '0 0 4px 0', zIndex: 2, pointerEvents: 'none',
           display: 'flex', flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'center', gap: 12,
         }}>
-          {!useRaster && (
-            <div style={{ transform: 'scale(0.46)', transformOrigin: 'center bottom' }}>
-              <KnightCharacter phase="idle" hitKey={0} />
-            </div>
-          )}
-          <div style={{ transform: `scale(${useRaster ? 0.72 : 0.46})`, transformOrigin: 'center bottom' }}>
+          <div style={{ transform: 'scale(0.46)', transformOrigin: 'center bottom' }}>
+            <KnightCharacter phase="idle" hitKey={0} />
+          </div>
+          <div style={{ transform: 'scale(0.46)', transformOrigin: 'center bottom' }}>
             <EnemyCharacter phase="idle" enemy={world.enemy} hitKey={0} />
           </div>
         </div>
