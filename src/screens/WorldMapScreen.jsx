@@ -355,7 +355,7 @@ function RegionBand({ world, worldIndex, status, trophy, score, delay, onTap, is
               <KnightCharacter phase="idle" hitKey={0} />
             </div>
           )}
-          <div style={{ transform: 'scale(0.46)', transformOrigin: 'center bottom' }}>
+          <div style={{ transform: `scale(${useRaster ? 0.72 : 0.46})`, transformOrigin: 'center bottom' }}>
             <EnemyCharacter phase="idle" enemy={world.enemy} hitKey={0} />
           </div>
         </div>

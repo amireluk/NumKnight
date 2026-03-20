@@ -38,6 +38,8 @@ function animateCount(from, to, ms, onTick, onDone) {
 // ── Region background images ──────────────────────────────────────────────────
 
 const _VER = typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : 'dev'
+const ENEMY_FOLDER = { goblin: 'goblin', skeleton: 'skeleton', orc: 'orc', darkKnight: 'dark-knight', dragon: 'dragon' }
+const ENEMY_SLUG   = { goblin: 'goblin', skeleton: 'skeleton', orc: 'orc', darkKnight: 'dark-knight', dragon: 'dragon' }
 const BG_FILE = {
   forest:     'forest',
   swamp:      'swamp',
@@ -383,9 +385,16 @@ export function AreaClearedScreen({ world, worldTrophies, worldScore, totalScore
         initial={{ scale: 0.7, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ type: 'spring', stiffness: 180, damping: 15, delay: 0.1 }}
-        style={{ width: '100%', maxHeight: '30vh', borderRadius: 20, overflow: 'hidden', boxShadow: '0 0 32px rgba(0,0,0,0.6)', flexShrink: 0 }}
+        style={{ width: '100%', maxHeight: '30vh', borderRadius: 20, overflow: 'hidden', boxShadow: '0 0 32px rgba(0,0,0,0.6)', flexShrink: 0, position: 'relative' }}
       >
         <RegionBg worldId={world.id} />
+        {useRaster && world.enemy && (
+          <img
+            src={`${import.meta.env.BASE_URL}assets/characters/${ENEMY_FOLDER[world.enemy.id] ?? world.enemy.id}/${ENEMY_SLUG[world.enemy.id] ?? world.enemy.id}-dead.webp?v=${_VER}`}
+            alt=""
+            style={{ position: 'absolute', bottom: 0, left: '50%', transform: 'translateX(-50%)', height: 'min(150px, 33vw)', width: 'auto', objectFit: 'contain' }}
+          />
+        )}
       </motion.div>
 
       {/* 3. Combined trophy + score panel — same width as scene */}
