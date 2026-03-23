@@ -1,7 +1,24 @@
 {
+  "enableAllProjectMcpServers": true,
   "permissions": {
     "allow": [
-      "Bash(python3 -c \":*)"
+      "Bash(ls*)",
+      "Bash(git status)",
+      "Bash(npm test)",
+      "Bash(npm run lint)",
+      "Bash(npm run dev)",
+      "Bash(npm run build)",
+      "Bash(npm run build:dev)",
+      "Bash(npm run deploy)",
+      "Bash(npm run deploy:dev)",
+      "Bash(npm run preview)",
+      "Bash(git pull)",
+      "Bash(git push)",
+      "Bash(git add*)",
+      "Bash(git commit*)",
+      "Bash(git diff*)",
+      "Bash(git log*)",
+      "Bash(git stash*)"
     ]
   }
 }

@@ -1,0 +1,25 @@
+{
+    "name": "Claude Code Sandbox",
+    "image": "mcr.microsoft.com/devcontainers/base:ubuntu-24.04",
+    "features": {
+        "ghcr.io/devcontainers/features/node:1": { "version": "20" },
+        "ghcr.io/devcontainers/features/github-cli:1": "latest"
+    },
+    // Installs Claude and creates a local "Allowlist" for the agent
+    "postCreateCommand": "npm install -g @anthropic-ai/claude-code && mkdir -p .claude && echo '{\"permissions\": {\"allow\": [\"Bash(ls*)\", \"Bash(git status)\", \"Bash(npm test)\", \"Bash(npm run lint)\"]}}' > .claude/settings.json",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "anthropic.claude-code" // Official extension for visual diffs
+            ],
+            "settings": {
+                // Sets the extension to "Auto-accept" file edits by default
+                "claudeCode.initialPermissionMode": "acceptEdits"
+            }
+        }
+    },
+    "mounts": [
+        "source=${localEnv:USERPROFILE}/.claude,target=/home/vscode/.claude,type=bind"
+    ],
+    "remoteUser": "vscode"
+}

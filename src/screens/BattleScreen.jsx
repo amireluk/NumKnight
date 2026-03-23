@@ -444,7 +444,7 @@ export function BattleScreen({ world, worldIndex, battleIndex, onBattleEnd, onQu
     const id = setInterval(() => {
       if (!timerActiveRef.current) { clearInterval(id); return }
       setTimeLeft((t) => {
-        if (t <= 1) { setTimedOut(true); clearInterval(id); return 0 }
+        if (t <= 1) { clearInterval(id); setTimeout(() => setTimedOut(true), 1000); return 0 }
         const next = t - 1
         if (next <= 5) playTimerTick()
         return next
