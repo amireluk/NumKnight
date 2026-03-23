@@ -6,7 +6,8 @@
         "ghcr.io/devcontainers/features/github-cli:1": "latest"
     },
     // Installs Claude and creates a local "Allowlist" for the agent
-    "postCreateCommand": "npm install -g @anthropic-ai/claude-code && mkdir -p .claude && echo '{\"permissions\": {\"allow\": [\"Bash(ls*)\", \"Bash(git status)\", \"Bash(npm test)\", \"Bash(npm run lint)\"]}}' > .claude/settings.json",
+    "runArgs": ["--privileged"],
+    "postCreateCommand": "npm install -g @anthropic-ai/claude-code && npm install && npx playwright install chrome",
     "customizations": {
         "vscode": {
             "extensions": [
