@@ -253,19 +253,67 @@ The arena div has **no** `overflow:hidden` so weapon/wing sprites aren't clipped
 ---
 
 ## What was last worked on
-- Knight RTL/flicker fix, world name translated on defeat screen
-- gh-pages deploy script (`npm run deploy`)
-- Grounded forest trees, brightened castle, overhauled dragon lair background
-- Design mode: phone frame, bottom nav, swipe support
-- Knight strolls castle fields, layered behind trees and castle
-- i18n (EN + Hebrew), difficulty system (Easy/Medium/Hard), StartScreen
-- Scoring, local leaderboard, Area Cleared screen with animated score transfer
-- All 5 per-world backgrounds and all 5 enemy SVGs
+- **Practice mode** — full implementation (picker → battle → end screen)
+- UI polish: button styles, Hebrew exclamation marks, progress bar, praise popups
+- Options + picker screens: kingdom scenery (castle, knight, birds)
 
 ## Implementation status
 - **Phases 1–4** (World Map, Backgrounds, Scoring, Leaderboard): ✅ Complete
+- **Practice Mode**: ✅ Complete
 - **Phase 5** (Visual Polish): ⏳ Pending
 - **Phase 6** (Backend Leaderboard): ⏳ Pending
+
+---
+
+## Practice mode
+
+### Screen flow
+```
+start → practice-picker → practice-battle → practice-end
+                ↑               ↑ (quit)         |
+                └───────────────┴─────────────────┘
+```
+- Quit (✕ or back) from practice-battle → goes to **start screen** (not picker)
+- "Practice Again" from end screen → same numbers, new battle
+- "Change Numbers" → back to picker
+
+### Number picker
+- Grid 1–9 (3×3), max 4 selected
+- Tapping a 5th number shakes it and does nothing
+- No count indicator shown
+- Selected state: solid yellow fill + dark text (same as main action buttons)
+- Background: kingdom scenery (castle, strolling knight, birds)
+
+### Practice battle
+- Background: castle (`worldId='castle'`)
+- Enemy: second `KnightCharacter` with `grayscale(1) brightness(0.55)` CSS filter — placeholder until real dummy art
+- No HP bars, no timer
+- Wrong answer: flash animation plays, question **stays** (player tries again)
+- Score = number of questions answered correctly **on the first attempt**
+- Progress bar: thin yellow bar (`#fbbf24`) at bottom of arena, fills left→right (`dir="ltr"` forced), no initial animation
+- Praise popup: random text rises from between the knights after each correct answer
+  - EN: GREAT! / GOOD JOB! / AWESOME! / CORRECT! / NICE ONE!
+  - HE: מעולה! / כל הכבוד! / נהדר! / נכון! / יפה מאוד!
+- Top header shows "PRACTICE" label + selected numbers (e.g. `3 · 7 · 8`)
+- No BattleIntro
+
+### Practice end screen
+- Background: kingdom scenery (castle, strolling knight, birds) — same as title/options/picker
+- Score shown as sentence: "You got X out of 20 right" (no raw fraction)
+- Both buttons solid yellow
+
+### Consecutive question prevention
+`makeRound(multipliers, factorRange, lastProblem)` retries up to 6 times if the new problem matches the last (in either factor order). Applied in both campaign (`BattleScreen`) and practice.
+
+---
+
+## UI design rules (established)
+
+- **All screen buttons** are solid yellow (`bg-yellow-400 border-b-4 border-yellow-600 text-black`) — no translucent/ghost buttons in the main UI
+- **Selected state** (toggles, number grid): solid yellow fill + dark text + bottom shadow — same weight as action buttons. Unselected: dark semi-transparent (`rgba(0,0,0,0.35)`) + white border.
+- **Hebrew exclamation marks**: always placed at the **end** of the string (`מעולה!` not `!מעולה`)
+- **Global `user-select: none`** on all `button` and `a` elements (prevents Android long-press text selection)
+- **Screens with kingdom scenery** (title, options, practice picker, practice end): `KingdomBackground` + `StrollingKnight` + `KingdomForeground` + `FlyingCreatures`, content at `zIndex: 4` to clear foreground (z=3)
 
 ---
 
