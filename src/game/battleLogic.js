@@ -33,8 +33,18 @@ export function generateOptions(answer) {
   return [answer, ...distractors].sort(() => Math.random() - 0.5)
 }
 
-export function makeRound(multipliers, factorRange = [1, 10]) {
-  const problem = generateProblem(multipliers, factorRange)
+export function makeRound(multipliers, factorRange = [1, 10], lastProblem = null) {
+  let problem
+  let attempts = 0
+  do {
+    problem = generateProblem(multipliers, factorRange)
+    attempts++
+  } while (
+    attempts < 6 &&
+    lastProblem !== null &&
+    ((problem.a === lastProblem.a && problem.b === lastProblem.b) ||
+     (problem.a === lastProblem.b && problem.b === lastProblem.a))
+  )
   return { problem, options: generateOptions(problem.answer) }
 }
 

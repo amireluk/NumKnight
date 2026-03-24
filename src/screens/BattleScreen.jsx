@@ -513,7 +513,7 @@ export function BattleScreen({ world, worldIndex, battleIndex, onBattleEnd, onQu
   const { problem, options } = round
 
   const loadNextRound = () => {
-    setRound(makeRound(world.multipliers, world.factorRange))
+    setRound(makeRound(world.multipliers, world.factorRange, round.problem))
     setButtonStates(IDLE_BUTTON_STATES)
     setPhase('idle')
   }

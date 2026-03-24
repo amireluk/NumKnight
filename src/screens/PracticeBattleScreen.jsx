@@ -125,6 +125,7 @@ export function PracticeBattleScreen({ selectedNumbers, onPracticeEnd, onQuit, u
       setPhase('attacking')
       const newScore = firstAttempt ? score + 1 : score
       const nextNum = questionNum + 1
+      const currentProblem = problem
       // Show praise popup
       const randomPraise = praiseList[Math.floor(Math.random() * praiseList.length)]
       setPraiseText(randomPraise)
@@ -143,7 +144,7 @@ export function PracticeBattleScreen({ selectedNumbers, onPracticeEnd, onQuit, u
           setScore(newScore)
           setQuestionNum(nextNum)
           setFirstAttempt(true)
-          setRound(makeRound(selectedNumbers, [0, 10]))
+          setRound(makeRound(selectedNumbers, [0, 10], currentProblem))
           setButtonStates(IDLE_BUTTON_STATES)
           setPhase('idle')
         }
