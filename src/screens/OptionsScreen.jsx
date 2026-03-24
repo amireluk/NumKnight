@@ -96,17 +96,17 @@ export function OptionsScreen({ difficulty, onDifficultyChange, useRaster, onRas
           'linear-gradient(to bottom, #1e3a70, #2d5aaa)',
       }}
     >
-      <FlyingCreatures />
+      <FlyingCreatures difficulty={difficulty} />
       <KingdomBackground />
       <StrollingKnight />
-      <KingdomForeground />
+      <KingdomForeground difficulty={difficulty} />
 
       {/* Header */}
       <div style={{
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         padding: '18px 20px 14px', flexShrink: 0,
         borderBottom: '1px solid rgba(255,255,255,0.08)',
-        position: 'relative', zIndex: 1,
+        position: 'relative', zIndex: 4,
       }}>
         <p style={{ fontSize: 15, fontWeight: 900, letterSpacing: '0.18em', color: 'rgba(255,255,255,0.9)' }}>
           {t?.optionsTitle ?? 'OPTIONS'}
@@ -125,7 +125,7 @@ export function OptionsScreen({ difficulty, onDifficultyChange, useRaster, onRas
       </div>
 
       {/* Settings list */}
-      <div style={{ flex: 1, overflowY: 'auto', padding: '20px 20px 32px', display: 'flex', flexDirection: 'column', gap: SECTION_GAP, position: 'relative', zIndex: 1 }}>
+      <div style={{ flex: 1, overflowY: 'auto', padding: '20px 20px 32px', display: 'flex', flexDirection: 'column', gap: SECTION_GAP, position: 'relative', zIndex: 4 }}>
 
         {/* Name */}
         <div>

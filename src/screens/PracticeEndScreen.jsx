@@ -4,7 +4,7 @@ import { FlyingCreatures } from '../components/FlyingCreatures'
 
 const TOTAL_QUESTIONS = 20
 
-export function PracticeEndScreen({ score, onPracticeAgain, onChangeNumbers, lang, t }) {
+export function PracticeEndScreen({ score, onPracticeAgain, onChangeNumbers, difficulty, lang, t }) {
   const isRtl = lang === 'he'
   const perfect = score === TOTAL_QUESTIONS
 
@@ -19,10 +19,10 @@ export function PracticeEndScreen({ score, onPracticeAgain, onChangeNumbers, lan
         paddingBottom: 210,
       }}
     >
-      <FlyingCreatures />
+      <FlyingCreatures difficulty={difficulty} />
       <KingdomBackground />
       <StrollingKnight />
-      <KingdomForeground />
+      <KingdomForeground difficulty={difficulty} />
 
       <motion.div
         initial={{ opacity: 0, y: 20 }}

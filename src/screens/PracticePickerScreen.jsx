@@ -5,7 +5,7 @@ import { FlyingCreatures } from '../components/FlyingCreatures'
 
 const MAX_SELECTED = 4
 
-export function PracticePickerScreen({ onStart, onBack, lang, t }) {
+export function PracticePickerScreen({ onStart, onBack, difficulty, lang, t }) {
   const [selected, setSelected] = useState([])
   // Map from number → shake animation controls
   const shakeRefs = useRef({})
@@ -40,16 +40,16 @@ export function PracticePickerScreen({ onStart, onBack, lang, t }) {
         justifyContent: 'flex-start',
       }}
     >
-      <FlyingCreatures />
+      <FlyingCreatures difficulty={difficulty} />
       <KingdomBackground />
       <StrollingKnight />
-      <KingdomForeground />
+      <KingdomForeground difficulty={difficulty} />
 
       {/* Back button */}
       <button
         onClick={onBack}
         style={{
-          position: 'absolute', top: 16, left: 16, zIndex: 2,
+          position: 'absolute', top: 16, left: 16, zIndex: 5,
           background: 'rgba(0,0,0,0.35)', border: '1.5px solid rgba(255,255,255,0.18)',
           borderRadius: 8, padding: '5px 12px',
           fontSize: 13, fontWeight: 900, color: 'rgba(255,255,255,0.7)',

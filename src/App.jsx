@@ -10,6 +10,9 @@ import { StartScreen } from './screens/StartScreen'
 import { OptionsScreen } from './screens/OptionsScreen'
 import { CampfireScreen } from './screens/CampfireScreen'
 import { DesignScreen } from './screens/DesignScreen'
+import { PracticePickerScreen } from './screens/PracticePickerScreen'
+import { PracticeBattleScreen } from './screens/PracticeBattleScreen'
+import { PracticeEndScreen } from './screens/PracticeEndScreen'
 import { EASY, MEDIUM, HARD, DEV } from './game/campaign.config'
 import { createNewRun, loadRun, saveRun, clearRun, isRunInProgress, clearBattleState } from './game/runState'
 import { getTrophy, calcBattleScore } from './game/battleLogic'
@@ -44,6 +47,11 @@ export default function App() {
   const [activeBoost, setActiveBoost] = useState(null)
   const RASTER_KEY = 'numknight_raster_bg'
   const [useRaster, setUseRaster] = useState(() => localStorage.getItem(RASTER_KEY) === 'true')
+
+  // Practice mode state
+  const [practiceNumbers, setPracticeNumbers] = useState([])
+  const [practiceScore, setPracticeScore] = useState(0)
+  const [practiceBattleKey, setPracticeBattleKey] = useState(0)
   const handleRasterChange = (val) => { setUseRaster(val); localStorage.setItem(RASTER_KEY, String(val)) }
 
   const world = worlds[run.worldIndex]
@@ -214,6 +222,26 @@ export default function App() {
     setScreen('start')
   }
 
+  const handlePracticeStart = (numbers) => {
+    setPracticeNumbers(numbers)
+    setPracticeBattleKey((k) => k + 1)
+    setScreen('practice-battle')
+  }
+
+  const handlePracticeEnd = (score) => {
+    setPracticeScore(score)
+    setScreen('practice-end')
+  }
+
+  const handlePracticeAgain = () => {
+    setPracticeBattleKey((k) => k + 1)
+    setScreen('practice-battle')
+  }
+
+  const handlePracticeChangeNumbers = () => {
+    setScreen('practice-picker')
+  }
+
   return (
     <>
     <AnimatePresence mode="wait">
@@ -236,6 +264,7 @@ export default function App() {
             onContinue={handleContinue}
             onOptions={() => setScreen('options')}
             onViewLeaderboard={handleViewLeaderboard}
+            onPractice={() => setScreen('practice-picker')}
             playerName={playerName}
             difficulty={difficulty}
             lang={lang} t={t}
@@ -348,6 +377,51 @@ export default function App() {
           transition={{ duration: 0.4 }} className="w-full"
         >
           <CampfireScreen onBoostChosen={handleBoostChosen} onBack={() => setScreen('map')} useRaster={useRaster} lang={lang} t={t} />
+        </motion.div>
+      )}
+
+      {screen === 'practice-picker' && (
+        <motion.div key="practice-picker"
+          initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+          transition={{ duration: 0.25 }} className="w-full"
+        >
+          <PracticePickerScreen
+            onStart={handlePracticeStart}
+            onBack={() => setScreen('start')}
+            difficulty={difficulty}
+            lang={lang} t={t}
+          />
+        </motion.div>
+      )}
+
+      {screen === 'practice-battle' && (
+        <motion.div key={`practice-battle-${practiceBattleKey}`}
+          initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+          transition={{ duration: 0.25 }} className="w-full"
+        >
+          <PracticeBattleScreen
+            key={practiceBattleKey}
+            selectedNumbers={practiceNumbers}
+            onPracticeEnd={handlePracticeEnd}
+            onQuit={() => setScreen('start')}
+            useRaster={useRaster}
+            lang={lang} t={t}
+          />
+        </motion.div>
+      )}
+
+      {screen === 'practice-end' && (
+        <motion.div key="practice-end"
+          initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+          transition={{ duration: 0.25 }} className="w-full"
+        >
+          <PracticeEndScreen
+            score={practiceScore}
+            onPracticeAgain={handlePracticeAgain}
+            onChangeNumbers={handlePracticeChangeNumbers}
+            difficulty={difficulty}
+            lang={lang} t={t}
+          />
         </motion.div>
       )}
 
