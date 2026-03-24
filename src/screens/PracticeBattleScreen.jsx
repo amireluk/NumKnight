@@ -69,11 +69,12 @@ function ProgressBar({ completed, total }) {
       height: 5, background: 'rgba(0,0,0,0.35)',
     }}>
       <motion.div
+        initial={{ width: '0%' }}
         animate={{ width: `${pct}%` }}
-        transition={{ duration: 0.35, ease: 'easeOut' }}
+        transition={pct === 0 ? { duration: 0 } : { duration: 0.35, ease: 'easeOut' }}
         style={{
           height: '100%',
-          background: 'linear-gradient(to right, #4ade80, #fbbf24)',
+          background: '#fbbf24',
           borderRadius: '0 3px 3px 0',
         }}
       />
