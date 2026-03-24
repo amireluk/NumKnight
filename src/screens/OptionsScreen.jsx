@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { isMuted, toggleMute } from '../game/sounds'
 import { getLog } from '../game/runLog'
@@ -56,6 +56,14 @@ export function OptionsScreen({ difficulty, onDifficultyChange, useRaster, onRas
   const [showLog, setShowLog] = useState(false)
 
   const hasLog = getLog().length > 0
+
+  // Android hardware back → close options
+  useEffect(() => {
+    window.history.pushState(null, '', window.location.href)
+    const onPop = () => onBack()
+    window.addEventListener('popstate', onPop)
+    return () => window.removeEventListener('popstate', onPop)
+  }, [onBack])
 
   const handleNameChange = (v) => {
     const trimmed = v.slice(0, 16)
