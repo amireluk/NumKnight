@@ -236,7 +236,6 @@ export default function App() {
             onContinue={handleContinue}
             onOptions={() => setScreen('options')}
             onViewLeaderboard={handleViewLeaderboard}
-            run={run}
             playerName={playerName}
             difficulty={difficulty}
             lang={lang} t={t}

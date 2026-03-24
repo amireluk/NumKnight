@@ -70,3 +70,7 @@ export function clearBattleState() {
 export function hasSavedBattle() {
   try { return !!localStorage.getItem(BATTLE_KEY) } catch { return false }
 }
+
+export function hasSavedRun() {
+  try { return !!localStorage.getItem(KEY) } catch { return false }
+}

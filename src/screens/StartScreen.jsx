@@ -3,12 +3,12 @@ import { useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { KingdomBackground, KingdomForeground, StrollingKnight } from '../components/KingdomScenery'
 import { FlyingCreatures } from '../components/FlyingCreatures'
-import { isRunInProgress, hasSavedBattle } from '../game/runState'
+import { hasSavedRun, hasSavedBattle } from '../game/runState'
 import { LogoBanner } from '../components/LogoBanner'
 
-export function StartScreen({ onNewGame, onContinue, onOptions, onViewLeaderboard, run, playerName, difficulty, lang, t }) {
+export function StartScreen({ onNewGame, onContinue, onOptions, onViewLeaderboard, playerName, difficulty, lang, t }) {
   const isRtl = lang === 'he'
-  const canContinue = isRunInProgress(run) || hasSavedBattle()
+  const canContinue = hasSavedRun() || hasSavedBattle()
 
   // Android hardware back — no-op on home screen (lets OS handle it)
   useEffect(() => {
