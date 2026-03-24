@@ -38,9 +38,9 @@ function PraisePopup({ text, popKey }) {
       {popKey > 0 && (
         <motion.div
           key={popKey}
-          initial={{ scale: 0.3, opacity: 1, y: 10 }}
-          animate={{ scale: [0.3, 1.45, 1.1, 1.1], opacity: [1, 1, 1, 0], y: [10, -14, -22, -40] }}
-          transition={{ duration: 0.85, times: [0, 0.35, 0.55, 1], ease: 'easeOut' }}
+          initial={{ scale: 0.2, opacity: 1, y: 75 }}
+          animate={{ scale: [0.2, 1.45, 1.1, 1.1], opacity: [1, 1, 1, 0], y: [75, 10, -18, -40] }}
+          transition={{ duration: 0.9, times: [0, 0.38, 0.58, 1], ease: 'easeOut' }}
           style={{
             position: 'absolute', top: '36%', left: 0, right: 0,
             display: 'flex', justifyContent: 'center',
