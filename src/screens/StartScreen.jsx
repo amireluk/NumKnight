@@ -5,7 +5,7 @@ import { FlyingCreatures } from '../components/FlyingCreatures'
 import { hasSavedRun, hasSavedBattle } from '../game/runState'
 import { LogoBanner } from '../components/LogoBanner'
 
-export function StartScreen({ onNewGame, onContinue, onOptions, onViewLeaderboard, playerName, difficulty, lang, t }) {
+export function StartScreen({ onNewGame, onContinue, onOptions, onViewLeaderboard, onPractice, playerName, difficulty, lang, t }) {
   const isRtl = lang === 'he'
   const canContinue = hasSavedRun()
 
@@ -73,26 +73,32 @@ export function StartScreen({ onNewGame, onContinue, onOptions, onViewLeaderboar
           </motion.button>
         )}
 
-        {/* NEW GAME */}
-        <motion.button
-          whileTap={{ scale: 0.95 }} whileHover={{ scale: 1.03 }}
-          onClick={onNewGame}
-          className="w-full bg-yellow-400 border-b-4 border-yellow-600 text-black font-black text-2xl rounded-2xl h-16 shadow-xl cursor-pointer tracking-widest"
-        >
-          {t?.newGame ?? 'NEW GAME'}
-        </motion.button>
+        {/* NEW GAME + PRACTICE — equal width side by side */}
+        <div style={{ display: 'flex', gap: 10 }}>
+          <motion.button
+            whileTap={{ scale: 0.95 }} whileHover={{ scale: 1.03 }}
+            onClick={onNewGame}
+            className="bg-yellow-400 border-b-4 border-yellow-600 text-black font-black text-2xl rounded-2xl h-16 shadow-xl cursor-pointer tracking-widest"
+            style={{ flex: 1 }}
+          >
+            {t?.newGame ?? 'NEW'}
+          </motion.button>
+
+          <motion.button
+            whileTap={{ scale: 0.95 }} whileHover={{ scale: 1.03 }}
+            onClick={onPractice}
+            className="bg-yellow-400 border-b-4 border-yellow-600 text-black font-black text-2xl rounded-2xl h-16 shadow-xl cursor-pointer tracking-widest"
+            style={{ flex: 1 }}
+          >
+            {t?.practice ?? 'PRACTICE'}
+          </motion.button>
+        </div>
 
         {/* OPTIONS */}
         <motion.button
           whileTap={{ scale: 0.95 }} whileHover={{ scale: 1.03 }}
           onClick={onOptions}
-          className="w-full rounded-2xl h-14 cursor-pointer tracking-widest font-black text-xl"
-          style={{
-            background: 'rgba(255,255,255,0.10)',
-            border: '1.5px solid rgba(255,255,255,0.22)',
-            color: 'rgba(255,255,255,0.75)',
-            boxShadow: 'none',
-          }}
+          className="w-full bg-yellow-400 border-b-4 border-yellow-600 text-black font-black text-xl rounded-2xl h-14 shadow-xl cursor-pointer tracking-widest"
         >
           {t?.optionsTitle ?? 'OPTIONS'}
         </motion.button>
@@ -101,13 +107,7 @@ export function StartScreen({ onNewGame, onContinue, onOptions, onViewLeaderboar
         <motion.button
           whileTap={{ scale: 0.95 }} whileHover={{ scale: 1.03 }}
           onClick={onViewLeaderboard}
-          className="w-full rounded-2xl h-14 cursor-pointer tracking-widest font-black text-xl"
-          style={{
-            background: 'rgba(255,255,255,0.10)',
-            border: '1.5px solid rgba(255,255,255,0.22)',
-            color: 'rgba(255,255,255,0.75)',
-            boxShadow: 'none',
-          }}
+          className="w-full bg-yellow-400 border-b-4 border-yellow-600 text-black font-black text-xl rounded-2xl h-14 shadow-xl cursor-pointer tracking-widest"
         >
           {t?.hallOfFameTitle ?? 'HALL OF FAME'}
         </motion.button>

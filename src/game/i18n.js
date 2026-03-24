@@ -70,7 +70,7 @@ export const T = {
     clearWarning: '! This will permanently erase all scores',
     playAgain: 'PLAY AGAIN',
     back: 'BACK',
-    newGame: 'NEW GAME',
+    newGame: 'NEW',
     continueRun: 'CONTINUE',
 
     // World names (by id)
@@ -187,7 +187,7 @@ export const T = {
     clearWarning: '! זה ימחק לצמיתות את כל השיאים',
     playAgain: 'שחק שוב',
     back: 'חזור',
-    newGame: 'משחק חדש',
+    newGame: 'חדש',
     continueRun: 'המשך',
 
     // World names (by id)

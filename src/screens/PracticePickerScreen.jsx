@@ -34,8 +34,8 @@ export function PracticePickerScreen({ onStart, onBack, lang, t }) {
         background: 'linear-gradient(to bottom, #1e3a70, #2d5aaa)',
         position: 'relative',
         overflow: 'hidden',
-        paddingTop: 80,
-        paddingBottom: 210,
+        paddingTop: 60,
+        paddingBottom: 190,
         justifyContent: 'flex-start',
       }}
     >
@@ -57,19 +57,19 @@ export function PracticePickerScreen({ onStart, onBack, lang, t }) {
         ✕
       </button>
 
-      <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 24, alignItems: 'center', position: 'relative', zIndex: 1 }}>
+      <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 14, alignItems: 'center', position: 'relative', zIndex: 4 }}>
         {/* Title */}
         <div style={{ textAlign: 'center' }}>
-          <p style={{ fontSize: 22, fontWeight: 900, color: 'white', letterSpacing: '0.08em', textShadow: '0 2px 8px rgba(0,0,0,0.5)' }}>
+          <p style={{ fontSize: 20, fontWeight: 900, color: 'white', letterSpacing: '0.08em', textShadow: '0 2px 8px rgba(0,0,0,0.5)' }}>
             {t?.practicePickerTitle ?? 'Choose Numbers to Practice'}
           </p>
-          <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.55)', marginTop: 6, fontWeight: 600 }}>
+          <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.55)', marginTop: 4, fontWeight: 600 }}>
             {t?.practicePickerSubtitle ?? 'Select up to 4'}
           </p>
         </div>
 
         {/* 3×3 grid of numbers 1–9 */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, width: '100%', maxWidth: 300 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8, width: '100%', maxWidth: 260 }}>
           {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((n) => (
             <NumberButton
               key={n}
@@ -81,7 +81,7 @@ export function PracticePickerScreen({ onStart, onBack, lang, t }) {
         </div>
 
         {/* Selection count indicator */}
-        <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.45)', fontWeight: 700, letterSpacing: '0.06em' }}>
+        <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)', fontWeight: 700, letterSpacing: '0.06em', margin: 0 }}>
           {selected.length} / {MAX_SELECTED}
         </p>
 
@@ -91,12 +91,12 @@ export function PracticePickerScreen({ onStart, onBack, lang, t }) {
           onClick={() => selected.length > 0 && onStart(selected)}
           disabled={selected.length === 0}
           style={{
-            width: '100%', maxWidth: 300, height: 60,
+            width: '100%', maxWidth: 260, height: 52,
             background: selected.length > 0 ? '#fbbf24' : 'rgba(255,255,255,0.12)',
             border: selected.length > 0 ? '0 solid transparent' : '1.5px solid rgba(255,255,255,0.2)',
             borderBottom: selected.length > 0 ? '4px solid #d97706' : undefined,
-            borderRadius: 18, cursor: selected.length > 0 ? 'pointer' : 'not-allowed',
-            fontSize: 18, fontWeight: 900, letterSpacing: '0.1em',
+            borderRadius: 16, cursor: selected.length > 0 ? 'pointer' : 'not-allowed',
+            fontSize: 16, fontWeight: 900, letterSpacing: '0.1em',
             color: selected.length > 0 ? '#1a1a2e' : 'rgba(255,255,255,0.35)',
             transition: 'background 0.2s, color 0.2s',
           }}
@@ -118,8 +118,8 @@ function NumberButton({ n, isSelected, onTap }) {
       onClick={() => onTap(n, controls)}
       style={{
         aspectRatio: '1',
-        borderRadius: 16,
-        fontSize: 28,
+        borderRadius: 14,
+        fontSize: 22,
         fontWeight: 900,
         cursor: 'pointer',
         border: isSelected ? '3px solid #fbbf24' : '2px solid rgba(255,255,255,0.2)',
