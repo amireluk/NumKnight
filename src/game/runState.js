@@ -1,7 +1,9 @@
 const KEY = 'numknight_run'
+const RUN_VERSION = 2  // bump when run shape changes to discard incompatible saves
 
 export function createNewRun(difficulty = 'medium') {
   return {
+    _v: RUN_VERSION,
     difficulty,
     worldIndex: 0,
     battleIndex: 0,
@@ -19,7 +21,11 @@ export function isRunInProgress(run) {
 export function loadRun() {
   try {
     const raw = localStorage.getItem(KEY)
-    return raw ? JSON.parse(raw) : null
+    if (!raw) return null
+    const parsed = JSON.parse(raw)
+    // Discard saves from incompatible older versions
+    if (parsed._v !== RUN_VERSION) { clearRun(); return null }
+    return parsed
   } catch {
     return null
   }
