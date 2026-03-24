@@ -24,7 +24,7 @@ export function loadRun() {
     if (!raw) return null
     const parsed = JSON.parse(raw)
     // Discard saves from incompatible older versions
-    if (parsed._v !== RUN_VERSION) { clearRun(); return null }
+    if (parsed._v !== RUN_VERSION) { clearRun(); clearBattleState(); return null }
     return parsed
   } catch {
     return null

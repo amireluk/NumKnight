@@ -8,7 +8,7 @@ import { LogoBanner } from '../components/LogoBanner'
 
 export function StartScreen({ onNewGame, onContinue, onOptions, onViewLeaderboard, playerName, difficulty, lang, t }) {
   const isRtl = lang === 'he'
-  const canContinue = hasSavedRun() || hasSavedBattle()
+  const canContinue = hasSavedRun()
 
   // Android hardware back — no-op on home screen (lets OS handle it)
   useEffect(() => {

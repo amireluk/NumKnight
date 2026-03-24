@@ -64,7 +64,7 @@ export default function App() {
 
   const handleContinue = () => {
     const saved = loadRun()
-    if (!saved) return
+    if (!saved) { clearBattleState(); setScreen('start'); return }
     setDifficulty(saved.difficulty ?? 'medium')
     setRun(saved)
     setWorldScore(saved.currentWorldScore ?? 0)
