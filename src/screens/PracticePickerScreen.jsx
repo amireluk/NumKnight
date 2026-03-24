@@ -80,11 +80,6 @@ export function PracticePickerScreen({ onStart, onBack, lang, t }) {
           ))}
         </div>
 
-        {/* Selection count indicator */}
-        <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)', fontWeight: 700, letterSpacing: '0.06em', margin: 0 }}>
-          {selected.length} / {MAX_SELECTED}
-        </p>
-
         {/* Start button */}
         <motion.button
           whileTap={{ scale: 0.95 }} whileHover={{ scale: 1.03 }}
@@ -122,10 +117,10 @@ function NumberButton({ n, isSelected, onTap }) {
         fontSize: 22,
         fontWeight: 900,
         cursor: 'pointer',
-        border: isSelected ? '3px solid #fbbf24' : '2px solid rgba(255,255,255,0.2)',
-        background: isSelected ? 'rgba(251,191,36,0.22)' : 'rgba(255,255,255,0.08)',
-        color: isSelected ? '#fbbf24' : 'rgba(255,255,255,0.75)',
-        boxShadow: isSelected ? '0 0 16px rgba(251,191,36,0.35)' : 'none',
+        border: isSelected ? '3px solid #d97706' : '2px solid rgba(255,255,255,0.25)',
+        background: isSelected ? '#fbbf24' : 'rgba(0,0,0,0.35)',
+        color: isSelected ? '#1a1a2e' : 'rgba(255,255,255,0.8)',
+        boxShadow: isSelected ? '0 4px 0 #92400e, 0 0 16px rgba(251,191,36,0.3)' : '0 2px 0 rgba(0,0,0,0.4)',
         transition: 'background 0.15s, border 0.15s, color 0.15s, box-shadow 0.15s',
       }}
     >

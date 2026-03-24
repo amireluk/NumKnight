@@ -4,6 +4,7 @@ import { isMuted, toggleMute } from '../game/sounds'
 import { getLog } from '../game/runLog'
 import { RunLogViewer } from '../components/RunLogViewer'
 import { AnimatePresence } from 'framer-motion'
+import { KingdomBackground, KingdomForeground, StrollingKnight } from '../components/KingdomScenery'
 
 const NAME_KEY = 'numknight_player_name'
 const DIFF_VALUES = ['easy', 'medium', 'hard']
@@ -33,9 +34,10 @@ function ToggleRow({ options, value, onChange }) {
             onClick={() => onChange(key)}
             style={{
               flex: 1, padding: '11px 8px', borderRadius: 12,
-              border: `2px solid ${selected ? 'rgba(251,191,36,0.9)' : 'rgba(255,255,255,0.13)'}`,
-              background: selected ? 'rgba(251,191,36,0.15)' : 'rgba(255,255,255,0.07)',
-              color: selected ? '#fbbf24' : 'rgba(255,255,255,0.35)',
+              border: selected ? '2px solid #d97706' : '2px solid rgba(255,255,255,0.25)',
+              background: selected ? '#fbbf24' : 'rgba(0,0,0,0.35)',
+              color: selected ? '#1a1a2e' : 'rgba(255,255,255,0.8)',
+              boxShadow: selected ? '0 3px 0 #92400e' : '0 2px 0 rgba(0,0,0,0.4)',
               fontWeight: 900, fontSize: 13, cursor: 'pointer',
               letterSpacing: '0.04em', transition: 'all 0.15s',
             }}
@@ -94,11 +96,16 @@ export function OptionsScreen({ difficulty, onDifficultyChange, useRaster, onRas
           'linear-gradient(to bottom, #1e3a70, #2d5aaa)',
       }}
     >
+      <KingdomBackground />
+      <StrollingKnight />
+      <KingdomForeground />
+
       {/* Header */}
       <div style={{
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         padding: '18px 20px 14px', flexShrink: 0,
         borderBottom: '1px solid rgba(255,255,255,0.08)',
+        position: 'relative', zIndex: 1,
       }}>
         <p style={{ fontSize: 15, fontWeight: 900, letterSpacing: '0.18em', color: 'rgba(255,255,255,0.9)' }}>
           {t?.optionsTitle ?? 'OPTIONS'}
@@ -117,7 +124,7 @@ export function OptionsScreen({ difficulty, onDifficultyChange, useRaster, onRas
       </div>
 
       {/* Settings list */}
-      <div style={{ flex: 1, overflowY: 'auto', padding: '20px 20px 32px', display: 'flex', flexDirection: 'column', gap: SECTION_GAP }}>
+      <div style={{ flex: 1, overflowY: 'auto', padding: '20px 20px 32px', display: 'flex', flexDirection: 'column', gap: SECTION_GAP, position: 'relative', zIndex: 1 }}>
 
         {/* Name */}
         <div>
@@ -162,9 +169,10 @@ export function OptionsScreen({ difficulty, onDifficultyChange, useRaster, onRas
                   onClick={() => onDifficultyChange(val)}
                   style={{
                     flex: 1, padding: '11px 4px', borderRadius: 12,
-                    border: `2px solid ${selected ? color : 'rgba(255,255,255,0.11)'}`,
-                    background: selected ? `${color}2e` : 'rgba(255,255,255,0.07)',
-                    color: selected ? color : 'rgba(255,255,255,0.35)',
+                    border: `2px solid ${selected ? color : 'rgba(255,255,255,0.25)'}`,
+                    background: selected ? color : 'rgba(0,0,0,0.35)',
+                    color: selected ? '#1a1a2e' : 'rgba(255,255,255,0.8)',
+                    boxShadow: selected ? `0 3px 0 rgba(0,0,0,0.4)` : '0 2px 0 rgba(0,0,0,0.4)',
                     fontWeight: 900, fontSize: 13, cursor: 'pointer',
                     transition: 'all 0.15s', letterSpacing: '0.04em',
                   }}
