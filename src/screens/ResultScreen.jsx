@@ -17,7 +17,7 @@ const BTN = {
   cursor: 'pointer', letterSpacing: '0.04em',
 }
 
-export function ResultScreen({ worldName, worldId, enemy, totalScore, onRestart, onViewScores, useRaster, onToggleRaster, lang, t }) {
+export function ResultScreen({ worldName, worldId, enemy, totalScore, onRestart, onViewScores, useRaster, lang, t }) {
   const isRtl = lang === 'he'
   return (
     <div
@@ -33,8 +33,6 @@ export function ResultScreen({ worldName, worldId, enemy, totalScore, onRestart,
     >
       {/* X button — top-left */}
       {onRestart && <button onClick={onRestart} style={{ ...BTN, left: 10 }}>✕</button>}
-      {/* Toggle — top-right */}
-      {onToggleRaster && <button onClick={onToggleRaster} style={{ ...BTN, right: 10 }}>{useRaster ? 'SVG' : 'IMG'}</button>}
 
       {/* Title */}
       <motion.div

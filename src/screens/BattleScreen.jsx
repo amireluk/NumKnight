@@ -311,7 +311,7 @@ function FallingRocks() {
   )
 }
 
-export function BattleScreen({ world, worldIndex, battleIndex, onBattleEnd, onQuit, scoreBonus = 0, useRaster = false, onToggleRaster, lang, t }) {
+export function BattleScreen({ world, worldIndex, battleIndex, onBattleEnd, onQuit, scoreBonus = 0, useRaster = false, lang, t }) {
   const shakeControls = useAnimation()
   const bgControls = useAnimation()
 
@@ -728,20 +728,6 @@ export function BattleScreen({ world, worldIndex, battleIndex, onBattleEnd, onQu
             </button>
           )}
 
-          {/* Raster / vector toggle — top-right */}
-          <button
-            onClick={onToggleRaster}
-            title={useRaster ? 'Switch to vector' : 'Switch to image'}
-            style={{
-              position: 'absolute', top: 8, right: 10, zIndex: 5,
-              background: 'rgba(0,0,0,0.35)', border: '1.5px solid rgba(255,255,255,0.18)',
-              borderRadius: 8, padding: '4px 10px',
-              fontSize: 11, fontWeight: 900, color: 'rgba(255,255,255,0.7)',
-              cursor: 'pointer', letterSpacing: '0.04em',
-            }}
-          >
-            {useRaster ? 'SVG' : 'IMG'}
-          </button>
 
           {/* Shield-up banner */}
           <AnimatePresence>

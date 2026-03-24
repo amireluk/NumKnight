@@ -1,6 +1,5 @@
 import { useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { useLongPress } from '../hooks/useLongPress'
 import { LogoBanner } from '../components/LogoBanner'
 import { EnemyCharacter } from '../components/EnemyCharacter'
 import { KnightCharacter } from '../components/KnightCharacter'
@@ -412,22 +411,6 @@ function RegionBand({ world, worldIndex, status, trophy, score, delay, onTap, is
         />
       )}
 
-      {/* Active: tap-to-fight hint */}
-      {isCurrent && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: [0, 1, 1, 0] }}
-          transition={{ delay: 1.2, duration: 2.4, repeat: Infinity, repeatDelay: 1.0 }}
-          style={{
-            position: 'absolute', bottom: 6, right: 8, zIndex: 5, pointerEvents: 'none',
-            fontSize: 9, fontWeight: 900, letterSpacing: '0.14em',
-            color: 'rgba(251,191,36,0.9)',
-            textShadow: '0 1px 4px rgba(0,0,0,0.9)',
-          }}
-        >
-          ⚔
-        </motion.div>
-      )}
     </motion.div>
   )
 }
@@ -436,10 +419,9 @@ function RegionBand({ world, worldIndex, status, trophy, score, delay, onTap, is
 
 export function WorldMapScreen({
   worlds, currentWorldIndex, trophies, worldScores,
-  isTransition, difficulty, isDevMode, onFight, onRestart, onBack, onLogoLongPress, useRaster, onToggleRaster, lang, t,
+  isTransition, difficulty, isDevMode, onFight, onRestart, onBack, useRaster, lang, t,
 }) {
   const isRtl = lang === 'he'
-  const logoLongPress = useLongPress(onLogoLongPress ?? (() => {}))
 
   // Android hardware back → new game screen
   useEffect(() => {
@@ -481,21 +463,6 @@ export function WorldMapScreen({
         ✕
       </motion.button>
 
-      {/* Toggle — top-right */}
-      {onToggleRaster && (
-        <button
-          onClick={onToggleRaster}
-          style={{
-            position: 'absolute', top: 14, right: 14, zIndex: 30,
-            background: 'rgba(0,0,0,0.35)', border: '1.5px solid rgba(255,255,255,0.18)',
-            borderRadius: 8, padding: '4px 10px',
-            fontSize: 12, fontWeight: 900, color: 'rgba(255,255,255,0.7)',
-            cursor: 'pointer', letterSpacing: '0.04em',
-          }}
-        >
-          {useRaster ? 'SVG' : 'IMG'}
-        </button>
-      )}
 
       {/* Header */}
       <motion.div
@@ -505,7 +472,7 @@ export function WorldMapScreen({
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.35 }}
       >
-        <LogoBanner logoLongPress={logoLongPress} showSword={false} />
+        <LogoBanner showSword={false} />
       </motion.div>
 
       {/* Region bands — Forest at top, Dragon Lair at bottom */}

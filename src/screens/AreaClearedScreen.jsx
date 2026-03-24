@@ -270,7 +270,7 @@ const BTN = {
   cursor: 'pointer', letterSpacing: '0.04em',
 }
 
-export function AreaClearedScreen({ world, worldTrophies, worldScore, totalScore, onContinue, useRaster, onToggleRaster, lang, t }) {
+export function AreaClearedScreen({ world, worldTrophies, worldScore, totalScore, onContinue, useRaster, lang, t }) {
   const isRtl = lang === 'he'
   const prevTotal = totalScore - worldScore
 
@@ -337,8 +337,8 @@ export function AreaClearedScreen({ world, worldTrophies, worldScore, totalScore
 
   return (
     <div style={{ position: 'relative' }}>
-    {/* Full-screen fireworks overlay — fixed so they aren't clipped */}
-    {bursts.map(b => (
+    {/* Full-screen fireworks overlay — fixed so they aren't clipped; skip in img mode */}
+    {!useRaster && bursts.map(b => (
       <ParticleBurst
         key={b.id}
         fixed
@@ -362,8 +362,6 @@ export function AreaClearedScreen({ world, worldTrophies, worldScore, totalScore
     >
       {/* X button — top-left */}
       {onContinue && <button onClick={onContinue} style={{ ...BTN, left: 10 }}>✕</button>}
-      {/* Toggle — top-right */}
-      {onToggleRaster && <button onClick={onToggleRaster} style={{ ...BTN, right: 10 }}>{useRaster ? 'SVG' : 'IMG'}</button>}
 
       {/* 1. Region name */}
       <motion.div

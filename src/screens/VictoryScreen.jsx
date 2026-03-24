@@ -69,7 +69,7 @@ const BTN = {
   cursor: 'pointer', letterSpacing: '0.04em',
 }
 
-export function VictoryScreen({ playerName, totalScore, onContinue, useRaster, onToggleRaster, lang, t }) {
+export function VictoryScreen({ playerName, totalScore, onContinue, useRaster, lang, t }) {
   const isRtl = lang === 'he'
   const [scoreDisplay, setScoreDisplay] = useState(0)
   const [showScore, setShowScore] = useState(false)
@@ -125,8 +125,6 @@ export function VictoryScreen({ playerName, totalScore, onContinue, useRaster, o
       <ConfettiRain />
       {/* X button — top-left (goes to hall of fame) */}
       {onContinue && <button onClick={onContinue} style={{ ...BTN, left: 10 }}>✕</button>}
-      {/* Toggle — top-right */}
-      {onToggleRaster && <button onClick={onToggleRaster} style={{ ...BTN, right: 10 }}>{useRaster ? 'SVG' : 'IMG'}</button>}
 
       {/* Gold glow — absolute, never affects layout */}
       <div style={{

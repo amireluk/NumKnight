@@ -141,7 +141,7 @@ function Flames() {
 }
 
 function Embers({ big = false }) {
-  const count = big ? 14 : 10
+  const count = big ? 28 : 20
   const embers = Array.from({ length: count }, (_, i) => ({
     id: i,
     x: -6 + (i * 4.1) % 14,
@@ -151,14 +151,14 @@ function Embers({ big = false }) {
     drift: (i % 2 === 0 ? 1 : -1) * (3 + (i * 1.9) % 7),
     color: i % 3 === 0 ? '#fde68a' : i % 3 === 1 ? '#fb923c' : '#fbbf24',
   }))
-  const rise = big ? -130 : -65
+  const rise = big ? -260 : -130
   return (
     <div style={{ position: 'absolute', bottom: big ? 8 : 48, left: '50%', transform: 'translateX(-50%)', pointerEvents: 'none' }}>
       {embers.map((e) => (
         <motion.div
           key={e.id}
-          initial={{ x: e.x, y: 0, opacity: 0.9 }}
-          animate={{ x: e.x + e.drift, y: rise, opacity: 0 }}
+          initial={{ x: e.x, y: 0, opacity: 0 }}
+          animate={{ x: e.x + e.drift, y: rise, opacity: [0, 0.9, 0] }}
           transition={{ delay: e.delay, duration: e.duration, repeat: Infinity, ease: 'easeOut' }}
           style={{ position: 'absolute', width: e.size, height: e.size * (big ? 2.5 : 1), borderRadius: big ? 2 : '50%', background: e.color }}
         />
@@ -214,29 +214,23 @@ function BoostCard({ boost, onConfirm, index }) {
         whileHover={{ scale: 1.03, y: -1, transition: { duration: 0.12 } }}
         onClick={() => setTimeout(() => onConfirm(boost.id), 120)}
         style={{
-          display: 'flex', alignItems: 'center', gap: 14,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
           background: colors.bg,
           borderBottom: `4px solid ${colors.border}`,
           borderTop: 'none', borderLeft: 'none', borderRight: 'none',
-          borderRadius: 16, padding: '13px 16px',
-          cursor: 'pointer', textAlign: 'left', width: '100%',
+          borderRadius: 16, padding: '16px 20px',
+          cursor: 'pointer', textAlign: 'center', width: '100%',
           boxShadow: '0 4px 12px rgba(0,0,0,0.4)',
         }}
       >
-        <span style={{ fontSize: 28, flexShrink: 0, lineHeight: 1 }}>{boost.icon}</span>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <p style={{
-            fontSize: 14, fontWeight: 900,
-            color: 'white',
-            letterSpacing: '0.05em', marginBottom: 3,
-            textShadow: '0 1px 3px rgba(0,0,0,0.4)',
-          }}>
-            {boost.name}
-          </p>
-          <p style={{ fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.65)', lineHeight: 1.4 }}>
-            {boost.desc}
-          </p>
-        </div>
+        <p style={{
+          fontSize: 16, fontWeight: 900,
+          color: 'white',
+          letterSpacing: '0.06em',
+          textShadow: '0 1px 3px rgba(0,0,0,0.4)',
+        }}>
+          {boost.name}
+        </p>
       </motion.button>
     </motion.div>
   )
@@ -252,23 +246,23 @@ const BTN = {
   cursor: 'pointer', letterSpacing: '0.04em',
 }
 
-export function CampfireScreen({ onBoostChosen, onBack, useRaster, onToggleRaster, lang, t }) {
+export function CampfireScreen({ onBoostChosen, onBack, useRaster, lang, t }) {
   const boosts = [
     {
       id: 'weakSpot',
-      name: t?.boostWeakSpotName ?? "Dragon's Weakness",
+      name: t?.boostWeakSpotName ?? 'Dragon is Weaker',
       icon: '⚔️',
       desc: t?.boostWeakSpotDesc ?? '−1 Dragon HP',
     },
     {
       id: 'steadyNerves',
-      name: t?.boostSteadyNervesName ?? 'Steady Nerves',
+      name: t?.boostSteadyNervesName ?? 'More Time for Each Question',
       icon: '🕯️',
       desc: t?.boostSteadyNervesDesc ?? '+3 seconds on every question timer',
     },
     {
       id: 'chronicle',
-      name: t?.boostChronicleName ?? "Hero's Chronicle",
+      name: t?.boostChronicleName ?? 'Extra Bonus Points',
       icon: '📜',
       desc: t?.boostChronicleDesc ?? '+100 bonus points per battle won',
     },
@@ -288,8 +282,6 @@ export function CampfireScreen({ onBoostChosen, onBack, useRaster, onToggleRaste
     >
       {/* X button — top-left */}
       {onBack && <button onClick={onBack} style={{ ...BTN, left: 10 }}>✕</button>}
-      {/* Toggle — top-right */}
-      {onToggleRaster && <button onClick={onToggleRaster} style={{ ...BTN, right: 10 }}>{useRaster ? 'SVG' : 'IMG'}</button>}
 
       {/* ── Scene ─────────────────────────────────────── */}
       <div style={{ position: 'relative', flex: '0 0 40%', minHeight: 0 }}>
@@ -351,15 +343,15 @@ export function CampfireScreen({ onBoostChosen, onBack, useRaster, onToggleRaste
         style={{ textAlign: 'center', padding: '10px 20px 6px', flexShrink: 0 }}
       >
         <p style={{
-          fontSize: 10, fontWeight: 900, letterSpacing: '0.22em',
-          color: 'rgba(251,146,60,0.65)', marginBottom: 4,
+          fontSize: 13, fontWeight: 900, letterSpacing: '0.22em',
+          color: 'rgba(251,146,60,0.75)', marginBottom: 6,
           textTransform: 'uppercase',
         }}>
           {t?.campfireTitle ?? 'THE DRAGON LAIR AWAITS'}
         </p>
         <p style={{
-          fontSize: 14, fontWeight: 600,
-          color: 'rgba(255,255,255,0.5)', letterSpacing: '0.02em',
+          fontSize: 17, fontWeight: 700,
+          color: 'rgba(255,255,255,0.65)', letterSpacing: '0.02em',
         }}>
           {t?.campfireSubtitle ?? 'Choose one boon before you enter'}
         </p>

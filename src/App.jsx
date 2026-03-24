@@ -7,6 +7,7 @@ import { AreaClearedScreen } from './screens/AreaClearedScreen'
 import { LeaderboardScreen } from './screens/LeaderboardScreen'
 import { VictoryScreen } from './screens/VictoryScreen'
 import { StartScreen } from './screens/StartScreen'
+import { OptionsScreen } from './screens/OptionsScreen'
 import { CampfireScreen } from './screens/CampfireScreen'
 import { DesignScreen } from './screens/DesignScreen'
 import { EASY, MEDIUM, HARD, DEV } from './game/campaign.config'
@@ -14,17 +15,17 @@ import { createNewRun, loadRun, saveRun, clearRun, isRunInProgress, clearBattleS
 import { getTrophy, calcBattleScore } from './game/battleLogic'
 import { LANG_KEY, T } from './game/i18n'
 import { clearLog } from './game/runLog'
-import { RunLogViewer } from './components/RunLogViewer'
 
 const CONFIGS = { easy: EASY, medium: MEDIUM, hard: HARD }
 const IS_DEV_MODE = new URLSearchParams(window.location.search).has('dev')
 
 export default function App() {
-  const [difficulty, setDifficulty] = useState(() => loadRun()?.difficulty ?? 'medium')
+  const [difficulty, setDifficulty] = useState(() => loadRun()?.difficulty ?? localStorage.getItem('numknight_difficulty') ?? 'medium')
   const [playerName, setPlayerName] = useState(() => localStorage.getItem('numknight_player_name') ?? '')
   const [lang, setLang] = useState(() => localStorage.getItem(LANG_KEY) ?? 'he')
 
   const handleLangChange = (l) => { setLang(l); localStorage.setItem(LANG_KEY, l) }
+  const handleDifficultyChange = (d) => { setDifficulty(d); localStorage.setItem('numknight_difficulty', d) }
   const t = T[lang] ?? T.en
 
   const worlds = IS_DEV_MODE ? DEV : (CONFIGS[difficulty] ?? MEDIUM)
@@ -41,10 +42,9 @@ export default function App() {
   // Holds score context passed to leaderboard
   const [pendingScore, setPendingScore] = useState(null)
   const [activeBoost, setActiveBoost] = useState(null)
-  const [showLog, setShowLog] = useState(false)
   const RASTER_KEY = 'numknight_raster_bg'
   const [useRaster, setUseRaster] = useState(() => localStorage.getItem(RASTER_KEY) === 'true')
-  const toggleRaster = () => setUseRaster(v => { const n = !v; localStorage.setItem(RASTER_KEY, String(n)); return n })
+  const handleRasterChange = (val) => { setUseRaster(val); localStorage.setItem(RASTER_KEY, String(val)) }
 
   const world = worlds[run.worldIndex]
 
@@ -84,13 +84,20 @@ export default function App() {
     setScreen('start')
   }
 
-  const handleStart = ({ name, diff }) => {
+  // Called when user taps NEW GAME — goes to Options first if no name set
+  const handleNewGame = () => {
+    if (!playerName) { setScreen('options'); return }
+    startNewGame()
+  }
+
+  const startNewGame = () => {
+    // Re-read name in case it was just set in Options
+    const name = localStorage.getItem('numknight_player_name') ?? ''
     setPlayerName(name)
-    setDifficulty(diff)
     clearRun()
     clearBattleState()
     clearLog()
-    const fresh = createNewRun(diff)
+    const fresh = createNewRun(difficulty)
     setRun(fresh)
     saveRun(fresh)
     setBattleKey(0)
@@ -224,7 +231,38 @@ export default function App() {
           initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
           transition={{ duration: 0.25 }} className="w-full"
         >
-          <StartScreen onStart={handleStart} onContinue={handleContinue} run={run} onViewLeaderboard={handleViewLeaderboard} onLogoLongPress={() => setShowLog(true)} lang={lang} onLangChange={handleLangChange} t={t} />
+          <StartScreen
+            onNewGame={handleNewGame}
+            onContinue={handleContinue}
+            onOptions={() => setScreen('options')}
+            onViewLeaderboard={handleViewLeaderboard}
+            run={run}
+            playerName={playerName}
+            difficulty={difficulty}
+            lang={lang} t={t}
+          />
+        </motion.div>
+      )}
+
+      {screen === 'options' && (
+        <motion.div key="options"
+          initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+          transition={{ duration: 0.25 }} className="w-full"
+        >
+          <OptionsScreen
+            difficulty={difficulty}
+            onDifficultyChange={handleDifficultyChange}
+            useRaster={useRaster}
+            onRasterChange={handleRasterChange}
+            lang={lang}
+            onLangChange={handleLangChange}
+            onBack={() => {
+              // Sync name from localStorage in case it was set in Options
+              setPlayerName(localStorage.getItem('numknight_player_name') ?? '')
+              setScreen('start')
+            }}
+            t={t}
+          />
         </motion.div>
       )}
 
@@ -233,7 +271,7 @@ export default function App() {
           initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
           transition={{ duration: 0.25 }} className="w-full"
         >
-          <BattleScreen key={battleKey} world={battleWorld} worldIndex={run.worldIndex} battleIndex={run.battleIndex} onBattleEnd={handleBattleEnd} onQuit={handleQuitBattle} scoreBonus={activeBoost === 'chronicle' ? 100 : 0} useRaster={useRaster} onToggleRaster={toggleRaster} lang={lang} t={t} />
+          <BattleScreen key={battleKey} world={battleWorld} worldIndex={run.worldIndex} battleIndex={run.battleIndex} onBattleEnd={handleBattleEnd} onQuit={handleQuitBattle} scoreBonus={activeBoost === 'chronicle' ? 100 : 0} useRaster={useRaster} lang={lang} t={t} />
         </motion.div>
       )}
 
@@ -248,7 +286,7 @@ export default function App() {
             worldScore={clearedData.worldScore}
             totalScore={clearedData.totalScore}
             onContinue={handleClearContinue}
-            useRaster={useRaster} onToggleRaster={toggleRaster}
+            useRaster={useRaster}
             lang={lang} t={t}
           />
         </motion.div>
@@ -266,7 +304,7 @@ export default function App() {
             totalScore={pendingScore?.totalScore ?? 0}
             onRestart={handleRestart}
             onViewScores={handleViewScores}
-            useRaster={useRaster} onToggleRaster={toggleRaster}
+            useRaster={useRaster}
             lang={lang} t={t}
           />
         </motion.div>
@@ -281,7 +319,7 @@ export default function App() {
             playerName={playerName}
             totalScore={pendingScore?.totalScore ?? 0}
             onContinue={handleVictoryContinue}
-            useRaster={useRaster} onToggleRaster={toggleRaster}
+            useRaster={useRaster}
             lang={lang} t={t}
           />
         </motion.div>
@@ -299,7 +337,7 @@ export default function App() {
             difficulty={difficulty}
             playerName={playerName}
             onBack={handleRestart}
-            useRaster={useRaster} onToggleRaster={toggleRaster}
+            useRaster={useRaster}
             lang={lang} t={t}
           />
         </motion.div>
@@ -310,7 +348,7 @@ export default function App() {
           initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
           transition={{ duration: 0.4 }} className="w-full"
         >
-          <CampfireScreen onBoostChosen={handleBoostChosen} onBack={() => setScreen('map')} useRaster={useRaster} onToggleRaster={toggleRaster} lang={lang} t={t} />
+          <CampfireScreen onBoostChosen={handleBoostChosen} onBack={() => setScreen('map')} useRaster={useRaster} lang={lang} t={t} />
         </motion.div>
       )}
 
@@ -330,16 +368,12 @@ export default function App() {
             onFight={handleFight}
             onRestart={handleRestart}
             onBack={() => setScreen('start')}
-            onLogoLongPress={() => setShowLog(true)}
-            useRaster={useRaster} onToggleRaster={toggleRaster}
+            useRaster={useRaster}
             lang={lang} t={t}
           />
         </motion.div>
       )}
     </AnimatePresence>
-    <AnimatePresence>
-      {showLog && <RunLogViewer onClose={() => setShowLog(false)} />}
-    </AnimatePresence>
-    </>
+</>
   )
 }
