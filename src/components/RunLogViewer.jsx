@@ -31,8 +31,8 @@ function entryText(e) {
   }
 }
 
-export function RunLogViewer({ onClose }) {
-  const log = getLog()
+export function RunLogViewer({ onClose, battleOnly = false }) {
+  const fullLog = getLog()
   const scrollRef = useRef(null)
 
   useEffect(() => {
@@ -46,6 +46,12 @@ export function RunLogViewer({ onClose }) {
     window.addEventListener('popstate', onPop)
     return () => window.removeEventListener('popstate', onPop)
   }, [onClose])
+
+  // If battleOnly, slice to everything from the last battle_start
+  const lastBattleIdx = battleOnly
+    ? [...fullLog].map((e, i) => e.type === 'battle_start' ? i : -1).filter(i => i >= 0).at(-1) ?? 0
+    : 0
+  const log = battleOnly ? fullLog.slice(lastBattleIdx) : fullLog
 
   // Annotate each entry with seconds elapsed since the nearest preceding battle_start
   let battleStartTs = log[0]?.ts ?? Date.now()
@@ -78,7 +84,7 @@ export function RunLogViewer({ onClose }) {
         }}
       >
         <span style={{ fontSize: 13, fontWeight: 900, color: '#fbbf24', letterSpacing: '0.16em' }}>
-          RUN LOG
+          {battleOnly ? 'BATTLE LOG' : 'RUN LOG'}
         </span>
         <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.28)', letterSpacing: '0.05em' }}>
           {entries.length} events · tap outside to close

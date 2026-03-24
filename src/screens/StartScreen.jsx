@@ -1,4 +1,3 @@
-/* eslint-disable no-undef */
 import { useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { KingdomBackground, KingdomForeground, StrollingKnight } from '../components/KingdomScenery'
@@ -19,9 +18,6 @@ export function StartScreen({ onNewGame, onContinue, onOptions, onViewLeaderboar
   }, [])
 
   const savedDiffLabel = t?.diffLabel?.[difficulty] ?? difficulty
-  const savedWorld = canContinue
-    ? (run?.worldIndex != null ? null : null) // world name shown inline below
-    : null
 
   return (
     <div

@@ -5,3 +5,5 @@ dist
 ref/
 public/assets/characters/_raw/
 public/assets/backgrounds/_raw/
+.playwright-mcp/
+*.png
