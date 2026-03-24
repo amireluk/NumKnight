@@ -1,5 +1,26 @@
 # NumKnight — Dev Notes for Claude
 
+## Dev environment
+
+Running inside a **VS Code Dev Container** (Ubuntu 24.04, Node 20, GitHub CLI).
+
+### Container config (`.devcontainer/devcontainer.json`)
+- `"runArgs": ["--privileged"]` — required so Chrome's internal sandbox can create Linux namespaces (without this, Playwright crashes)
+- `postCreateCommand` auto-runs on rebuild: installs Claude Code + `playwright-mcp` globally, `npm install`, and `npx playwright install chrome`
+- Mounts `~/.claude` from the Windows host so credentials and memory persist across container rebuilds
+
+### Playwright MCP (`.mcp.json`)
+- `playwright-mcp` is configured as an MCP server — use it to visually test the game
+- Dev server runs on `http://localhost:5173/NumKnight/` — always start with `npm run dev` before using Playwright
+- No `--no-sandbox` needed — `--privileged` on the container handles it
+- The `.playwright-mcp/` directory (screenshots/logs) is **not committed** — add to `.gitignore` if needed
+
+### Claude Code settings (`.claude/settings.json`)
+- `enableAllProjectMcpServers: true` — auto-approves the Playwright MCP
+- Common npm scripts and git commands are pre-allowed (no confirmation prompts)
+
+---
+
 ## Sprite processing pipeline
 See `prompts/pipeline.md` for the full Python pipeline (split → chroma-key → binarize → erode → autocrop → normalize → save).
 Per-character settings (bg colour, flip_poses, green_bg) are documented in that file.

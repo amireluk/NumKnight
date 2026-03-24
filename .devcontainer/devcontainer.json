@@ -7,7 +7,7 @@
     },
     // Installs Claude and creates a local "Allowlist" for the agent
     "runArgs": ["--privileged"],
-    "postCreateCommand": "npm install -g @anthropic-ai/claude-code && npm install && npx playwright install chrome",
+    "postCreateCommand": "npm install -g @anthropic-ai/claude-code playwright-mcp && npm install && npx playwright install chrome",
     "customizations": {
         "vscode": {
             "extensions": [
