@@ -95,6 +95,16 @@ export const T = {
     optionsSoundOff: 'Off',
     optionsViewLog: 'View Game Log',
 
+    // Practice mode
+    practice: 'PRACTICE',
+    practicePickerTitle: 'Choose Numbers to Practice',
+    practicePickerSubtitle: 'Select up to 4',
+    practiceStartBtn: 'START PRACTICE',
+    practiceGoodJob: 'GOOD JOB!',
+    practiceAgain: 'PRACTICE AGAIN',
+    practiceChangeNumbers: 'CHANGE NUMBERS',
+    practiceQuestionLabel: (n, total) => `${n} / ${total}`,
+
     // CampfireScreen
     campfireTitle: 'The Dragon Lair Awaits',
     campfireSubtitle: 'Choose one boon before you enter',
@@ -124,11 +134,11 @@ export const T = {
     // BattleIntro
     round: 'סיבוב',
     finalRound: 'סיבוב אחרון',
-    go: '!קדימה',
+    go: 'קדימה!',
 
     // BattleScreen
     roundLabel: (n, total) => `סיבוב ${n}/${total}`,
-    trophyLabel: { gold: '!מושלם', silver: '!כל הכבוד', bronze: '!שרדת' },
+    trophyLabel: { gold: 'מושלם!', silver: 'כל הכבוד!', bronze: 'שרדת!' },
     pts: 'נק׳',
     ptsLabel: (n) => `נק׳ ${n}`,
     timeBonusLabel: (n) => `בונוס זמן ${n}`,
@@ -138,10 +148,10 @@ export const T = {
 
     // Boss mechanic
     bossShieldUp: 'המגן פעיל',
-    bossShieldCrack: '!המגן נסדק',
-    bossShieldCrackHint: '!עוד אחד',
-    bossShieldShatter: '!המגן התנפץ',
-    bossShieldShatterHint: '!מכה',
+    bossShieldCrack: 'המגן נסדק!',
+    bossShieldCrackHint: 'עוד אחד!',
+    bossShieldShatter: 'המגן התנפץ!',
+    bossShieldShatterHint: 'מכה!',
 
     // AreaClearedScreen
     areaCleared: 'האזור נוקה',
@@ -201,6 +211,16 @@ export const T = {
     optionsSoundOn: 'פועל',
     optionsSoundOff: 'כבוי',
     optionsViewLog: 'יומן המשחק',
+
+    // Practice mode
+    practice: 'תרגול',
+    practicePickerTitle: 'בחר מספרים לתרגול',
+    practicePickerSubtitle: 'בחר עד 4 מספרים',
+    practiceStartBtn: 'התחל תרגול',
+    practiceGoodJob: 'כל הכבוד!',
+    practiceAgain: 'תרגל שוב',
+    practiceChangeNumbers: 'שנה מספרים',
+    practiceQuestionLabel: (n, total) => `${n} / ${total}`,
 
     // CampfireScreen
     campfireTitle: 'מאורת הדרקון מחכה',
