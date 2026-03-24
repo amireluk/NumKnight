@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react'
 import { motion, useAnimation } from 'framer-motion'
 import { KingdomBackground, KingdomForeground, StrollingKnight } from '../components/KingdomScenery'
+import { FlyingCreatures } from '../components/FlyingCreatures'
 
 const MAX_SELECTED = 4
 
@@ -39,6 +40,7 @@ export function PracticePickerScreen({ onStart, onBack, lang, t }) {
         justifyContent: 'flex-start',
       }}
     >
+      <FlyingCreatures />
       <KingdomBackground />
       <StrollingKnight />
       <KingdomForeground />

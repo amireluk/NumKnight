@@ -5,10 +5,10 @@ import { getLog } from '../game/runLog'
 import { RunLogViewer } from '../components/RunLogViewer'
 import { AnimatePresence } from 'framer-motion'
 import { KingdomBackground, KingdomForeground, StrollingKnight } from '../components/KingdomScenery'
+import { FlyingCreatures } from '../components/FlyingCreatures'
 
 const NAME_KEY = 'numknight_player_name'
 const DIFF_VALUES = ['easy', 'medium', 'hard']
-const DIFF_COLOR = { easy: '#4ade80', medium: '#fbbf24', hard: '#ef4444' }
 
 function SectionLabel({ children }) {
   return (
@@ -96,6 +96,7 @@ export function OptionsScreen({ difficulty, onDifficultyChange, useRaster, onRas
           'linear-gradient(to bottom, #1e3a70, #2d5aaa)',
       }}
     >
+      <FlyingCreatures />
       <KingdomBackground />
       <StrollingKnight />
       <KingdomForeground />
@@ -161,7 +162,6 @@ export function OptionsScreen({ difficulty, onDifficultyChange, useRaster, onRas
           <div style={{ display: 'flex', gap: 8 }}>
             {DIFF_VALUES.map((val) => {
               const selected = difficulty === val
-              const color = DIFF_COLOR[val]
               return (
                 <motion.button
                   key={val}
@@ -169,10 +169,10 @@ export function OptionsScreen({ difficulty, onDifficultyChange, useRaster, onRas
                   onClick={() => onDifficultyChange(val)}
                   style={{
                     flex: 1, padding: '11px 4px', borderRadius: 12,
-                    border: `2px solid ${selected ? color : 'rgba(255,255,255,0.25)'}`,
-                    background: selected ? color : 'rgba(0,0,0,0.35)',
+                    border: selected ? '2px solid #d97706' : '2px solid rgba(255,255,255,0.25)',
+                    background: selected ? '#fbbf24' : 'rgba(0,0,0,0.35)',
                     color: selected ? '#1a1a2e' : 'rgba(255,255,255,0.8)',
-                    boxShadow: selected ? `0 3px 0 rgba(0,0,0,0.4)` : '0 2px 0 rgba(0,0,0,0.4)',
+                    boxShadow: selected ? '0 3px 0 #92400e' : '0 2px 0 rgba(0,0,0,0.4)',
                     fontWeight: 900, fontSize: 13, cursor: 'pointer',
                     transition: 'all 0.15s', letterSpacing: '0.04em',
                   }}
