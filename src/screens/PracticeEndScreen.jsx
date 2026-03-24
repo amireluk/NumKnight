@@ -58,8 +58,8 @@ export function PracticeEndScreen({ score, onPracticeAgain, onChangeNumbers, lan
         >
           <p style={{ fontSize: 20, fontWeight: 900, color: 'white', letterSpacing: '0.04em', margin: 0 }}>
             {t?.practiceResultText
-              ? t.practiceResultText(score, TOTAL_QUESTIONS)
-              : `You got ${score} out of ${TOTAL_QUESTIONS} right`}
+              ? t.practiceResultText(score)
+              : `You got ${score} right!`}
           </p>
         </motion.div>
 
