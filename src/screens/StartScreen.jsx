@@ -64,7 +64,7 @@ export function StartScreen({ onNewGame, onContinue, onOptions, onViewLeaderboar
             className="w-full bg-yellow-400 border-b-4 border-yellow-600 text-black font-black text-2xl rounded-2xl h-16 shadow-xl cursor-pointer tracking-widest"
             style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2 }}
           >
-            <span style={{ lineHeight: 1 }}>{t?.continueRun ?? 'CONTINUE BATTLE'}</span>
+            <span style={{ lineHeight: 1 }}>{t?.continueRun ?? 'CONTINUE'}</span>
             {playerName && (
               <span dir="ltr" style={{ fontSize: 11, fontWeight: 700, opacity: 0.60, letterSpacing: '0.05em', lineHeight: 1 }}>
                 {[playerName, savedDiffLabel].filter(Boolean).join(' · ')}
@@ -81,7 +81,7 @@ export function StartScreen({ onNewGame, onContinue, onOptions, onViewLeaderboar
             className="bg-yellow-400 border-b-4 border-yellow-600 text-black font-black text-2xl rounded-2xl h-16 shadow-xl cursor-pointer tracking-widest"
             style={{ flex: 1 }}
           >
-            {t?.newGame ?? 'BATTLE'}
+            {t?.newGame ?? 'NEW'}
           </motion.button>
 
           <motion.button
