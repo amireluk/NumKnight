@@ -417,6 +417,7 @@ export default function App() {
         >
           <PracticeEndScreen
             score={practiceScore}
+            selectedNumbers={practiceNumbers}
             onPracticeAgain={handlePracticeAgain}
             onChangeNumbers={handlePracticeChangeNumbers}
             difficulty={difficulty}

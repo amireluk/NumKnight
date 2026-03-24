@@ -4,7 +4,7 @@ import { FlyingCreatures } from '../components/FlyingCreatures'
 
 const TOTAL_QUESTIONS = 20
 
-export function PracticeEndScreen({ score, onPracticeAgain, onChangeNumbers, difficulty, lang, t }) {
+export function PracticeEndScreen({ score, selectedNumbers, onPracticeAgain, onChangeNumbers, difficulty, lang, t }) {
   const isRtl = lang === 'he'
   const perfect = score === TOTAL_QUESTIONS
 
@@ -75,7 +75,7 @@ export function PracticeEndScreen({ score, onPracticeAgain, onChangeNumbers, dif
             onClick={onPracticeAgain}
             className="w-full bg-yellow-400 border-b-4 border-yellow-600 text-black font-black text-xl rounded-2xl h-16 shadow-xl cursor-pointer tracking-widest"
           >
-            {t?.practiceAgain ?? 'PRACTICE AGAIN'}
+            {t?.practiceAgain ? t.practiceAgain(selectedNumbers) : `PRACTICE AGAIN  ${selectedNumbers.join(', ')}`}
           </motion.button>
 
           <motion.button
@@ -83,7 +83,7 @@ export function PracticeEndScreen({ score, onPracticeAgain, onChangeNumbers, dif
             onClick={onChangeNumbers}
             className="w-full bg-yellow-400 border-b-4 border-yellow-600 text-black font-black text-xl rounded-2xl h-14 shadow-xl cursor-pointer tracking-widest"
           >
-            {t?.practiceChangeNumbers ?? 'CHANGE NUMBERS'}
+            {t?.practiceNewNumbers ?? 'NEW NUMBERS'}
           </motion.button>
         </motion.div>
       </motion.div>

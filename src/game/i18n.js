@@ -102,8 +102,8 @@ export const T = {
     practiceStartBtn: 'START PRACTICE',
     practiceGoodJob: 'GOOD JOB!',
     practiceResultText: (score) => `You got ${score} right!`,
-    practiceAgain: 'PRACTICE AGAIN',
-    practiceChangeNumbers: 'CHANGE NUMBERS',
+    practiceAgain: (nums) => `PRACTICE AGAIN  ${nums.join(', ')}`,
+    practiceNewNumbers: 'NEW NUMBERS',
     practiceQuestionLabel: (n, total) => `${n} / ${total}`,
 
     // CampfireScreen
@@ -220,8 +220,8 @@ export const T = {
     practiceStartBtn: 'התחל תרגול',
     practiceGoodJob: 'כל הכבוד!',
     practiceResultText: (score) => `ענית נכון על ${score}!`,
-    practiceAgain: 'תרגל שוב',
-    practiceChangeNumbers: 'שנה מספרים',
+    practiceAgain: (nums) => `תרגל שוב  ${nums.join(', ')}`,
+    practiceNewNumbers: 'מספרים חדשים',
     practiceQuestionLabel: (n, total) => `${n} / ${total}`,
 
     // CampfireScreen
