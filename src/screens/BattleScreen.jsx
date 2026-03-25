@@ -9,6 +9,7 @@ import { playCorrect, playWrong, playSwordSwing, playImpact, playVictory, playDe
   playTimerTick, playTimerExpiry } from '../game/sounds'
 import { saveBattleState, loadBattleState, clearBattleState } from '../game/runState'
 import { logEvent } from '../game/runLog'
+import { recordResult } from '../game/statsState'
 import { HPBar } from '../components/HPBar'
 import { KnightCharacter } from '../components/KnightCharacter'
 import { EnemyCharacter } from '../components/EnemyCharacter'
@@ -311,7 +312,7 @@ function FallingRocks() {
   )
 }
 
-export function BattleScreen({ world, worldIndex, battleIndex, onBattleEnd, onQuit, scoreBonus = 0, useRaster = false, lang, t }) {
+export function BattleScreen({ world, worldIndex, battleIndex, onBattleEnd, onQuit, scoreBonus = 0, useRaster = false, lang, t, playerName }) {
   const shakeControls = useAnimation()
   const bgControls = useAnimation()
 
@@ -362,6 +363,9 @@ export function BattleScreen({ world, worldIndex, battleIndex, onBattleEnd, onQu
 
   // Screen flash on player hit
   const [flashHitKey, setFlashHitKey] = useState(0)
+
+  // Hidden response timer — ms from question display to first tap
+  const questionStartTime = useRef(Date.now())
 
   // Timer — on resume, first question gets saved time + 1s bonus
   const resumeTimeLeft = useRef(saved?.timeLeft != null ? Math.min(saved.timeLeft + 1, world.timer ?? Infinity) : null)
@@ -472,6 +476,7 @@ export function BattleScreen({ world, worldIndex, battleIndex, onBattleEnd, onQu
     if (!timedOut || phaseRef.current !== 'idle') return
     setTimedOut(false)
     setButtonStates(round.options.map((opt) => (opt === round.problem.answer ? 'correct' : 'idle')))
+    recordResult(playerName, round.problem.a, round.problem.b, false, (world.timer ?? 0) * 1000)
     logEvent('timeout', { q: `${round.problem.a}×${round.problem.b}`, correct: round.problem.answer })
     playTimerExpiry()
     playWrong()
@@ -516,12 +521,15 @@ export function BattleScreen({ world, worldIndex, battleIndex, onBattleEnd, onQu
     setRound(makeRound(world.multipliers, world.factorRange, round.problem))
     setButtonStates(IDLE_BUTTON_STATES)
     setPhase('idle')
+    questionStartTime.current = Date.now()
   }
 
   const handleAnswer = (selected) => {
     if (phase !== 'idle') return
 
     const isCorrect = selected === problem.answer
+    const elapsed = Date.now() - questionStartTime.current
+
     setButtonStates(options.map((opt) => {
       if (opt === problem.answer) return 'correct'
       if (opt === selected)       return 'wrong'
@@ -529,6 +537,7 @@ export function BattleScreen({ world, worldIndex, battleIndex, onBattleEnd, onQu
     }))
 
     if (isCorrect) {
+      recordResult(playerName, problem.a, problem.b, true, elapsed)
       // Accumulate time bonus for timed worlds
       let qTimeBonus = 0
       if (world.timer && timeLeft !== null) {
@@ -626,6 +635,7 @@ export function BattleScreen({ world, worldIndex, battleIndex, onBattleEnd, onQu
       }, 225)
 
     } else {
+      recordResult(playerName, problem.a, problem.b, false, elapsed)
       logEvent('wrong', { q: `${problem.a}×${problem.b}`, selected, correct: problem.answer })
       playWrong()
       const newMistakes = mistakes + 1

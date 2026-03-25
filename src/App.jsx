@@ -13,6 +13,7 @@ import { DesignScreen } from './screens/DesignScreen'
 import { PracticePickerScreen } from './screens/PracticePickerScreen'
 import { PracticeBattleScreen } from './screens/PracticeBattleScreen'
 import { PracticeEndScreen } from './screens/PracticeEndScreen'
+import { StatsScreen } from './screens/StatsScreen'
 import { EASY, MEDIUM, HARD, DEV } from './game/campaign.config'
 import { createNewRun, loadRun, saveRun, clearRun, isRunInProgress, clearBattleState } from './game/runState'
 import { getTrophy, calcBattleScore } from './game/battleLogic'
@@ -289,6 +290,7 @@ export default function App() {
               setPlayerName(localStorage.getItem('numknight_player_name') ?? '')
               setScreen('start')
             }}
+            onStats={() => setScreen('stats')}
             t={t}
           />
         </motion.div>
@@ -299,7 +301,7 @@ export default function App() {
           initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
           transition={{ duration: 0.25 }} className="w-full"
         >
-          <BattleScreen key={battleKey} world={battleWorld} worldIndex={run.worldIndex} battleIndex={run.battleIndex} onBattleEnd={handleBattleEnd} onQuit={handleQuitBattle} scoreBonus={activeBoost === 'chronicle' ? 100 : 0} useRaster={useRaster} lang={lang} t={t} />
+          <BattleScreen key={battleKey} world={battleWorld} worldIndex={run.worldIndex} battleIndex={run.battleIndex} onBattleEnd={handleBattleEnd} onQuit={handleQuitBattle} scoreBonus={activeBoost === 'chronicle' ? 100 : 0} useRaster={useRaster} playerName={playerName} lang={lang} t={t} />
         </motion.div>
       )}
 
@@ -389,6 +391,7 @@ export default function App() {
             onStart={handlePracticeStart}
             onBack={() => setScreen('start')}
             difficulty={difficulty}
+            playerName={playerName}
             lang={lang} t={t}
           />
         </motion.div>
@@ -405,6 +408,7 @@ export default function App() {
             onPracticeEnd={handlePracticeEnd}
             onQuit={() => setScreen('start')}
             useRaster={useRaster}
+            playerName={playerName}
             lang={lang} t={t}
           />
         </motion.div>
@@ -420,6 +424,20 @@ export default function App() {
             selectedNumbers={practiceNumbers}
             onPracticeAgain={handlePracticeAgain}
             onChangeNumbers={handlePracticeChangeNumbers}
+            difficulty={difficulty}
+            lang={lang} t={t}
+          />
+        </motion.div>
+      )}
+
+      {screen === 'stats' && (
+        <motion.div key="stats"
+          initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+          transition={{ duration: 0.25 }} className="w-full"
+        >
+          <StatsScreen
+            onBack={() => setScreen('start')}
+            playerName={playerName}
             difficulty={difficulty}
             lang={lang} t={t}
           />

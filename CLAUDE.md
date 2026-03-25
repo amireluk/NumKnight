@@ -94,6 +94,8 @@ Do NOT deploy to prod unless the user explicitly asks.
 | `src/game/runState.js` | localStorage helpers: `createNewRun / loadRun / saveRun / clearRun` |
 | `src/game/battleLogic.js` | `makeRound`, `generateOptions`, `getTrophy`, `calcBattleScore` |
 | `src/game/scoreState.js` | Leaderboard helpers: `saveScore / loadScores` (key: `numknight_scores`) |
+| `src/game/statsState.js` | Per-number statistics: `recordResult / loadPlayerStats / computeNumberRating` (key: `numknight_stats`) |
+| `src/screens/StatsScreen.jsx` | Statistics screen — 3×3 grid of numbers with % correct, median time, rating color |
 | `src/game/i18n.js` | EN + Hebrew translations; `T[lang]` object; `LANG_KEY` constant |
 | `src/game/sounds.js` | `playCorrect/Wrong/SwordSwing/Impact/Victory/Defeat` |
 | `src/App.jsx` | Campaign state machine — screen routing, run persistence, score tracking |
@@ -256,12 +258,14 @@ The arena div has **no** `overflow:hidden` so weapon/wing sprites aren't clipped
 - **Practice mode** — full implementation (picker → battle → end screen)
 - UI polish: button styles, Hebrew exclamation marks, progress bar, praise popups
 - Options + picker screens: kingdom scenery (castle, knight, birds)
+- **Phase 7 (Statistics)** — designed and documented, not yet implemented
 
 ## Implementation status
 - **Phases 1–4** (World Map, Backgrounds, Scoring, Leaderboard): ✅ Complete
 - **Practice Mode**: ✅ Complete
 - **Phase 5** (Visual Polish): ⏳ Pending
 - **Phase 6** (Backend Leaderboard): ⏳ Pending
+- **Phase 7** (Per-Number Statistics): ⏳ Pending — full spec in `PLAN_PENDING.md`
 
 ---
 
@@ -456,41 +460,93 @@ timeBonus        = only for timed worlds (timer !== null)
 ## Phase 6 — Cross-Device Backend Leaderboard ⏳ PENDING
 **Goal:** Global high scores visible across all devices/players.
 
-### Recommended stack
-**Supabase** (free tier, no self-hosting needed)
-- PostgreSQL database
-- Auto-generated REST API
-- No auth required for a public leaderboard (anon key is fine)
-- Works with `vite-plugin-singlefile` (pure HTTP calls, no SSR needed)
+### Stack
+**Firebase + Firestore** (Google, free tier)
+- Firestore NoSQL database — simple document reads/writes, no SQL needed
+- Firebase Analytics (GA4) included in the same project — see Phase GA
+- Security via Firestore Security Rules (not key secrecy — the API key is intentionally public)
+- `firebase` npm package, ~40KB gzipped
 
-### Schema
-```sql
-CREATE TABLE scores (
-  id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  name        text NOT NULL,
-  total_score integer NOT NULL,
-  worlds_cleared integer NOT NULL,
-  trophy_summary  text,   -- e.g. "GGSBS" (G=gold S=silver B=bronze)
-  created_at  timestamptz DEFAULT now()
-);
-CREATE INDEX ON scores(total_score DESC);
+### Firestore collection: `scores`
+Each document: `{ name, totalScore, worldsCleared, difficulty, date }`
+
+### Security rules
+```
+allow read: if true;
+allow create: if request.resource.data.keys()
+  .hasOnly(['name','totalScore','worldsCleared','difficulty','date']);
+allow update, delete: if false;
 ```
 
 ### App changes
+- `src/game/firebase.js` — init app, export `db` and `analytics`
 - `src/game/api.js` — `submitScore(entry)`, `fetchLeaderboard(limit=20)`
 - Leaderboard screen fetches global scores on mount; falls back to local if offline
 - Player name persisted locally (`numknight_player_name`) so they don't re-enter it each run
 - Submit score at end of run (fire-and-forget, non-blocking)
 
-### Anti-cheat (lightweight)
-- Score is recomputed server-side from the submitted `battles[]` array (validate formula)
-- Rate-limit submissions per IP (Supabase Edge Functions or just rely on their built-in rate limits)
-- Names: client-side length cap (16 chars), no validation for content (keep it simple)
-
 ### Considerations
-- The app is currently a single HTML file — Supabase JS client adds ~40KB gzipped. Acceptable.
 - Offline-first: always save locally, submit globally when possible
 - No login/accounts — name is the identity. Same name from different devices = separate entries (by design, keeps it simple)
+- Names: client-side length cap (16 chars)
+
+---
+
+## Phase 7 — Per-Number Statistics ⏳ PENDING
+
+**Goal:** Track each player's accuracy and response speed per multiplication table (×1–×9), show a statistics screen, and surface a color-coded "rating" on the practice number picker as a practice recommendation. Stats do NOT affect question selection in any mode.
+
+### localStorage key: `numknight_stats`
+```js
+{
+  players: [
+    {
+      name: "Alice",
+      lastUsed: 1700000000000,   // timestamp — evict oldest when > 5 players
+      numbers: {
+        "3": { results: [{ success: bool, timeMs: number }, ...] },  // max 40, rolling
+        // "1"–"9"
+      }
+    }
+  ]
+}
+```
+
+### What counts
+- **Success**: correct on the very first attempt
+- **Failure**: wrong on first attempt, OR timer expired (campaign)
+- **timeMs**: ms from question display to first interaction (or timer limit in ms for expiry)
+- For question `a × b`: record the **same result** to both `numbers[a]` AND `numbers[b]` (skip duplicate if `a === b`)
+- Both **practice** and **campaign** battles feed stats
+- Aggregated by `playerName` — up to 5 names stored, oldest evicted
+
+### Rating formula (per number)
+```
+pct      = successes / results.length
+medianMs = median of all timeMs values
+rating   = pct × 0.6  +  (1 − clamp(medianMs, 500, 4000) / 4000) × 0.4
+```
+Bands: `< 0.40` = Needs work (red), `0.40–0.69` = Getting there (amber), `≥ 0.70` = Strong (green).
+
+### Stats screen (`StatsScreen.jsx`)
+- Accessible from Start Screen (solid yellow button below HALL OF FAME)
+- Kingdom scenery background
+- 3×3 grid — each cell: number, success %, median time, color tint from rating band
+- Cells with < 10 results show "not enough data" in a dimmed state
+
+### Practice picker enhancement
+Each number button gets a small colored dot (bottom-right corner) for red/amber/green rating.
+No dot if < 5 results. Legend line below the grid explains the colors.
+
+### Hidden response timer
+Runs in both `PracticeBattleScreen` and `BattleScreen`. Starts when new question renders, stops on first tap. Timer-expiry in campaign = `success: false, timeMs: world.timer * 1000`.
+
+### Key files
+- `src/game/statsState.js` — `recordResult(name, a, b, success, timeMs)`, `loadPlayerStats(name)`, `computeNumberRating(results)`
+- `src/screens/StatsScreen.jsx` — stats display
+- Modified: `PracticeBattleScreen.jsx`, `BattleScreen.jsx`, `PracticePickerScreen.jsx`, `StartScreen.jsx`, `App.jsx`, `i18n.js`
+
+Full implementation checklist in `PLAN_PENDING.md` § Phase 7.
 
 ---
 
@@ -502,4 +558,5 @@ Phase 3 (Scoring)       ✅ Done
 Phase 4 (Local LB)      ✅ Done
 Phase 5 (Polish)        ← next up — do incrementally, high impact per effort
 Phase 6 (Backend LB)    ← last, biggest lift
+Phase 7 (Statistics)    ← good next candidate — enhances practice mode
 ```

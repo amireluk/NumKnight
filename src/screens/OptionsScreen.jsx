@@ -50,7 +50,7 @@ function ToggleRow({ options, value, onChange }) {
   )
 }
 
-export function OptionsScreen({ difficulty, onDifficultyChange, useRaster, onRasterChange, lang, onLangChange, onBack, t }) {
+export function OptionsScreen({ difficulty, onDifficultyChange, useRaster, onRasterChange, lang, onLangChange, onBack, onStats, t }) {
   const isRtl = lang === 'he'
 
   const [name, setName]   = useState(() => localStorage.getItem(NAME_KEY) ?? '')
@@ -210,10 +210,28 @@ export function OptionsScreen({ difficulty, onDifficultyChange, useRaster, onRas
           />
         </div>
 
+        {/* Statistics */}
+        <div>
+          <SectionLabel>{' '}</SectionLabel>
+          <motion.button
+            whileTap={{ scale: 0.96 }}
+            onClick={onStats}
+            style={{
+              width: '100%', padding: '13px 16px', borderRadius: 12,
+              border: '1.5px solid rgba(251,191,36,0.35)',
+              background: 'rgba(251,191,36,0.08)',
+              color: 'rgba(251,191,36,0.85)',
+              fontWeight: 800, fontSize: 14, cursor: 'pointer',
+              letterSpacing: '0.06em',
+            }}
+          >
+            {t?.statsButton ?? 'Your Numbers'}
+          </motion.button>
+        </div>
+
         {/* View Game Log */}
         {hasLog && (
           <div>
-            <SectionLabel>{' '}</SectionLabel>
             <motion.button
               whileTap={{ scale: 0.96 }}
               onClick={() => setShowLog(true)}

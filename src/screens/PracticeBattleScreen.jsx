@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { motion, useAnimation, AnimatePresence } from 'framer-motion'
 import { makeRound } from '../game/battleLogic'
 import { playCorrect, playWrong, playSwordSwing, playImpact } from '../game/sounds'
 import { KnightCharacter } from '../components/KnightCharacter'
 import { AnswerButton } from '../components/AnswerButton'
 import { BattleBackground } from '../components/BattleBackground'
+import { recordResult } from '../game/statsState'
 
 const TOTAL_QUESTIONS = 20
 const IDLE_BUTTON_STATES = ['idle', 'idle', 'idle', 'idle']
@@ -82,7 +83,7 @@ function ProgressBar({ completed, total }) {
   )
 }
 
-export function PracticeBattleScreen({ selectedNumbers, onPracticeEnd, onQuit, useRaster, lang, t }) {
+export function PracticeBattleScreen({ selectedNumbers, onPracticeEnd, onQuit, useRaster, lang, t, playerName }) {
   const shakeControls = useAnimation()
   const bgControls = useAnimation()
 
@@ -97,6 +98,9 @@ export function PracticeBattleScreen({ selectedNumbers, onPracticeEnd, onQuit, u
   const [flashHitKey, setFlashHitKey] = useState(0)
   const [praiseKey, setPraiseKey] = useState(0)
   const [praiseText, setPraiseText] = useState('')
+
+  // Hidden response timer — records ms from question display to first tap
+  const questionStartTime = useRef(Date.now())
 
   const { problem, options } = round
   const isRtl = lang === 'he'
@@ -113,6 +117,7 @@ export function PracticeBattleScreen({ selectedNumbers, onPracticeEnd, onQuit, u
   const handleAnswer = (selected) => {
     if (phase !== 'idle') return
     const isCorrect = selected === problem.answer
+    const elapsed = Date.now() - questionStartTime.current
 
     setButtonStates(options.map((opt) => {
       if (opt === problem.answer) return 'correct'
@@ -121,6 +126,10 @@ export function PracticeBattleScreen({ selectedNumbers, onPracticeEnd, onQuit, u
     }))
 
     if (isCorrect) {
+      // Record stat on first attempt only (success or failure was already recorded on wrong)
+      if (firstAttempt) {
+        recordResult(playerName, problem.a, problem.b, true, elapsed)
+      }
       playCorrect()
       setPhase('attacking')
       const newScore = firstAttempt ? score + 1 : score
@@ -147,9 +156,14 @@ export function PracticeBattleScreen({ selectedNumbers, onPracticeEnd, onQuit, u
           setRound(makeRound(selectedNumbers, [0, 10], currentProblem))
           setButtonStates(IDLE_BUTTON_STATES)
           setPhase('idle')
+          questionStartTime.current = Date.now()
         }
       }, 225)
     } else {
+      // Record failure on first wrong attempt only
+      if (firstAttempt) {
+        recordResult(playerName, problem.a, problem.b, false, elapsed)
+      }
       playWrong()
       setFirstAttempt(false)
       setPhase('hit')
@@ -248,7 +262,7 @@ export function PracticeBattleScreen({ selectedNumbers, onPracticeEnd, onQuit, u
 
         {/* Problem card */}
         <div className="bg-white/10 border border-white/20 rounded-3xl py-5 px-4 text-center shadow-xl">
-          <p className="text-5xl font-black text-white tracking-wide">
+          <p dir="ltr" className="text-5xl font-black text-white tracking-wide">
             {problem.a} × {problem.b} = ?
           </p>
         </div>

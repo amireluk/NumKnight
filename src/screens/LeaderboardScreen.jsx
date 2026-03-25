@@ -70,7 +70,8 @@ export function LeaderboardScreen({ totalScore, endWorld, cleared, difficulty, p
   }, [])
 
   const [clearConfirm, setClearConfirm] = useState(false)
-  useEffect(() => { setClearConfirm(false) }, [viewIndex])
+  const [clearConfirmReady, setClearConfirmReady] = useState(false)
+  useEffect(() => { setClearConfirm(false); setClearConfirmReady(false) }, [viewIndex])
 
   // Circular navigation — pills animate like the main carousel, both run simultaneously
   const goTo = (next) => {
@@ -121,10 +122,17 @@ export function LeaderboardScreen({ totalScore, endWorld, cleared, difficulty, p
   }, [onBack])
 
   const handleClear = () => {
-    if (!clearConfirm) { setClearConfirm(true); return }
+    if (!clearConfirm) {
+      setClearConfirm(true)
+      setClearConfirmReady(false)
+      setTimeout(() => setClearConfirmReady(true), 1000)
+      return
+    }
+    if (!clearConfirmReady) return
     clearScores(viewDiff)
     setDisplayScores(prev => ({ ...prev, [viewDiff]: [] }))
     setClearConfirm(false)
+    setClearConfirmReady(false)
   }
 
   const cardWidth = containerWidth - 2 * PEEK
@@ -321,18 +329,22 @@ export function LeaderboardScreen({ totalScore, endWorld, cleared, difficulty, p
                 <div style={{ marginTop: 12, display: 'flex', flexDirection: 'column', alignItems: 'stretch', gap: 4 }}>
                   <motion.button
                     onClick={d === viewDiff ? handleClear : undefined}
-                    onBlur={() => setClearConfirm(false)}
+                    onBlur={() => { setClearConfirm(false); setClearConfirmReady(false) }}
                     whileTap={{ scale: 0.97 }}
                     style={{
-                      padding: '5px 14px', borderRadius: 10, cursor: 'pointer',
+                      padding: '5px 14px', borderRadius: 10,
+                      cursor: clearConfirm && d === viewDiff && !clearConfirmReady ? 'default' : 'pointer',
                       fontSize: 11, fontWeight: 900, letterSpacing: '0.06em',
                       border: `1.5px solid ${clearConfirm && d === viewDiff ? 'rgba(239,68,68,0.8)' : 'rgba(255,255,255,0.14)'}`,
                       background: clearConfirm && d === viewDiff ? 'rgba(239,68,68,0.18)' : 'rgba(255,255,255,0.06)',
-                      color: clearConfirm && d === viewDiff ? '#ef4444' : 'rgba(255,255,255,0.30)',
+                      color: clearConfirm && d === viewDiff
+                        ? (clearConfirmReady ? '#ef4444' : 'rgba(239,68,68,0.45)')
+                        : 'rgba(255,255,255,0.30)',
+                      opacity: clearConfirm && d === viewDiff && !clearConfirmReady ? 0.6 : 1,
                       transition: 'all 0.18s',
                     }}
                   >
-                    {clearConfirm && d === viewDiff ? (t?.confirmClear ?? '⚠ YES, ERASE ALL') : (t?.clearBoard ?? 'Clear all scores')}
+                    {clearConfirm && d === viewDiff ? (t?.confirmClear ?? '⚠ YES, ERASE ALL') : (t?.clearBoard ?? 'Clear scores')}
                   </motion.button>
                   {clearConfirm && d === viewDiff && (
                     <motion.p
@@ -340,7 +352,7 @@ export function LeaderboardScreen({ totalScore, endWorld, cleared, difficulty, p
                       animate={{ opacity: 1, y: 0 }}
                       style={{ fontSize: 10, color: '#ef4444', fontWeight: 700, textAlign: 'center' }}
                     >
-                      {t?.clearWarning ?? '⚠ This will permanently erase all scores'}
+                      {t?.clearWarning ?? 'This will permanently delete all your scores and rankings. This cannot be undone.'}
                     </motion.p>
                   )}
                 </div>
