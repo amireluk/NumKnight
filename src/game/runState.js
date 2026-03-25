@@ -10,12 +10,13 @@ export function createNewRun(difficulty = 'medium') {
     trophies: [], // 'gold' | 'silver' | 'bronze', one per completed battle
     totalScore: 0,
     worldScores: [], // numeric score per completed world, indexed by worldIndex
+    started: false, // true once the player has passed the start screen into a run
   }
 }
 
 export function isRunInProgress(run) {
   if (!run) return false
-  return run.trophies?.length > 0 || run.worldIndex > 0 || run.battleIndex > 0
+  return run.started === true
 }
 
 export function loadRun() {

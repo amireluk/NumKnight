@@ -75,7 +75,7 @@ export default function App() {
     const saved = loadRun()
     if (!saved) { clearBattleState(); setScreen('start'); return }
     setDifficulty(saved.difficulty ?? 'medium')
-    setRun(saved)
+    setRun({ ...saved, started: true })
     setWorldScore(saved.currentWorldScore ?? 0)
     const savedWorlds = CONFIGS[saved.difficulty ?? 'medium'] ?? MEDIUM
     const savedWorld = savedWorlds[saved.worldIndex]
@@ -106,7 +106,7 @@ export default function App() {
     clearRun()
     clearBattleState()
     clearLog()
-    const fresh = createNewRun(difficulty)
+    const fresh = { ...createNewRun(difficulty), started: true }
     setRun(fresh)
     saveRun(fresh)
     setBattleKey(0)
