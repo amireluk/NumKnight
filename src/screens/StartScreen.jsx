@@ -2,12 +2,19 @@ import { useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { KingdomBackground, KingdomForeground, StrollingKnight } from '../components/KingdomScenery'
 import { FlyingCreatures } from '../components/FlyingCreatures'
-import { hasSavedRun, hasSavedBattle } from '../game/runState'
+import { loadRun, isRunInProgress } from '../game/runState'
 import { LogoBanner } from '../components/LogoBanner'
+import { EASY, MEDIUM, HARD } from '../game/campaign.config'
+
+const CONFIGS = { easy: EASY, medium: MEDIUM, hard: HARD }
 
 export function StartScreen({ onNewGame, onContinue, onOptions, onViewLeaderboard, onPractice, playerName, difficulty, lang, t }) {
   const isRtl = lang === 'he'
-  const canContinue = hasSavedRun()
+  const run = loadRun()
+  const canContinue = isRunInProgress(run)
+  const worlds = CONFIGS[difficulty] ?? MEDIUM
+  const savedWorldName = run ? (worlds[run.worldIndex]?.name ?? '') : ''
+  const savedDiffLabel = t?.diffLabel?.[difficulty] ?? difficulty
 
   // Android hardware back — no-op on home screen (lets OS handle it)
   useEffect(() => {
@@ -16,8 +23,6 @@ export function StartScreen({ onNewGame, onContinue, onOptions, onViewLeaderboar
     window.addEventListener('popstate', onPop)
     return () => window.removeEventListener('popstate', onPop)
   }, [])
-
-  const savedDiffLabel = t?.diffLabel?.[difficulty] ?? difficulty
 
   return (
     <div
@@ -56,43 +61,31 @@ export function StartScreen({ onNewGame, onContinue, onOptions, onViewLeaderboar
           </p>
         </div>
 
-        {/* CONTINUE — only when there's a run in progress */}
-        {canContinue && (
-          <motion.button
-            whileTap={{ scale: 0.95 }} whileHover={{ scale: 1.03 }}
-            onClick={onContinue}
-            className="w-full bg-yellow-400 border-b-4 border-yellow-600 text-black font-black text-2xl rounded-2xl h-16 shadow-xl cursor-pointer tracking-widest"
-            style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2 }}
-          >
-            <span style={{ lineHeight: 1 }}>{t?.continueRun ?? 'CONTINUE'}</span>
-            {playerName && (
-              <span dir="ltr" style={{ fontSize: 11, fontWeight: 700, opacity: 0.60, letterSpacing: '0.05em', lineHeight: 1 }}>
-                {[playerName, savedDiffLabel].filter(Boolean).join(' · ')}
-              </span>
-            )}
-          </motion.button>
-        )}
+        {/* NEW RUN / CONTINUE RUN — single button */}
+        <motion.button
+          whileTap={{ scale: 0.95 }} whileHover={{ scale: 1.03 }}
+          onClick={canContinue ? onContinue : onNewGame}
+          className="w-full bg-yellow-400 border-b-4 border-yellow-600 text-black font-black text-2xl rounded-2xl h-16 shadow-xl cursor-pointer tracking-widest"
+          style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2 }}
+        >
+          <span style={{ lineHeight: 1 }}>
+            {canContinue ? (t?.continueRun ?? 'CONTINUE RUN') : (t?.newGame ?? 'NEW RUN')}
+          </span>
+          {canContinue && (
+            <span dir="ltr" style={{ fontSize: 11, fontWeight: 700, opacity: 0.60, letterSpacing: '0.05em', lineHeight: 1 }}>
+              {[playerName, savedWorldName, savedDiffLabel].filter(Boolean).join(' · ')}
+            </span>
+          )}
+        </motion.button>
 
-        {/* NEW GAME + PRACTICE — equal width side by side */}
-        <div style={{ display: 'flex', gap: 10 }}>
-          <motion.button
-            whileTap={{ scale: 0.95 }} whileHover={{ scale: 1.03 }}
-            onClick={onNewGame}
-            className="bg-yellow-400 border-b-4 border-yellow-600 text-black font-black text-2xl rounded-2xl h-16 shadow-xl cursor-pointer tracking-widest"
-            style={{ flex: 1 }}
-          >
-            {t?.newGame ?? 'NEW'}
-          </motion.button>
-
-          <motion.button
-            whileTap={{ scale: 0.95 }} whileHover={{ scale: 1.03 }}
-            onClick={onPractice}
-            className="bg-yellow-400 border-b-4 border-yellow-600 text-black font-black text-2xl rounded-2xl h-16 shadow-xl cursor-pointer tracking-widest"
-            style={{ flex: 1 }}
-          >
-            {t?.practice ?? 'PRACTICE'}
-          </motion.button>
-        </div>
+        {/* PRACTICE — full width */}
+        <motion.button
+          whileTap={{ scale: 0.95 }} whileHover={{ scale: 1.03 }}
+          onClick={onPractice}
+          className="w-full bg-yellow-400 border-b-4 border-yellow-600 text-black font-black text-2xl rounded-2xl h-16 shadow-xl cursor-pointer tracking-widest"
+        >
+          {t?.practice ?? 'PRACTICE'}
+        </motion.button>
 
         {/* OPTIONS */}
         <motion.button

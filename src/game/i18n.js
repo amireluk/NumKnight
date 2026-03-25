@@ -65,13 +65,16 @@ export const T = {
     conquered: 'CONQUERED',
     fellAtShort: (name) => `Fell at ${name}`,
     noScores: 'No scores yet — be the first!',
-    clearBoard: 'Clear',
+    clearBoard: 'Clear scores',
     confirmClear: '⚠ YES, ERASE ALL',
-    clearWarning: '! This will permanently erase all scores',
+    clearWarning: 'This will permanently delete all your scores and rankings. This cannot be undone.',
+    clearStats: 'Clear history',
+    confirmClearStats: '⚠ YES, CLEAR HISTORY',
+    clearStatsWarning: 'This will permanently delete your entire practice history and statistics. This cannot be undone.',
     playAgain: 'PLAY AGAIN',
     back: 'BACK',
-    newGame: 'NEW',
-    continueRun: 'CONTINUE',
+    newGame: 'NEW RUN',
+    continueRun: 'CONTINUE RUN',
 
     // World names (by id)
     worldName: {
@@ -105,6 +108,24 @@ export const T = {
     practiceAgain: (nums) => `PRACTICE AGAIN  ${nums.join(', ')}`,
     practiceNewNumbers: 'NEW NUMBERS',
     practiceQuestionLabel: (n, total) => `${n} / ${total}`,
+
+    // StatsScreen
+    statsTitle: 'YOUR NUMBERS',
+    statsSubtitle: (name) => name ? `${name}'s progress` : 'Your progress',
+    statsNotEnoughData: 'Play more',
+    statsMedianTime: (s) => `${s}s`,
+    statsRatingWeak: 'Needs work',
+    statsRatingMid: 'Getting there',
+    statsRatingStrong: 'Strong',
+    statsLegendWeak: 'needs work',
+    statsLegendMid: 'getting there',
+    statsLegendStrong: 'strong',
+    statsButton: 'STATS',
+    statsTapToSee: 'TAP A NUMBER TO SEE HISTORY',
+    statsHistoryTitle: (n, count) => `×${n} — LAST ${count}`,
+    statsHistoryClose: 'tap anywhere to close',
+    statsPlayMoreToSee: 'play more to see statistics',
+    practiceRecommended: 'recommended for you',
 
     // CampfireScreen
     campfireTitle: 'The Dragon Lair Awaits',
@@ -183,13 +204,16 @@ export const T = {
     conquered: 'ניצחון',
     fellAtShort: (name) => `נפל ב${name}`,
     noScores: 'אין שיאים עדיין — היה הראשון!',
-    clearBoard: 'נקה',
+    clearBoard: 'נקה ניקוד',
     confirmClear: '⚠ כן, מחק הכל',
-    clearWarning: '! זה ימחק לצמיתות את כל השיאים',
+    clearWarning: 'פעולה זו תמחק לצמיתות את כל הניקודים והדירוגים שלך. לא ניתן לבטל.',
+    clearStats: 'נקה היסטוריה',
+    confirmClearStats: '⚠ כן, נקה היסטוריה',
+    clearStatsWarning: 'פעולה זו תמחק לצמיתות את כל היסטוריית התרגול והסטטיסטיקות שלך. לא ניתן לבטל.',
     playAgain: 'שחק שוב',
     back: 'חזור',
-    newGame: 'חדש',
-    continueRun: 'המשך',
+    newGame: 'ריצה חדשה',
+    continueRun: 'המשך ריצה',
 
     // World names (by id)
     worldName: {
@@ -223,6 +247,24 @@ export const T = {
     practiceAgain: (nums) => `תרגל שוב  ${nums.join(', ')}`,
     practiceNewNumbers: 'מספרים חדשים',
     practiceQuestionLabel: (n, total) => `${n} / ${total}`,
+
+    // StatsScreen
+    statsTitle: 'המספרים שלך',
+    statsSubtitle: (name) => name ? `ההתקדמות של ${name}` : 'ההתקדמות שלך',
+    statsNotEnoughData: 'שחק עוד',
+    statsMedianTime: (s) => `${s}שנ`,
+    statsRatingWeak: 'צריך תרגול',
+    statsRatingMid: 'בדרך הנכונה',
+    statsRatingStrong: 'חזק',
+    statsLegendWeak: 'צריך תרגול',
+    statsLegendMid: 'בדרך',
+    statsLegendStrong: 'חזק',
+    statsButton: 'סטטיסטיקות',
+    statsTapToSee: 'לחץ על מספר לצפייה בהיסטוריה',
+    statsHistoryTitle: (n, count) => `×${n} — ${count} שאלות אחרונות`,
+    statsHistoryClose: 'לחץ לסגירה',
+    statsPlayMoreToSee: 'שחק עוד כדי לראות סטטיסטיקות',
+    practiceRecommended: 'מומלץ עבורך',
 
     // CampfireScreen
     campfireTitle: 'מאורת הדרקון מחכה',
