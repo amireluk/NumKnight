@@ -62,7 +62,7 @@ export function PracticePickerScreen({ onStart, onBack, difficulty, playerName, 
         justifyContent: 'flex-start',
       }}
     >
-      <FlyingCreatures difficulty={difficulty} />
+      <FlyingCreatures difficulty={difficulty} useRaster={useRaster} />
       {useRaster ? (
         <img
           src={`${import.meta.env.BASE_URL}assets/backgrounds/title.webp`}
@@ -77,7 +77,7 @@ export function PracticePickerScreen({ onStart, onBack, difficulty, playerName, 
           <KingdomForeground difficulty={difficulty} />
         </>
       )}
-      <StrollingKnight />
+      <StrollingKnight useRaster={useRaster} />
 
       {/* Back button */}
       <button

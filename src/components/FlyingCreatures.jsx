@@ -52,7 +52,7 @@ const CONFIG = {
 
 // ── Component ─────────────────────────────────────────────────────────────────
 
-export function FlyingCreatures({ difficulty = 'easy' }) {
+export function FlyingCreatures({ difficulty = 'easy', useRaster = false }) {
   const cfg = CONFIG[difficulty] ?? CONFIG.easy
 
   // Regenerate layout when difficulty changes — key change will remount + restart animations
@@ -62,7 +62,7 @@ export function FlyingCreatures({ difficulty = 'easy' }) {
       topPct: 63 + (i / cfg.count) * 14 + (Math.random() - 0.5) * 4,
       duration: (10 + Math.random() * 8) / cfg.speedMult,
       delay: -(i / cfg.count) * (12 / cfg.speedMult), // negative delay = already in-flight on mount
-      scale: 0.65 + Math.random() * 0.55,
+      scale: (0.65 + Math.random() * 0.55) * (useRaster ? 0.55 : 1),
       yAmp: 8 + Math.random() * 14,
       yPeriod: 2.2 + Math.random() * 1.8,
       opacity: cfg.type === 'bird' ? 0.55 + Math.random() * 0.3 : 1,

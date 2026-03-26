@@ -42,7 +42,7 @@ export function StartScreen({ onNewGame, onContinue, onOptions, onViewLeaderboar
       }}
     >
       {/* ── Persistent background — never remounts ── */}
-      <FlyingCreatures difficulty={difficulty} />
+      <FlyingCreatures difficulty={difficulty} useRaster={useRaster} />
       {useRaster ? (
         <img
           src={`${import.meta.env.BASE_URL}assets/backgrounds/title.webp`}
@@ -57,7 +57,7 @@ export function StartScreen({ onNewGame, onContinue, onOptions, onViewLeaderboar
           <KingdomForeground difficulty={difficulty} />
         </>
       )}
-      <StrollingKnight />
+      <StrollingKnight useRaster={useRaster} />
 
       {/* ── UI panel ── */}
       <motion.div

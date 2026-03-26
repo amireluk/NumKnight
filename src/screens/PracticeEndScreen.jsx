@@ -19,7 +19,7 @@ export function PracticeEndScreen({ score, selectedNumbers, onPracticeAgain, onC
         paddingBottom: 210,
       }}
     >
-      <FlyingCreatures difficulty={difficulty} />
+      <FlyingCreatures difficulty={difficulty} useRaster={useRaster} />
       {useRaster ? (
         <img
           src={`${import.meta.env.BASE_URL}assets/backgrounds/title.webp`}
@@ -34,7 +34,7 @@ export function PracticeEndScreen({ score, selectedNumbers, onPracticeAgain, onC
           <KingdomForeground difficulty={difficulty} />
         </>
       )}
-      <StrollingKnight />
+      <StrollingKnight useRaster={useRaster} />
 
       <motion.div
         initial={{ opacity: 0, y: 20 }}

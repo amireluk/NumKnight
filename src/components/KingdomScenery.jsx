@@ -25,7 +25,7 @@ function groundBottom(screenX, containerW) {
   return (230 - vy) * scale
 }
 
-export function StrollingKnight() {
+export function StrollingKnight({ useRaster = false }) {
   const wrapRef   = useRef(null)
   const motionX   = useMotionValue(20)
   const cancelled = useRef(false)
@@ -70,7 +70,7 @@ export function StrollingKnight() {
         opacity: visible ? 1 : 0,
       }}>
         <div style={{
-          transform: `scale(0.3) scaleX(${facingRight ? 1 : -1})`,
+          transform: `scale(${useRaster ? 0.38 : 0.3}) scaleX(${facingRight ? 1 : -1})`,
           transformOrigin: 'center bottom',
           display: 'inline-block',
           filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.5))',
