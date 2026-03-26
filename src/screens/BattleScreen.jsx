@@ -99,7 +99,8 @@ function ShieldUpBanner({ t }) {
 }
 
 // In-scene overlay shown when the enemy is defeated
-function TrophyOverlay({ trophy, timeBonus, scoreBonus = 0, onContinue, t }) {
+function TrophyOverlay({ trophy, timeBonus, scoreBonus = 0, onContinue, lang, t }) {
+  const isRtl = lang === 'he'
   const TROPHY_LABEL = t?.trophyLabel ?? TROPHY_LABEL_DEFAULT
   const BASE_SCORE = { gold: 100, silver: 50, bronze: 25 }
   const baseScore = BASE_SCORE[trophy] ?? 0
@@ -141,6 +142,7 @@ function TrophyOverlay({ trophy, timeBonus, scoreBonus = 0, onContinue, t }) {
         initial={{ opacity: 0, y: 14 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.35 }}
+        dir={isRtl ? 'rtl' : 'ltr'}
         style={{
           fontSize: 30, fontWeight: 900, letterSpacing: '0.18em',
           color: TROPHY_COLOR[trophy],
@@ -828,10 +830,10 @@ export function BattleScreen({ world, worldIndex, battleIndex, onBattleEnd, onQu
           <p className="text-5xl font-black text-white tracking-wide">
             {problem.a} × {problem.b} = ?
           </p>
-          {world.timer && !introPlaying && timeLeft !== null && timeLeft >= 0 && (
+          {world.timer && !introPlaying && timeLeft !== null && (
             <div className="mt-4 px-2">
-              <TimerBar timeLeft={timeLeft} maxTime={world.timer} />
-              <p className="text-xs text-white/50 mt-1 text-right tabular-nums">{timeLeft}s</p>
+              <TimerBar timeLeft={Math.max(0, timeLeft)} maxTime={world.timer} />
+              {timeLeft >= 0 && <p className="text-xs text-white/50 mt-1 text-right tabular-nums">{timeLeft}s</p>}
             </div>
           )}
         </motion.div>
@@ -887,7 +889,7 @@ export function BattleScreen({ world, worldIndex, battleIndex, onBattleEnd, onQu
           timeBonus={wonTimeBonusRef.current}
           scoreBonus={scoreBonus}
           onContinue={() => onBattleEnd({ won: true, mistakes: wonMistakesRef.current, timeBonus: wonTimeBonusRef.current })}
-          t={t}
+          lang={lang} t={t}
         />
       )}
     </motion.div>
