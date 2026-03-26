@@ -352,9 +352,11 @@ export function AreaClearedScreen({ world, worldTrophies, worldScore, totalScore
     <div
       dir={isRtl ? 'rtl' : 'ltr'}
       className="flex flex-col items-center h-dvh max-w-md mx-auto px-4 py-5 gap-4"
+      onClick={showContinue ? onContinue : undefined}
       style={{
         position: 'relative',
         overflow: 'hidden',
+        cursor: showContinue ? 'pointer' : 'default',
         background:
           'radial-gradient(ellipse at 50% 38%, rgba(251,191,36,0.11) 0%, transparent 65%), ' +
           'linear-gradient(to bottom, #1e3a70, #2d5aaa)',
@@ -454,21 +456,16 @@ export function AreaClearedScreen({ world, worldTrophies, worldScore, totalScore
         </div>
       </motion.div>
 
-      {/* 4. Continue */}
-      {showContinue ? (
-        <motion.button
-          initial={{ opacity: 0, y: 22 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ type: 'spring', stiffness: 210, damping: 18 }}
-          whileTap={{ scale: 0.95 }}
-          whileHover={{ scale: 1.04 }}
-          onClick={onContinue}
-          className="w-full bg-yellow-400 border-b-4 border-yellow-600 text-black font-black text-xl rounded-2xl h-16 shadow-xl cursor-pointer tracking-widest"
+      {/* 4. Tap anywhere hint */}
+      {showContinue && (
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: [0, 0.5, 0.5, 0] }}
+          transition={{ duration: 2.4, repeat: Infinity, times: [0, 0.2, 0.8, 1] }}
+          style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.45)', letterSpacing: '0.12em', textAlign: 'center' }}
         >
-          {t?.continueCta ?? 'CONTINUE'}
-        </motion.button>
-      ) : (
-        <div style={{ height: 64 }} />
+          {t?.tapToContinue ?? 'TAP TO CONTINUE'}
+        </motion.p>
       )}
     </div>
     </div>

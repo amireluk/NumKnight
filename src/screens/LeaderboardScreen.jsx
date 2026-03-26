@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { saveScore, loadScores, clearScores } from '../game/scoreState'
+import { saveScore, loadScores } from '../game/scoreState'
 
 const DIFF_COLOR = { easy: '#4ade80', medium: '#fbbf24', hard: '#ef4444' }
 const DIFF_LABEL_DEFAULT = { easy: 'Easy', medium: 'Medium', hard: 'Hard' }
@@ -38,8 +38,6 @@ export function LeaderboardScreen({ totalScore, endWorld, cleared, difficulty, p
   })
 
   const [displayScores, setDisplayScores] = useState(scores)
-  const [clearConfirm, setClearConfirm] = useState(false)
-  const [clearConfirmReady, setClearConfirmReady] = useState(false)
 
   useEffect(() => {
     window.history.pushState(null, '', window.location.href)
@@ -47,20 +45,6 @@ export function LeaderboardScreen({ totalScore, endWorld, cleared, difficulty, p
     window.addEventListener('popstate', onPop)
     return () => window.removeEventListener('popstate', onPop)
   }, [onBack])
-
-  const handleClear = () => {
-    if (!clearConfirm) {
-      setClearConfirm(true)
-      setClearConfirmReady(false)
-      setTimeout(() => setClearConfirmReady(true), 1000)
-      return
-    }
-    if (!clearConfirmReady) return
-    clearScores()
-    setDisplayScores([])
-    setClearConfirm(false)
-    setClearConfirmReady(false)
-  }
 
   return (
     <div
@@ -179,36 +163,6 @@ export function LeaderboardScreen({ totalScore, endWorld, cleared, difficulty, p
           })
         )}
 
-        {/* Clear button */}
-        <div style={{ marginTop: 8, display: 'flex', flexDirection: 'column', alignItems: 'stretch', gap: 4 }}>
-          <motion.button
-            onClick={handleClear}
-            onBlur={() => { setClearConfirm(false); setClearConfirmReady(false) }}
-            whileTap={{ scale: 0.97 }}
-            style={{
-              padding: '5px 14px', borderRadius: 10,
-              cursor: clearConfirm && !clearConfirmReady ? 'default' : 'pointer',
-              fontSize: 11, fontWeight: 900, letterSpacing: '0.06em',
-              border: 'none',
-              borderBottom: `4px solid ${clearConfirm ? '#b91c1c' : '#ca8a04'}`,
-              background: clearConfirm ? '#ef4444' : '#facc15',
-              color: clearConfirm ? (clearConfirmReady ? '#fff' : 'rgba(255,255,255,0.5)') : '#000',
-              opacity: clearConfirm && !clearConfirmReady ? 0.6 : 1,
-              transition: 'all 0.18s',
-            }}
-          >
-            {clearConfirm ? (t?.confirmClear ?? '⚠ YES, ERASE ALL') : (t?.clearBoard ?? 'Clear scores')}
-          </motion.button>
-          {clearConfirm && (
-            <motion.p
-              initial={{ opacity: 0, y: -4 }}
-              animate={{ opacity: 1, y: 0 }}
-              style={{ fontSize: 10, color: '#ef4444', fontWeight: 700, textAlign: 'center' }}
-            >
-              {t?.clearWarning ?? 'This will permanently delete all your scores and rankings. This cannot be undone.'}
-            </motion.p>
-          )}
-        </div>
       </div>
 
       {/* Back button */}

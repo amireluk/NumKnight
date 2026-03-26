@@ -224,7 +224,7 @@ export function PracticeBattleScreen({ selectedNumbers, onPracticeEnd, onQuit, u
               padding: '4px 14px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1,
             }}>
               <span style={{ fontSize: 9, fontWeight: 900, letterSpacing: '0.18em', color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase' }}>
-                {t?.practice ?? 'PRACTICE'}
+                {t?.practiceLabel ?? 'PRACTICE'}
               </span>
               <span style={{ fontSize: 15, fontWeight: 900, letterSpacing: '0.12em', color: '#fbbf24', textShadow: '0 1px 4px rgba(0,0,0,0.8)' }}>
                 {numbersLabel}

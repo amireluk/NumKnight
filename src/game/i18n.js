@@ -100,6 +100,7 @@ export const T = {
 
     // Practice mode
     practice: 'START PRACTICE',
+    practiceLabel: 'PRACTICE',
     practicePickerTitle: 'Choose Numbers to Practice',
     practicePickerSubtitle: 'Select up to 4',
     practiceStartBtn: 'START PRACTICE',
@@ -160,9 +161,9 @@ export const T = {
 
     // BattleScreen
     roundLabel: (n, total) => `סיבוב ${n}/${total}`,
-    trophyLabel: { gold: 'מושלם!', silver: 'כל הכבוד!', bronze: 'שרדת!' },
+    trophyLabel: { gold: 'מושלם\u200F!', silver: 'כל הכבוד\u200F!', bronze: 'שרדת\u200F!' },
     pts: 'נק׳',
-    ptsLabel: (n) => `${n} נק׳`,
+    ptsLabel: (n) => `\u200F${n} נק׳`,
     timeBonusLabel: (n) => `בונוס זמן ${n}`,
     timeBonus: 'בונוס זמן',
     chronicleBonusLabel: (n) => `📜 +${n} בונוס ברכה`,
@@ -239,6 +240,7 @@ export const T = {
 
     // Practice mode
     practice: 'התחל תרגול',
+    practiceLabel: 'תרגול',
     practicePickerTitle: 'בחר מספרים לתרגול',
     practicePickerSubtitle: 'בחר עד 4 מספרים',
     practiceStartBtn: 'התחל תרגול',
