@@ -450,7 +450,7 @@ export function BattleScreen({ world, worldIndex, battleIndex, onBattleEnd, onQu
     const id = setInterval(() => {
       if (!timerActiveRef.current) { clearInterval(id); return }
       setTimeLeft((t) => {
-        if (t <= 1) { clearInterval(id); setTimeout(() => setTimedOut(true), 1000); return -1 }
+        if (t <= 1) { clearInterval(id); setTimeout(() => setTimedOut(true), 1000); return 0 }
         const next = t - 1
         if (next <= 5) playTimerTick()
         return next
@@ -832,8 +832,8 @@ export function BattleScreen({ world, worldIndex, battleIndex, onBattleEnd, onQu
           </p>
           {world.timer && !introPlaying && timeLeft !== null && (
             <div className="mt-4 px-2">
-              <TimerBar timeLeft={Math.max(0, timeLeft)} maxTime={world.timer} />
-              {timeLeft >= 0 && <p className="text-xs text-white/50 mt-1 text-right tabular-nums">{timeLeft}s</p>}
+              <TimerBar timeLeft={timeLeft} maxTime={world.timer} />
+              <p className="text-xs text-white/50 mt-1 text-right tabular-nums">{timeLeft}s</p>
             </div>
           )}
         </motion.div>
