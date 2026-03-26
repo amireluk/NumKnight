@@ -150,13 +150,13 @@ export const T = {
     questions: 'שאלות',
 
     // WorldMapScreen
-    fight: 'קדימה\u200F!',
+    fight: '!קדימה',
     tapToFight: '⚔ לחץ להילחם',
 
     // BattleIntro
     round: 'סיבוב',
     finalRound: 'סיבוב אחרון',
-    go: 'קדימה\u200F!',
+    go: '!קדימה',
 
     // BattleScreen
     roundLabel: (n, total) => `סיבוב ${n}/${total}`,
@@ -213,7 +213,7 @@ export const T = {
     playAgain: 'שחק שוב',
     back: 'חזור',
     newGame: 'התחל משחק',
-    continueRun: 'המשך ריצה',
+    continueRun: 'המשך משחק',
 
     // World names (by id)
     worldName: {
