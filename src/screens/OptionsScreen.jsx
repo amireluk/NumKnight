@@ -137,7 +137,7 @@ export function OptionsScreen({ difficulty, onDifficultyChange, useRaster, onRas
               dir={isRtl ? 'rtl' : 'ltr'}
               value={name}
               onChange={(e) => handleNameChange(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && nameUnsaved && handleNameSave()}
+              onKeyDown={(e) => { if (e.key === 'Enter') { if (nameUnsaved) handleNameSave(); e.target.blur() } }}
               placeholder={t?.namePlaceholder ?? 'Enter your name...'}
               maxLength={16}
               style={{

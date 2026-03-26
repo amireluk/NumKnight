@@ -166,14 +166,43 @@ Hard: tighter timers (Castle 6s, Dragon Lair 4s), Dragon Lair playerHP:2.
 
 ## Architecture
 
-### Run state (localStorage key: `numknight_run`)
+### State management — three independent stores
+
+| Store | Key | Scope | Cleared by |
+|-------|-----|-------|-----------|
+| Game state | `numknight_run` | Single global slot | Name change, difficulty change, death, victory |
+| Hall of Fame | `numknight_scores_<difficulty>` | Per difficulty, top 10 by score | Manual "Clear scores" in leaderboard only |
+| Statistics | `numknight_stats` | Per player name, up to 5 names | Manual "Clear history" in stats screen only |
+
+#### Game state (`numknight_run`)
+- **Single slot** — no per-player or per-difficulty variants
+- `started: false` on fresh/restarted runs; `started: true` once the player enters the map
+- Auto-save effect only writes to localStorage when `run.started === true` — prevents stale state persisting after restart
+- Cleared on: name change, difficulty change, death+leaderboard, victory+leaderboard
+
+#### Hall of Fame (`numknight_scores_<difficulty>`)
+- One key per difficulty; capped at 10 entries; lowest score dropped when full
+- Never touched by name/difficulty changes or game-state resets
+
+#### Statistics (`numknight_stats`)
+- Keyed by exact player name (case-sensitive); up to 5 names stored
+- Switches automatically when `playerName` prop changes — new name shows its own history (empty if first time)
+- Returning to a previous name restores full history
+- `lastUsed` timestamp updated only when a result is **recorded** (i.e. the player plays), not on view
+- Eviction: when a 6th name would be added, the name with the oldest `lastUsed` is removed
+- Never cleared automatically — only by explicit "Clear history" button in the Stats screen
+
+### Run state shape
 ```js
 {
+  _v,            // version — bumped when shape changes to discard old saves
+  difficulty,
   worldIndex,
   battleIndex,
   trophies[],      // 'gold'|'silver'|'bronze' — one per completed battle
   totalScore,      // cumulative score across all battles
   worldScores[],   // score per world (indexed by worldIndex)
+  started,         // false = fresh/restarted, true = player has entered the map
 }
 ```
 - Victory when `trophies.length >= sum of all worlds' battles`
