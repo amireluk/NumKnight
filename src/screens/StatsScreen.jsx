@@ -3,6 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { KingdomBackground, KingdomForeground, StrollingKnight } from '../components/KingdomScenery'
 import { FlyingCreatures } from '../components/FlyingCreatures'
 import { loadPlayerStats, computeNumberRating, clearPlayerStats } from '../game/statsState'
+import { getLog } from '../game/runLog'
+import { RunLogViewer } from '../components/RunLogViewer'
 
 const BAND_COLOR = {
   strong: '#4ade80',
@@ -167,6 +169,8 @@ export function StatsScreen({ onBack, playerName, difficulty, lang, t }) {
   const [confirmClear, setConfirmClear] = useState(false)
   const [confirmReady, setConfirmReady] = useState(false)
   const [statsVersion, setStatsVersion] = useState(0)
+  const [showLog, setShowLog] = useState(false)
+  const hasLog = getLog().length > 0
 
   // Android back button — close overlay first, then navigate back
   useEffect(() => {
@@ -268,7 +272,7 @@ export function StatsScreen({ onBack, playerName, difficulty, lang, t }) {
           {(['strong', 'mid', 'weak']).map((band) => (
             <span key={band} style={{
               display: 'flex', alignItems: 'center', gap: 4,
-              flexDirection: isRtl ? 'row-reverse' : 'row',
+              flexDirection: 'row',
               fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.5)',
             }}>
               <span style={{ width: 8, height: 8, borderRadius: '50%', background: BAND_COLOR[band], display: 'inline-block', flexShrink: 0 }} />
@@ -281,6 +285,23 @@ export function StatsScreen({ onBack, playerName, difficulty, lang, t }) {
           ))}
         </div>
 
+        {/* View log button */}
+        {hasLog && (
+          <motion.button
+            whileTap={{ scale: 0.96 }}
+            onClick={() => setShowLog(true)}
+            style={{
+              padding: '8px 20px', borderRadius: 10,
+              border: 'none', borderBottom: '4px solid #ca8a04',
+              background: '#facc15', color: '#000',
+              fontWeight: 900, fontSize: 11, cursor: 'pointer',
+              letterSpacing: '0.08em',
+            }}
+          >
+            {t?.optionsViewLog ?? 'VIEW GAME LOG'}
+          </motion.button>
+        )}
+
         {/* Clear stats button */}
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
           <motion.button
@@ -288,19 +309,18 @@ export function StatsScreen({ onBack, playerName, difficulty, lang, t }) {
             onClick={handleClear}
             onBlur={() => { setConfirmClear(false); setConfirmReady(false) }}
             style={{
-              background: confirmClear ? 'rgba(248,113,113,0.25)' : 'rgba(0,0,0,0.25)',
-              border: `1.5px solid ${confirmClear ? 'rgba(248,113,113,0.7)' : 'rgba(255,255,255,0.15)'}`,
+              border: 'none',
+              borderBottom: `4px solid ${confirmClear ? '#b91c1c' : '#ca8a04'}`,
+              background: confirmClear ? '#ef4444' : '#facc15',
               borderRadius: 10, padding: '6px 18px',
               fontSize: 11, fontWeight: 900, letterSpacing: '0.1em',
-              color: confirmClear
-                ? (confirmReady ? '#f87171' : 'rgba(248,113,113,0.45)')
-                : 'rgba(255,255,255,0.35)',
+              color: confirmClear ? (confirmReady ? '#fff' : 'rgba(255,255,255,0.5)') : '#000',
               cursor: confirmClear && !confirmReady ? 'default' : 'pointer',
               transition: 'all 0.2s',
               opacity: confirmClear && !confirmReady ? 0.6 : 1,
             }}
           >
-            {confirmClear ? (t?.confirmClearStats ?? '⚠ YES, CLEAR HISTORY') : (t?.clearStats ?? 'Clear history')}
+            {confirmClear ? (t?.confirmClearStats ?? '⚠ YES, CLEAR HISTORY') : (t?.clearStats ?? 'CLEAR HISTORY')}
           </motion.button>
           {confirmClear && (
             <motion.p
@@ -326,6 +346,7 @@ export function StatsScreen({ onBack, playerName, difficulty, lang, t }) {
             onClose={() => setSelectedNumber(null)}
           />
         )}
+        {showLog && <RunLogViewer onClose={() => setShowLog(false)} />}
       </AnimatePresence>
     </div>
   )

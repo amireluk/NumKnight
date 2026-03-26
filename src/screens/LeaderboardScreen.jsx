@@ -335,11 +335,12 @@ export function LeaderboardScreen({ totalScore, endWorld, cleared, difficulty, p
                       padding: '5px 14px', borderRadius: 10,
                       cursor: clearConfirm && d === viewDiff && !clearConfirmReady ? 'default' : 'pointer',
                       fontSize: 11, fontWeight: 900, letterSpacing: '0.06em',
-                      border: `1.5px solid ${clearConfirm && d === viewDiff ? 'rgba(239,68,68,0.8)' : 'rgba(255,255,255,0.14)'}`,
-                      background: clearConfirm && d === viewDiff ? 'rgba(239,68,68,0.18)' : 'rgba(255,255,255,0.06)',
+                      border: 'none',
+                      borderBottom: `4px solid ${clearConfirm && d === viewDiff ? '#b91c1c' : '#ca8a04'}`,
+                      background: clearConfirm && d === viewDiff ? '#ef4444' : '#facc15',
                       color: clearConfirm && d === viewDiff
-                        ? (clearConfirmReady ? '#ef4444' : 'rgba(239,68,68,0.45)')
-                        : 'rgba(255,255,255,0.30)',
+                        ? (clearConfirmReady ? '#fff' : 'rgba(255,255,255,0.5)')
+                        : '#000',
                       opacity: clearConfirm && d === viewDiff && !clearConfirmReady ? 0.6 : 1,
                       transition: 'all 0.18s',
                     }}

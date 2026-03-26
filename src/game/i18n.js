@@ -73,7 +73,7 @@ export const T = {
     clearStatsWarning: 'This will permanently delete your entire practice history and statistics. This cannot be undone.',
     playAgain: 'PLAY AGAIN',
     back: 'BACK',
-    newGame: 'NEW RUN',
+    newGame: 'START GAME',
     continueRun: 'CONTINUE RUN',
 
     // World names (by id)
@@ -99,7 +99,7 @@ export const T = {
     optionsViewLog: 'View Game Log',
 
     // Practice mode
-    practice: 'PRACTICE',
+    practice: 'START PRACTICE',
     practicePickerTitle: 'Choose Numbers to Practice',
     practicePickerSubtitle: 'Select up to 4',
     practiceStartBtn: 'START PRACTICE',
@@ -212,7 +212,7 @@ export const T = {
     clearStatsWarning: 'פעולה זו תמחק לצמיתות את כל היסטוריית התרגול והסטטיסטיקות שלך. לא ניתן לבטל.',
     playAgain: 'שחק שוב',
     back: 'חזור',
-    newGame: 'ריצה חדשה',
+    newGame: 'התחל משחק',
     continueRun: 'המשך ריצה',
 
     // World names (by id)
@@ -238,7 +238,7 @@ export const T = {
     optionsViewLog: 'יומן המשחק',
 
     // Practice mode
-    practice: 'תרגול',
+    practice: 'התחל תרגול',
     practicePickerTitle: 'בחר מספרים לתרגול',
     practicePickerSubtitle: 'בחר עד 4 מספרים',
     practiceStartBtn: 'התחל תרגול',

@@ -218,14 +218,15 @@ export function OptionsScreen({ difficulty, onDifficultyChange, useRaster, onRas
             onClick={onStats}
             style={{
               width: '100%', padding: '13px 16px', borderRadius: 12,
-              border: '1.5px solid rgba(251,191,36,0.35)',
-              background: 'rgba(251,191,36,0.08)',
-              color: 'rgba(251,191,36,0.85)',
-              fontWeight: 800, fontSize: 14, cursor: 'pointer',
+              border: '4px solid #ca8a04',
+              borderTop: 'none', borderLeft: 'none', borderRight: 'none',
+              background: '#facc15',
+              color: '#000',
+              fontWeight: 900, fontSize: 14, cursor: 'pointer',
               letterSpacing: '0.06em',
             }}
           >
-            {t?.statsButton ?? 'Your Numbers'}
+            {t?.statsButton ?? 'YOUR NUMBERS'}
           </motion.button>
         </div>
 

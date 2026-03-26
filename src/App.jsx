@@ -15,7 +15,7 @@ import { PracticeBattleScreen } from './screens/PracticeBattleScreen'
 import { PracticeEndScreen } from './screens/PracticeEndScreen'
 import { StatsScreen } from './screens/StatsScreen'
 import { EASY, MEDIUM, HARD, DEV } from './game/campaign.config'
-import { createNewRun, loadRun, saveRun, clearRun, isRunInProgress, clearBattleState } from './game/runState'
+import { createNewRun, loadRun, saveRun, clearRun, clearBattleState } from './game/runState'
 import { getTrophy, calcBattleScore } from './game/battleLogic'
 import { LANG_KEY, T } from './game/i18n'
 import { clearLog } from './game/runLog'
@@ -29,7 +29,12 @@ export default function App() {
   const [lang, setLang] = useState(() => localStorage.getItem(LANG_KEY) ?? 'he')
 
   const handleLangChange = (l) => { setLang(l); localStorage.setItem(LANG_KEY, l) }
-  const handleDifficultyChange = (d) => { setDifficulty(d); localStorage.setItem('numknight_difficulty', d) }
+  const handleDifficultyChange = (d) => {
+    setDifficulty(d)
+    localStorage.setItem('numknight_difficulty', d)
+    clearRun()
+    setRun(createNewRun(d))
+  }
   const t = T[lang] ?? T.en
 
   const worlds = IS_DEV_MODE ? DEV : (CONFIGS[difficulty] ?? MEDIUM)
@@ -69,7 +74,7 @@ export default function App() {
     return world
   })()
 
-  useEffect(() => { saveRun({ ...run, currentWorldScore: worldScore }) }, [run, worldScore])
+  useEffect(() => { if (run?.started) saveRun({ ...run, currentWorldScore: worldScore }) }, [run, worldScore])
 
   const handleContinue = () => {
     const saved = loadRun()
@@ -213,7 +218,6 @@ export default function App() {
     clearBattleState()
     const fresh = createNewRun()
     setRun(fresh)
-    saveRun(fresh)
     setClearedData(null)
     setMapIsTransition(false)
     setWorldScore(0)
@@ -286,8 +290,12 @@ export default function App() {
             lang={lang}
             onLangChange={handleLangChange}
             onBack={() => {
-              // Sync name from localStorage in case it was set in Options
-              setPlayerName(localStorage.getItem('numknight_player_name') ?? '')
+              const newName = localStorage.getItem('numknight_player_name') ?? ''
+              if (newName !== playerName) {
+                clearRun()
+                setRun(createNewRun(difficulty))
+              }
+              setPlayerName(newName)
               setScreen('start')
             }}
             onStats={() => setScreen('stats')}

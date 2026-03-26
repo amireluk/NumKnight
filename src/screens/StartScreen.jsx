@@ -65,7 +65,7 @@ export function StartScreen({ onNewGame, onContinue, onOptions, onViewLeaderboar
         <motion.button
           whileTap={{ scale: 0.95 }} whileHover={{ scale: 1.03 }}
           onClick={canContinue ? onContinue : onNewGame}
-          className="w-full bg-yellow-400 border-b-4 border-yellow-600 text-black font-black text-2xl rounded-2xl h-16 shadow-xl cursor-pointer tracking-widest"
+          className="w-full bg-yellow-400 border-b-4 border-yellow-600 text-black font-black text-xl rounded-2xl h-14 shadow-xl cursor-pointer tracking-widest"
           style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2 }}
         >
           <span style={{ lineHeight: 1 }}>
@@ -82,9 +82,9 @@ export function StartScreen({ onNewGame, onContinue, onOptions, onViewLeaderboar
         <motion.button
           whileTap={{ scale: 0.95 }} whileHover={{ scale: 1.03 }}
           onClick={onPractice}
-          className="w-full bg-yellow-400 border-b-4 border-yellow-600 text-black font-black text-2xl rounded-2xl h-16 shadow-xl cursor-pointer tracking-widest"
+          className="w-full bg-yellow-400 border-b-4 border-yellow-600 text-black font-black text-xl rounded-2xl h-14 shadow-xl cursor-pointer tracking-widest"
         >
-          {t?.practice ?? 'PRACTICE'}
+          {t?.practice ?? 'START PRACTICE'}
         </motion.button>
 
         {/* OPTIONS */}
