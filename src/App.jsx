@@ -298,7 +298,10 @@ export default function App() {
               setPlayerName(newName)
               setScreen('start')
             }}
-            onStats={() => setScreen('stats')}
+            onStats={() => {
+              setPlayerName(localStorage.getItem('numknight_player_name') ?? '')
+              setScreen('stats')
+            }}
             t={t}
           />
         </motion.div>
@@ -444,7 +447,7 @@ export default function App() {
           transition={{ duration: 0.25 }} className="w-full"
         >
           <StatsScreen
-            onBack={() => setScreen('start')}
+            onBack={() => setScreen('options')}
             playerName={playerName}
             difficulty={difficulty}
             lang={lang} t={t}
