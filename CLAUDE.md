@@ -313,9 +313,9 @@ start → practice-picker → practice-battle → practice-end
 
 ## UI design rules (established)
 
-- **All screen buttons** are solid yellow (`bg-yellow-400 border-b-4 border-yellow-600 text-black`) — no translucent/ghost buttons in the main UI
+- **All screen buttons** are solid yellow (`bg-yellow-400 border-b-4 border-yellow-600 text-black`) — no translucent/ghost buttons anywhere in the main UI. Disabled states use reduced opacity on the same solid style, never a ghost/outline style.
 - **Selected state** (toggles, number grid): solid yellow fill + dark text + bottom shadow — same weight as action buttons. Unselected: dark semi-transparent (`rgba(0,0,0,0.35)`) + white border.
-- **Hebrew exclamation marks**: always placed at the **end** of the string (`מעולה!` not `!מעולה`)
+- **Hebrew exclamation marks**: always placed at the **end** of the string (`מעולה!` not `!מעולה`), and use `\u200F` (RTL mark) before `!` to prevent bidi rendering from flipping it in neutral contexts (e.g. `'קדימה\u200F!'`)
 - **Global `user-select: none`** on all `button` and `a` elements (prevents Android long-press text selection)
 - **Screens with kingdom scenery** (title, options, practice picker, practice end): `KingdomBackground` + `StrollingKnight` + `KingdomForeground` + `FlyingCreatures`, content at `zIndex: 4` to clear foreground (z=3)
 

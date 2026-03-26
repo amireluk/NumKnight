@@ -150,17 +150,17 @@ export const T = {
     questions: 'שאלות',
 
     // WorldMapScreen
-    fight: 'קדימה!',
+    fight: 'קדימה\u200F!',
     tapToFight: '⚔ לחץ להילחם',
 
     // BattleIntro
     round: 'סיבוב',
     finalRound: 'סיבוב אחרון',
-    go: 'קדימה!',
+    go: 'קדימה\u200F!',
 
     // BattleScreen
     roundLabel: (n, total) => `סיבוב ${n}/${total}`,
-    trophyLabel: { gold: 'מושלם!', silver: 'כל הכבוד!', bronze: 'שרדת!' },
+    trophyLabel: { gold: 'מושלם\u200F!', silver: 'כל הכבוד\u200F!', bronze: 'שרדת\u200F!' },
     pts: 'נק׳',
     ptsLabel: (n) => `נק׳ ${n}`,
     timeBonusLabel: (n) => `בונוס זמן ${n}`,
@@ -170,10 +170,10 @@ export const T = {
 
     // Boss mechanic
     bossShieldUp: 'המגן פעיל',
-    bossShieldCrack: 'המגן נסדק!',
-    bossShieldCrackHint: 'עוד אחד!',
-    bossShieldShatter: 'המגן התנפץ!',
-    bossShieldShatterHint: 'מכה!',
+    bossShieldCrack: 'המגן נסדק\u200F!',
+    bossShieldCrackHint: 'עוד אחד\u200F!',
+    bossShieldShatter: 'המגן התנפץ\u200F!',
+    bossShieldShatterHint: 'מכה\u200F!',
 
     // AreaClearedScreen
     areaCleared: 'האזור נוקה',
@@ -203,7 +203,7 @@ export const T = {
     yourScore: 'הניקוד שלך',
     conquered: 'ניצחון',
     fellAtShort: (name) => `נפל ב${name}`,
-    noScores: 'אין שיאים עדיין — היה הראשון!',
+    noScores: 'אין שיאים עדיין — היה הראשון\u200F!',
     clearBoard: 'נקה ניקוד',
     confirmClear: '⚠ כן, מחק הכל',
     clearWarning: 'פעולה זו תמחק לצמיתות את כל הניקודים והדירוגים שלך. לא ניתן לבטל.',
@@ -242,8 +242,8 @@ export const T = {
     practicePickerTitle: 'בחר מספרים לתרגול',
     practicePickerSubtitle: 'בחר עד 4 מספרים',
     practiceStartBtn: 'התחל תרגול',
-    practiceGoodJob: 'כל הכבוד!',
-    practiceResultText: (score) => `ענית נכון על ${score}!`,
+    practiceGoodJob: 'כל הכבוד\u200F!',
+    practiceResultText: (score) => `ענית נכון על ${score}\u200F!`,
     practiceAgain: (nums) => `תרגל שוב  ${nums.join(', ')}`,
     practiceNewNumbers: 'מספרים חדשים',
     practiceQuestionLabel: (n, total) => `${n} / ${total}`,

@@ -12,9 +12,13 @@ export function StartScreen({ onNewGame, onContinue, onOptions, onViewLeaderboar
   const isRtl = lang === 'he'
   const run = loadRun()
   const canContinue = isRunInProgress(run)
-  const worlds = CONFIGS[difficulty] ?? MEDIUM
-  const savedWorldName = run ? (worlds[run.worldIndex]?.name ?? '') : ''
-  const savedDiffLabel = t?.diffLabel?.[difficulty] ?? difficulty
+  const worlds = CONFIGS[run?.difficulty ?? difficulty] ?? MEDIUM
+  const savedWorld = run ? worlds[run.worldIndex] : null
+  const savedWorldName = savedWorld
+    ? (t?.worldName?.[savedWorld.id] ?? savedWorld.name)
+    : ''
+  const savedDiffLabel = t?.diffLabel?.[run?.difficulty ?? difficulty] ?? difficulty
+  const newDiffLabel = t?.diffLabel?.[difficulty] ?? difficulty
 
   // Android hardware back — no-op on home screen (lets OS handle it)
   useEffect(() => {
@@ -69,13 +73,17 @@ export function StartScreen({ onNewGame, onContinue, onOptions, onViewLeaderboar
           style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2 }}
         >
           <span style={{ lineHeight: 1 }}>
-            {canContinue ? (t?.continueRun ?? 'CONTINUE RUN') : (t?.newGame ?? 'NEW RUN')}
+            {canContinue ? (t?.continueRun ?? 'CONTINUE RUN') : (t?.newGame ?? 'START GAME')}
           </span>
-          {canContinue && (
+          {canContinue ? (
             <span dir="ltr" style={{ fontSize: 11, fontWeight: 700, opacity: 0.60, letterSpacing: '0.05em', lineHeight: 1 }}>
               {[playerName, savedWorldName, savedDiffLabel].filter(Boolean).join(' · ')}
             </span>
-          )}
+          ) : (playerName || newDiffLabel) ? (
+            <span dir="ltr" style={{ fontSize: 11, fontWeight: 700, opacity: 0.60, letterSpacing: '0.05em', lineHeight: 1 }}>
+              {[playerName, newDiffLabel].filter(Boolean).join(' · ')}
+            </span>
+          ) : null}
         </motion.button>
 
         {/* PRACTICE — full width */}

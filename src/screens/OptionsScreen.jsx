@@ -1,9 +1,7 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { isMuted, toggleMute } from '../game/sounds'
-import { getLog } from '../game/runLog'
-import { RunLogViewer } from '../components/RunLogViewer'
-import { AnimatePresence } from 'framer-motion'
+
 import { KingdomBackground, KingdomForeground, StrollingKnight } from '../components/KingdomScenery'
 import { FlyingCreatures } from '../components/FlyingCreatures'
 
@@ -55,10 +53,6 @@ export function OptionsScreen({ difficulty, onDifficultyChange, useRaster, onRas
 
   const [name, setName]   = useState(() => localStorage.getItem(NAME_KEY) ?? '')
   const [muted, setMuted] = useState(() => isMuted())
-  const [showLog, setShowLog] = useState(false)
-
-  const hasLog = getLog().length > 0
-
   // Android hardware back → close options
   useEffect(() => {
     window.history.pushState(null, '', window.location.href)
@@ -230,32 +224,8 @@ export function OptionsScreen({ difficulty, onDifficultyChange, useRaster, onRas
           </motion.button>
         </div>
 
-        {/* View Game Log */}
-        {hasLog && (
-          <div>
-            <motion.button
-              whileTap={{ scale: 0.96 }}
-              onClick={() => setShowLog(true)}
-              style={{
-                width: '100%', padding: '13px 16px', borderRadius: 12,
-                border: '1.5px solid rgba(251,191,36,0.35)',
-                background: 'rgba(251,191,36,0.08)',
-                color: 'rgba(251,191,36,0.85)',
-                fontWeight: 800, fontSize: 14, cursor: 'pointer',
-                letterSpacing: '0.06em',
-              }}
-            >
-              {t?.optionsViewLog ?? 'View Game Log'}
-            </motion.button>
-          </div>
-        )}
-
       </div>
 
-      {/* Log overlay */}
-      <AnimatePresence>
-        {showLog && <RunLogViewer onClose={() => setShowLog(false)} />}
-      </AnimatePresence>
     </div>
   )
 }

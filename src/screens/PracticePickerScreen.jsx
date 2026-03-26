@@ -120,13 +120,13 @@ export function PracticePickerScreen({ onStart, onBack, difficulty, playerName, 
           disabled={selected.length === 0}
           style={{
             width: '100%', maxWidth: 260, height: 52,
-            background: selected.length > 0 ? '#fbbf24' : 'rgba(255,255,255,0.12)',
-            border: selected.length > 0 ? '0 solid transparent' : '1.5px solid rgba(255,255,255,0.2)',
-            borderBottom: selected.length > 0 ? '4px solid #d97706' : undefined,
+            background: '#fbbf24',
+            border: 'none', borderBottom: '4px solid #d97706',
             borderRadius: 16, cursor: selected.length > 0 ? 'pointer' : 'not-allowed',
             fontSize: 16, fontWeight: 900, letterSpacing: '0.1em',
-            color: selected.length > 0 ? '#1a1a2e' : 'rgba(255,255,255,0.35)',
-            transition: 'background 0.2s, color 0.2s',
+            color: '#1a1a2e',
+            opacity: selected.length > 0 ? 1 : 0.4,
+            transition: 'opacity 0.2s',
           }}
         >
           {t?.practiceStartBtn ?? 'START PRACTICE'}
