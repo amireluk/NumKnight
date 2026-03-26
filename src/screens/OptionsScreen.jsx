@@ -51,8 +51,11 @@ function ToggleRow({ options, value, onChange }) {
 export function OptionsScreen({ difficulty, onDifficultyChange, useRaster, onRasterChange, lang, onLangChange, onBack, onStats, t }) {
   const isRtl = lang === 'he'
 
-  const [name, setName]   = useState(() => localStorage.getItem(NAME_KEY) ?? '')
-  const [muted, setMuted] = useState(() => isMuted())
+  const [name, setName]         = useState(() => localStorage.getItem(NAME_KEY) ?? '')
+  const [savedName, setSavedName] = useState(() => localStorage.getItem(NAME_KEY) ?? '')
+  const [muted, setMuted]       = useState(() => isMuted())
+  const nameUnsaved = name.trim() !== savedName
+
   // Android hardware back → close options
   useEffect(() => {
     window.history.pushState(null, '', window.location.href)
@@ -62,9 +65,14 @@ export function OptionsScreen({ difficulty, onDifficultyChange, useRaster, onRas
   }, [onBack])
 
   const handleNameChange = (v) => {
-    const trimmed = v.slice(0, 16)
-    setName(trimmed)
+    setName(v.slice(0, 16))
+  }
+
+  const handleNameSave = () => {
+    const trimmed = name.trim()
     localStorage.setItem(NAME_KEY, trimmed)
+    setSavedName(trimmed)
+    setName(trimmed)
   }
 
   const handleMuteToggle = () => {
@@ -124,20 +132,38 @@ export function OptionsScreen({ difficulty, onDifficultyChange, useRaster, onRas
         {/* Name */}
         <div>
           <SectionLabel>{t?.optionsName ?? 'YOUR NAME'}</SectionLabel>
-          <input
-            dir={isRtl ? 'rtl' : 'ltr'}
-            value={name}
-            onChange={(e) => handleNameChange(e.target.value)}
-            placeholder={t?.namePlaceholder ?? 'Enter your name...'}
-            maxLength={16}
-            style={{
-              width: '100%', borderRadius: 12,
-              border: '1.5px solid rgba(255,255,255,0.16)',
-              background: 'rgba(255,255,255,0.12)',
-              color: 'white', padding: '12px 14px', fontSize: 16,
-              outline: 'none', boxSizing: 'border-box',
-            }}
-          />
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+            <input
+              dir={isRtl ? 'rtl' : 'ltr'}
+              value={name}
+              onChange={(e) => handleNameChange(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && nameUnsaved && handleNameSave()}
+              placeholder={t?.namePlaceholder ?? 'Enter your name...'}
+              maxLength={16}
+              style={{
+                flex: 1, borderRadius: 12,
+                border: '1.5px solid rgba(255,255,255,0.16)',
+                background: 'rgba(255,255,255,0.12)',
+                color: 'white', padding: '12px 14px', fontSize: 16,
+                outline: 'none', boxSizing: 'border-box',
+              }}
+            />
+            {nameUnsaved && (
+              <motion.button
+                whileTap={{ scale: 0.95 }}
+                onClick={handleNameSave}
+                style={{
+                  flexShrink: 0,
+                  background: '#facc15', border: 'none', borderBottom: '3px solid #ca8a04',
+                  borderRadius: 10, padding: '10px 14px',
+                  fontSize: 13, fontWeight: 900, color: '#000',
+                  cursor: 'pointer', letterSpacing: '0.06em',
+                }}
+              >
+                {isRtl ? 'שמור' : 'SAVE'}
+              </motion.button>
+            )}
+          </div>
         </div>
 
         {/* Language */}
