@@ -99,9 +99,21 @@ export function OptionsScreen({ difficulty, onDifficultyChange, useRaster, onRas
       }}
     >
       <FlyingCreatures difficulty={difficulty} />
-      <KingdomBackground />
+      {useRaster ? (
+        <img
+          src={`${import.meta.env.BASE_URL}assets/backgrounds/title.webp`}
+          alt=""
+          style={{ position: 'absolute', bottom: 0, left: 0, width: '100%', display: 'block', zIndex: 1, pointerEvents: 'none',
+            maskImage: 'linear-gradient(to bottom, transparent 0%, black 22%)',
+            WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 22%)' }}
+        />
+      ) : (
+        <>
+          <KingdomBackground />
+          <KingdomForeground difficulty={difficulty} />
+        </>
+      )}
       <StrollingKnight />
-      <KingdomForeground difficulty={difficulty} />
 
       {/* Header */}
       <div style={{

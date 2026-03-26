@@ -6,7 +6,7 @@ import { loadPlayerStats, computeNumberRating } from '../game/statsState'
 
 const MAX_SELECTED = 4
 
-export function PracticePickerScreen({ onStart, onBack, difficulty, playerName, lang, t }) {
+export function PracticePickerScreen({ onStart, onBack, difficulty, playerName, useRaster, lang, t }) {
   const [selected, setSelected] = useState([])
   const shakeRefs = useRef({})
 
@@ -63,9 +63,21 @@ export function PracticePickerScreen({ onStart, onBack, difficulty, playerName, 
       }}
     >
       <FlyingCreatures difficulty={difficulty} />
-      <KingdomBackground />
+      {useRaster ? (
+        <img
+          src={`${import.meta.env.BASE_URL}assets/backgrounds/title.webp`}
+          alt=""
+          style={{ position: 'absolute', bottom: 0, left: 0, width: '100%', display: 'block', zIndex: 1, pointerEvents: 'none',
+            maskImage: 'linear-gradient(to bottom, transparent 0%, black 22%)',
+            WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 22%)' }}
+        />
+      ) : (
+        <>
+          <KingdomBackground />
+          <KingdomForeground difficulty={difficulty} />
+        </>
+      )}
       <StrollingKnight />
-      <KingdomForeground difficulty={difficulty} />
 
       {/* Back button */}
       <button

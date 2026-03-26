@@ -163,7 +163,7 @@ function HistoryOverlay({ n, stats, t, onClose }) {
   )
 }
 
-export function StatsScreen({ onBack, playerName, difficulty, lang, t }) {
+export function StatsScreen({ onBack, playerName, difficulty, useRaster, lang, t }) {
   const isRtl = lang === 'he'
   const [selectedNumber, setSelectedNumber] = useState(null)
   const [confirmClear, setConfirmClear] = useState(false)
@@ -214,9 +214,21 @@ export function StatsScreen({ onBack, playerName, difficulty, lang, t }) {
       }}
     >
       <FlyingCreatures difficulty={difficulty} />
-      <KingdomBackground />
+      {useRaster ? (
+        <img
+          src={`${import.meta.env.BASE_URL}assets/backgrounds/title.webp`}
+          alt=""
+          style={{ position: 'absolute', bottom: 0, left: 0, width: '100%', display: 'block', zIndex: 1, pointerEvents: 'none',
+            maskImage: 'linear-gradient(to bottom, transparent 0%, black 22%)',
+            WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 22%)' }}
+        />
+      ) : (
+        <>
+          <KingdomBackground />
+          <KingdomForeground difficulty={difficulty} />
+        </>
+      )}
       <StrollingKnight />
-      <KingdomForeground difficulty={difficulty} />
 
       {/* Back button */}
       <button

@@ -8,7 +8,7 @@ import { EASY, MEDIUM, HARD } from '../game/campaign.config'
 
 const CONFIGS = { easy: EASY, medium: MEDIUM, hard: HARD }
 
-export function StartScreen({ onNewGame, onContinue, onOptions, onViewLeaderboard, onPractice, playerName, difficulty, lang, t }) {
+export function StartScreen({ onNewGame, onContinue, onOptions, onViewLeaderboard, onPractice, playerName, difficulty, useRaster, lang, t }) {
   const isRtl = lang === 'he'
   const run = loadRun()
   const canContinue = isRunInProgress(run)
@@ -43,9 +43,21 @@ export function StartScreen({ onNewGame, onContinue, onOptions, onViewLeaderboar
     >
       {/* ── Persistent background — never remounts ── */}
       <FlyingCreatures difficulty={difficulty} />
-      <KingdomBackground />
+      {useRaster ? (
+        <img
+          src={`${import.meta.env.BASE_URL}assets/backgrounds/title.webp`}
+          alt=""
+          style={{ position: 'absolute', bottom: 0, left: 0, width: '100%', display: 'block', zIndex: 1, pointerEvents: 'none',
+            maskImage: 'linear-gradient(to bottom, transparent 0%, black 22%)',
+            WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 22%)' }}
+        />
+      ) : (
+        <>
+          <KingdomBackground />
+          <KingdomForeground difficulty={difficulty} />
+        </>
+      )}
       <StrollingKnight />
-      <KingdomForeground difficulty={difficulty} />
 
       {/* ── UI panel ── */}
       <motion.div

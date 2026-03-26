@@ -4,7 +4,7 @@ import { FlyingCreatures } from '../components/FlyingCreatures'
 
 const TOTAL_QUESTIONS = 20
 
-export function PracticeEndScreen({ score, selectedNumbers, onPracticeAgain, onChangeNumbers, difficulty, lang, t }) {
+export function PracticeEndScreen({ score, selectedNumbers, onPracticeAgain, onChangeNumbers, difficulty, useRaster, lang, t }) {
   const isRtl = lang === 'he'
   const perfect = score === TOTAL_QUESTIONS
 
@@ -20,9 +20,21 @@ export function PracticeEndScreen({ score, selectedNumbers, onPracticeAgain, onC
       }}
     >
       <FlyingCreatures difficulty={difficulty} />
-      <KingdomBackground />
+      {useRaster ? (
+        <img
+          src={`${import.meta.env.BASE_URL}assets/backgrounds/title.webp`}
+          alt=""
+          style={{ position: 'absolute', bottom: 0, left: 0, width: '100%', display: 'block', zIndex: 1, pointerEvents: 'none',
+            maskImage: 'linear-gradient(to bottom, transparent 0%, black 22%)',
+            WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 22%)' }}
+        />
+      ) : (
+        <>
+          <KingdomBackground />
+          <KingdomForeground difficulty={difficulty} />
+        </>
+      )}
       <StrollingKnight />
-      <KingdomForeground difficulty={difficulty} />
 
       <motion.div
         initial={{ opacity: 0, y: 20 }}

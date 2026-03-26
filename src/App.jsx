@@ -272,6 +272,7 @@ export default function App() {
             onPractice={() => setScreen('practice-picker')}
             playerName={playerName}
             difficulty={difficulty}
+            useRaster={useRaster}
             lang={lang} t={t}
           />
         </motion.div>
@@ -403,6 +404,7 @@ export default function App() {
             onBack={() => setScreen('start')}
             difficulty={difficulty}
             playerName={playerName}
+            useRaster={useRaster}
             lang={lang} t={t}
           />
         </motion.div>
@@ -436,6 +438,7 @@ export default function App() {
             onPracticeAgain={handlePracticeAgain}
             onChangeNumbers={handlePracticeChangeNumbers}
             difficulty={difficulty}
+            useRaster={useRaster}
             lang={lang} t={t}
           />
         </motion.div>
@@ -450,6 +453,7 @@ export default function App() {
             onBack={() => setScreen('options')}
             playerName={playerName}
             difficulty={difficulty}
+            useRaster={useRaster}
             lang={lang} t={t}
           />
         </motion.div>
