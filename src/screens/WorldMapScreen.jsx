@@ -375,18 +375,41 @@ function RegionBand({ world, worldIndex, status, trophy, score, delay, onTap, is
         </div>
       )}
 
-      {/* Region name — top-left label */}
-      <div style={{
-        position: 'absolute', top: 5, left: 7, zIndex: 4,
-        pointerEvents: 'none',
-        background: 'rgba(0,0,0,0.35)', borderRadius: 5,
-        padding: '1px 7px',
-        fontSize: 10, fontWeight: 900, letterSpacing: '0.08em',
-        color: isLocked ? 'rgba(255,255,255,0.28)' : 'rgba(255,255,255,0.82)',
-        textTransform: 'uppercase',
-      }}>
-        {t?.worldName?.[world.id] ?? world.name}
-      </div>
+      {/* Region name */}
+      {useRaster ? (
+        /* Raster mode: centered, large, breathing — only for active region */
+        isCurrent && (
+          <div style={{
+            position: 'absolute', inset: 0, zIndex: 4, pointerEvents: 'none',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}>
+            <motion.span
+              animate={{ opacity: [0.45, 0.9, 0.45] }}
+              transition={{ duration: 3.5, repeat: Infinity, ease: 'easeInOut' }}
+              style={{
+                fontSize: 28, fontWeight: 900, letterSpacing: '0.12em',
+                color: 'rgba(255,255,255,0.88)', textTransform: 'uppercase',
+                textShadow: '0 1px 6px rgba(0,0,0,0.9)',
+              }}
+            >
+              {t?.worldName?.[world.id] ?? world.name}
+            </motion.span>
+          </div>
+        )
+      ) : (
+        /* SVG mode: top-left small label for all regions */
+        <div style={{
+          position: 'absolute', top: 5, left: 7, zIndex: 4,
+          pointerEvents: 'none',
+          background: 'rgba(0,0,0,0.35)', borderRadius: 5,
+          padding: '1px 7px',
+          fontSize: 10, fontWeight: 900, letterSpacing: '0.08em',
+          color: isLocked ? 'rgba(255,255,255,0.28)' : 'rgba(255,255,255,0.82)',
+          textTransform: 'uppercase',
+        }}>
+          {t?.worldName?.[world.id] ?? world.name}
+        </div>
+      )}
 
       {/* Active: glowing border animation */}
       {isCurrent && (
