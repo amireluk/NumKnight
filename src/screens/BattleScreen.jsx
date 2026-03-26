@@ -541,7 +541,7 @@ export function BattleScreen({ world, worldIndex, battleIndex, onBattleEnd, onQu
       // Accumulate time bonus for timed worlds
       let qTimeBonus = 0
       if (world.timer && timeLeft !== null) {
-        qTimeBonus = Math.floor((timeLeft / world.timer) * 50)
+        qTimeBonus = Math.floor((timeLeft / world.timer) * 30)
         timeBonusAccRef.current += qTimeBonus
       }
       logEvent('correct', { q: `${problem.a}×${problem.b}`, selected, timeBonus: qTimeBonus })

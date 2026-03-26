@@ -125,7 +125,7 @@ export default function App() {
   const handleBattleEnd = ({ won, mistakes, timeBonus = 0 }) => {
     if (won) {
       const trophy = getTrophy(mistakes)
-      const rawScore = calcBattleScore(trophy, timeBonus)
+      const rawScore = calcBattleScore(trophy, timeBonus, run.worldIndex, difficulty)
       const battleScore = activeBoost === 'chronicle' ? rawScore + 100 : rawScore
       const newTrophies = [...run.trophies, trophy]
       const newWorldScore = worldScore + battleScore

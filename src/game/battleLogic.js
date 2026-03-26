@@ -55,8 +55,14 @@ export function getTrophy(mistakes) {
   return 'bronze'
 }
 
-// base: gold=100, silver=50, bronze=25 + timeBonus (seconds × 10, accumulated per correct answer)
-export function calcBattleScore(trophy, timeBonus = 0) {
+// World multiplier applied to base score only (rewards campaign progression)
+export const WORLD_SCORE_MULTIPLIERS = [1.0, 1.1, 1.3, 1.6, 2.0]
+// Difficulty multiplier applied to the whole battle score
+export const DIFF_SCORE_MULTIPLIERS = { easy: 1.0, medium: 1.2, hard: 1.5 }
+
+export function calcBattleScore(trophy, timeBonus = 0, worldIndex = 0, difficulty = 'easy') {
   const base = { gold: 100, silver: 50, bronze: 25 }[trophy] ?? 0
-  return base + timeBonus
+  const worldMult = WORLD_SCORE_MULTIPLIERS[worldIndex] ?? 1.0
+  const diffMult = DIFF_SCORE_MULTIPLIERS[difficulty] ?? 1.0
+  return Math.round((base * worldMult + timeBonus) * diffMult)
 }

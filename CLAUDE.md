@@ -171,7 +171,7 @@ Hard: tighter timers (Castle 6s, Dragon Lair 4s), Dragon Lair playerHP:2.
 | Store | Key | Scope | Cleared by |
 |-------|-----|-------|-----------|
 | Game state | `numknight_run` | Single global slot | Name change, difficulty change, death, victory |
-| Hall of Fame | `numknight_scores_<difficulty>` | Per difficulty, top 10 by score | Manual "Clear scores" in leaderboard only |
+| Hall of Fame | `numknight_scores` | Unified across all difficulties, top 30 by score | Manual "Clear scores" in leaderboard only |
 | Statistics | `numknight_stats` | Per player name, up to 5 names | Manual "Clear history" in stats screen only |
 
 #### Game state (`numknight_run`)
@@ -180,8 +180,10 @@ Hard: tighter timers (Castle 6s, Dragon Lair 4s), Dragon Lair playerHP:2.
 - Auto-save effect only writes to localStorage when `run.started === true` — prevents stale state persisting after restart
 - Cleared on: name change, difficulty change, death+leaderboard, victory+leaderboard
 
-#### Hall of Fame (`numknight_scores_<difficulty>`)
-- One key per difficulty; capped at 10 entries; lowest score dropped when full
+#### Hall of Fame (`numknight_scores`)
+- Single unified key across all difficulties; capped at 30 entries sorted by score
+- Each entry includes a `difficulty` field; shown as a colored badge in the leaderboard
+- Migration: on first load, merges old `numknight_scores_easy/medium/hard` keys then deletes them
 - Never touched by name/difficulty changes or game-state resets
 
 #### Statistics (`numknight_stats`)
@@ -213,10 +215,19 @@ Hard: tighter timers (Castle 6s, Dragon Lair 4s), Dragon Lair playerHP:2.
 
 ### Scoring
 ```
-battleScore = calcBattleScore(trophy, timeBonus)
-  trophy multiplier: gold×3, silver×2, bronze×1
-  timeBonus: only for timed worlds — floor((timeLeft / world.timer) × 50) per correct answer
+battleScore = round((base × worldMultiplier + timeBonus) × difficultyMultiplier)
+
+base               gold=100, silver=50, bronze=25
+worldMultiplier    [1.0, 1.1, 1.3, 1.6, 2.0]  indexed by worldIndex (Forest→Dragon Lair)
+                   applied to base only — rewards progressing further in the campaign
+difficultyMultiplier  easy=1.0, medium=1.2, hard=1.5
+                   applied to the whole battle score
+timeBonus          only for timed worlds — floor((timeLeft / world.timer) × 30) per correct answer
+                   max 30 pts per question; adds ~90–250 pts per timed battle for fast answers
 ```
+
+Max scores per difficulty (perfect gold run, instant answers):
+  Easy ~2,370 · Medium ~3,450 · Hard ~5,100
 
 ### Multiplier system
 - Each world has an explicit `multipliers` array in the config
