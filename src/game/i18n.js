@@ -26,7 +26,7 @@ export const T = {
     ptsLabel: (n) => `${n} pts`,
     timeBonusLabel: (n) => `${n} time bonus`,
     timeBonus: 'time bonus',
-    chronicleBonusLabel: (n) => `📜 +${n} chronicle bonus`,
+    chronicleBonusLabel: (n) => `📜 +${n} boon bonus`,
     tapToContinue: 'TAP TO CONTINUE',
 
     // Boss mechanic
@@ -160,12 +160,12 @@ export const T = {
 
     // BattleScreen
     roundLabel: (n, total) => `סיבוב ${n}/${total}`,
-    trophyLabel: { gold: 'מושלם\u200F!', silver: 'כל הכבוד\u200F!', bronze: 'שרדת\u200F!' },
+    trophyLabel: { gold: 'מושלם!', silver: 'כל הכבוד!', bronze: 'שרדת!' },
     pts: 'נק׳',
-    ptsLabel: (n) => `נק׳ ${n}`,
+    ptsLabel: (n) => `${n} נק׳`,
     timeBonusLabel: (n) => `בונוס זמן ${n}`,
     timeBonus: 'בונוס זמן',
-    chronicleBonusLabel: (n) => `📜 +${n} בונוס כרוניקה`,
+    chronicleBonusLabel: (n) => `📜 +${n} בונוס ברכה`,
     tapToContinue: 'לחץ להמשך',
 
     // Boss mechanic

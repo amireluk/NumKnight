@@ -1,7 +1,7 @@
 const KEY = 'numknight_scores'
 const OLD_KEYS = ['numknight_scores_easy', 'numknight_scores_medium', 'numknight_scores_hard']
 const DIFFS = ['easy', 'medium', 'hard']
-const CAP = 30
+const CAP = 15
 
 function migrate() {
   if (localStorage.getItem(KEY) !== null) return
