@@ -115,21 +115,21 @@ export function LeaderboardScreen({ totalScore, endWorld, cleared, difficulty, p
                   flexShrink: 0,
                 }}
               >
-                {/* Rank */}
+                {/* Rank — fixed width, always at the start edge */}
                 <span style={{
-                  fontSize: isNew ? 15 : 13, width: 24, textAlign: 'center',
+                  fontSize: 13, width: 22, textAlign: 'center',
                   color: isNew ? '#fbbf24' : 'rgba(255,255,255,0.25)',
                   fontWeight: 900, flexShrink: 0,
                 }}>
                   {i + 1}
                 </span>
 
-                {/* Name + version */}
+                {/* Name + NEW badge + version — fills remaining space */}
                 <span style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 1 }}>
                   <span style={{ display: 'flex', alignItems: 'center', gap: 5, overflow: 'hidden' }}>
                     <span style={{
                       color: isNew ? '#fff' : 'rgba(255,255,255,0.85)',
-                      fontWeight: isNew ? 900 : 700, fontSize: isNew ? 14 : 13,
+                      fontWeight: isNew ? 900 : 700, fontSize: 13,
                       overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                       flex: 1, minWidth: 0,
                     }}>
@@ -151,36 +151,35 @@ export function LeaderboardScreen({ totalScore, endWorld, cleared, difficulty, p
                   )}
                 </span>
 
-                {/* Difficulty badge */}
+                {/* Difficulty badge — fixed width so column aligns */}
                 <span style={{
-                  flexShrink: 0,
+                  flexShrink: 0, width: 56, textAlign: 'center',
                   background: DIFF_COLOR[entry.difficulty] ?? 'rgba(255,255,255,0.2)',
-                  color: '#000',
-                  borderRadius: 99,
-                  padding: '2px 7px',
-                  fontSize: 9,
-                  fontWeight: 900,
-                  letterSpacing: '0.08em',
+                  color: '#000', borderRadius: 99, padding: '2px 0',
+                  fontSize: 9, fontWeight: 900, letterSpacing: '0.08em',
                 }}>
                   {diffLabels[entry.difficulty] ?? entry.difficulty}
                 </span>
 
-                {/* Conquered / fell at */}
+                {/* Conquered / fell at — fixed width, truncate long world names */}
                 <span style={{
-                  fontSize: 10, fontWeight: 700, letterSpacing: '0.04em',
+                  fontSize: 10, fontWeight: 700, letterSpacing: '0.03em',
                   color: entry.cleared ? '#fbbf24' : 'rgba(255,255,255,0.35)',
-                  flexShrink: 0, minWidth: 52, textAlign: 'center',
+                  flexShrink: 0, width: 88,
+                  overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                  textAlign: 'center',
                 }}>
                   {entry.cleared
                     ? (t?.conquered ?? 'CONQUERED')
                     : (t?.fellAtShort ? t.fellAtShort(worldDisplayName(entry.endWorld ?? '', t)) : (entry.endWorld ?? ''))}
                 </span>
 
-                {/* Score */}
+                {/* Score — fixed width, aligned to the end edge */}
                 <span style={{
                   color: isNew ? '#fbbf24' : 'rgba(251,191,36,0.85)',
                   fontWeight: 900, fontSize: isNew ? 17 : 15,
-                  flexShrink: 0, minWidth: 38, textAlign: 'right',
+                  flexShrink: 0, width: 52,
+                  textAlign: isRtl ? 'left' : 'right',
                 }}>
                   {entry.score.toLocaleString()}
                 </span>
