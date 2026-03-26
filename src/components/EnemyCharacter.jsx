@@ -572,7 +572,7 @@ const RASTER_ENEMIES = {
 export function EnemyCharacter({ phase, enemy, hitKey, raging = false }) {
   const cfg = ENEMIES[enemy.id] ?? ENEMIES.goblin
   const { Body, Weapon, splashColor, pivotX, pivotY } = cfg
-  const rasterSprites = (localStorage.getItem(RASTER_KEY) === 'true') ? (RASTER_ENEMIES[enemy.id] ?? null) : null
+  const rasterSprites = (localStorage.getItem(RASTER_KEY) !== 'false') ? (RASTER_ENEMIES[enemy.id] ?? null) : null
 
   const moveControls = useAnimation()
   const weaponControls = useAnimation()

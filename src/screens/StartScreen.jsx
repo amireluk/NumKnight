@@ -91,39 +91,44 @@ export function StartScreen({ onNewGame, onContinue, onOptions, onViewLeaderboar
             <span dir="ltr" style={{ fontSize: 11, fontWeight: 700, opacity: 0.60, letterSpacing: '0.05em', lineHeight: 1 }}>
               {[playerName, savedWorldName, savedDiffLabel].filter(Boolean).join(' · ')}
             </span>
-          ) : (playerName || newDiffLabel) ? (
+          ) : playerName ? (
             <span dir="ltr" style={{ fontSize: 11, fontWeight: 700, opacity: 0.60, letterSpacing: '0.05em', lineHeight: 1 }}>
               {[playerName, newDiffLabel].filter(Boolean).join(' · ')}
             </span>
           ) : null}
         </motion.button>
 
-        {/* PRACTICE — full width */}
-        <motion.button
-          whileTap={{ scale: 0.95 }} whileHover={{ scale: 1.03 }}
-          onClick={onPractice}
-          className="w-full bg-yellow-400 border-b-4 border-yellow-600 text-black font-black text-xl rounded-2xl h-14 shadow-xl cursor-pointer tracking-widest"
-        >
-          {t?.practice ?? 'START PRACTICE'}
-        </motion.button>
+        {/* PRACTICE, OPTIONS, HALL OF FAME — hidden until player has a name */}
+        {playerName && (
+          <>
+            {/* PRACTICE — full width */}
+            <motion.button
+              whileTap={{ scale: 0.95 }} whileHover={{ scale: 1.03 }}
+              onClick={onPractice}
+              className="w-full bg-yellow-400 border-b-4 border-yellow-600 text-black font-black text-xl rounded-2xl h-14 shadow-xl cursor-pointer tracking-widest"
+            >
+              {t?.practice ?? 'START PRACTICE'}
+            </motion.button>
 
-        {/* OPTIONS */}
-        <motion.button
-          whileTap={{ scale: 0.95 }} whileHover={{ scale: 1.03 }}
-          onClick={onOptions}
-          className="w-full bg-yellow-400 border-b-4 border-yellow-600 text-black font-black text-xl rounded-2xl h-14 shadow-xl cursor-pointer tracking-widest"
-        >
-          {t?.optionsTitle ?? 'OPTIONS'}
-        </motion.button>
+            {/* OPTIONS */}
+            <motion.button
+              whileTap={{ scale: 0.95 }} whileHover={{ scale: 1.03 }}
+              onClick={onOptions}
+              className="w-full bg-yellow-400 border-b-4 border-yellow-600 text-black font-black text-xl rounded-2xl h-14 shadow-xl cursor-pointer tracking-widest"
+            >
+              {t?.optionsTitle ?? 'OPTIONS'}
+            </motion.button>
 
-        {/* HALL OF FAME */}
-        <motion.button
-          whileTap={{ scale: 0.95 }} whileHover={{ scale: 1.03 }}
-          onClick={onViewLeaderboard}
-          className="w-full bg-yellow-400 border-b-4 border-yellow-600 text-black font-black text-xl rounded-2xl h-14 shadow-xl cursor-pointer tracking-widest"
-        >
-          {t?.hallOfFameTitle ?? 'HALL OF FAME'}
-        </motion.button>
+            {/* HALL OF FAME */}
+            <motion.button
+              whileTap={{ scale: 0.95 }} whileHover={{ scale: 1.03 }}
+              onClick={onViewLeaderboard}
+              className="w-full bg-yellow-400 border-b-4 border-yellow-600 text-black font-black text-xl rounded-2xl h-14 shadow-xl cursor-pointer tracking-widest"
+            >
+              {t?.hallOfFameTitle ?? 'HALL OF FAME'}
+            </motion.button>
+          </>
+        )}
 
       </motion.div>
     </div>

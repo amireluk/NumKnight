@@ -105,13 +105,12 @@ export function LeaderboardScreen({ totalScore, endWorld, cleared, difficulty, p
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.1 + i * 0.03 }}
                 style={{
-                  background: isNew ? 'rgba(251,191,36,0.18)' : 'rgba(255,255,255,0.04)',
-                  border: `${isNew ? 2 : 1}px solid ${isNew ? 'rgba(251,191,36,0.75)' : 'rgba(255,255,255,0.08)'}`,
+                  background: isNew ? 'rgba(251,191,36,0.12)' : 'rgba(255,255,255,0.04)',
+                  border: '1px solid rgba(255,255,255,0.08)',
                   borderRadius: 12,
-                  padding: isNew ? '11px 12px' : '9px 12px',
+                  padding: '9px 12px',
                   display: 'flex', alignItems: 'center', gap: 8,
-                  transform: isNew ? 'scale(1.02)' : 'scale(1)',
-                  boxShadow: isNew ? '0 0 18px rgba(251,191,36,0.22)' : 'none',
+                  boxShadow: isNew ? 'inset 3px 0 0 #fbbf24' : 'none',
                   flexShrink: 0,
                 }}
               >
@@ -135,14 +134,6 @@ export function LeaderboardScreen({ totalScore, endWorld, cleared, difficulty, p
                     }}>
                       {entry.name}
                     </span>
-                    {isNew && (
-                      <span style={{
-                        flexShrink: 0, fontSize: 9, fontWeight: 900, letterSpacing: '0.12em',
-                        background: '#fbbf24', color: '#000', borderRadius: 4, padding: '1px 5px',
-                      }}>
-                        {t?.newBadge ?? 'NEW'}
-                      </span>
-                    )}
                   </span>
                   {entry.version && (
                     <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.22)', fontWeight: 600, letterSpacing: '0.08em' }}>

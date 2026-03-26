@@ -73,7 +73,7 @@ export function NameEntryScreen({ difficulty, onDifficultyChange, lang, onLangCh
             dir={isRtl ? 'rtl' : 'ltr'}
             value={name}
             onChange={(e) => setName(e.target.value.slice(0, 16))}
-            onKeyDown={(e) => { if (e.key === 'Enter') { if (canStart) handleStart(); e.target.blur() } }}
+            onKeyDown={(e) => { if (e.key === 'Enter') e.target.blur() }}
             placeholder={t?.namePlaceholder ?? 'Enter your name...'}
             maxLength={16}
             autoFocus

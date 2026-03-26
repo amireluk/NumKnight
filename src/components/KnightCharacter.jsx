@@ -163,7 +163,7 @@ export function KnightCharacter({ phase, hitKey, useRaster }) {
   const swordControls = useAnimation()
   const [flashing, setFlashing] = useState(false)
   const [sprite, setSprite] = useState('idle')
-  const raster = useRaster ?? (localStorage.getItem(RASTER_KEY) === 'true')
+  const raster = useRaster ?? (localStorage.getItem(RASTER_KEY) !== 'false')
 
   // Preload all sprites on mount so swaps are instant
   useEffect(() => {

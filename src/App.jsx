@@ -14,6 +14,9 @@ import { PracticePickerScreen } from './screens/PracticePickerScreen'
 import { PracticeBattleScreen } from './screens/PracticeBattleScreen'
 import { PracticeEndScreen } from './screens/PracticeEndScreen'
 import { StatsScreen } from './screens/StatsScreen'
+import { NameEntryScreen } from './screens/NameEntryScreen'
+import { LoadingScreen } from './screens/LoadingScreen'
+import { preloadCritical, preloadBackground } from './game/preload'
 import { EASY, MEDIUM, HARD, DEV } from './game/campaign.config'
 import { createNewRun, loadRun, saveRun, clearRun, clearBattleState } from './game/runState'
 import { getTrophy, calcBattleScore } from './game/battleLogic'
@@ -42,7 +45,7 @@ export default function App() {
 
   const [run, setRun] = useState(() => loadRun() ?? createNewRun())
   const [screen, setScreen] = useState(
-    () => window.location.search.includes('design') ? 'design' : IS_DEV_MODE ? 'map' : 'start'
+    () => window.location.search.includes('design') ? 'design' : 'start'
   )
   const [clearedData, setClearedData] = useState(null)
   const [battleKey, setBattleKey] = useState(0)
@@ -52,13 +55,26 @@ export default function App() {
   const [pendingScore, setPendingScore] = useState(null)
   const [activeBoost, setActiveBoost] = useState(null)
   const RASTER_KEY = 'numknight_raster_bg'
-  const [useRaster, setUseRaster] = useState(() => localStorage.getItem(RASTER_KEY) === 'true')
+  const [useRaster, setUseRaster] = useState(() => {
+    const stored = localStorage.getItem(RASTER_KEY)
+    return stored === null ? true : stored === 'true'
+  })
 
   // Practice mode state
   const [practiceNumbers, setPracticeNumbers] = useState([])
   const [practiceScore, setPracticeScore] = useState(0)
   const [practiceBattleKey, setPracticeBattleKey] = useState(0)
   const handleRasterChange = (val) => { setUseRaster(val); localStorage.setItem(RASTER_KEY, String(val)) }
+
+  // Asset preloading — only blocks on title.webp; everything else loads in background
+  const [assetsReady, setAssetsReady] = useState(() => !useRaster)
+  const [showLoader,  setShowLoader]  = useState(false)
+  useEffect(() => {
+    if (!useRaster) return
+    preloadBackground()
+    const threshold = setTimeout(() => setShowLoader(true), 20)
+    preloadCritical().then(() => { clearTimeout(threshold); setAssetsReady(true) })
+  }, []) // eslint-disable-line
 
   const world = worlds[run.worldIndex]
 
@@ -98,9 +114,9 @@ export default function App() {
     setScreen('start')
   }
 
-  // Called when user taps NEW GAME — goes to Options first if no name set
+  // Called when user taps NEW GAME — goes to name-entry first if no name set
   const handleNewGame = () => {
-    if (!playerName) { setScreen('options'); return }
+    if (!playerName) { setScreen('name-entry'); return }
     startNewGame()
   }
 
@@ -247,6 +263,12 @@ export default function App() {
     setScreen('practice-picker')
   }
 
+  if (!assetsReady) return (
+    <div style={{ position: 'fixed', inset: 0, background: 'linear-gradient(to bottom, #1e3a70, #2d5aaa)' }}>
+      <AnimatePresence>{showLoader && <LoadingScreen key="loader" />}</AnimatePresence>
+    </div>
+  )
+
   return (
     <>
     <AnimatePresence mode="wait">
@@ -302,6 +324,26 @@ export default function App() {
             onStats={() => {
               setPlayerName(localStorage.getItem('numknight_player_name') ?? '')
               setScreen('stats')
+            }}
+            t={t}
+          />
+        </motion.div>
+      )}
+
+      {screen === 'name-entry' && (
+        <motion.div key="name-entry"
+          initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+          transition={{ duration: 0.25 }} className="w-full"
+        >
+          <NameEntryScreen
+            difficulty={difficulty}
+            onDifficultyChange={handleDifficultyChange}
+            lang={lang}
+            onLangChange={handleLangChange}
+            useRaster={useRaster}
+            onStart={(name) => {
+              setPlayerName(name)
+              startNewGame()
             }}
             t={t}
           />
@@ -481,6 +523,21 @@ export default function App() {
         </motion.div>
       )}
     </AnimatePresence>
+
+    {IS_DEV_MODE && (
+      <button
+        onClick={() => { localStorage.clear(); window.location.reload() }}
+        style={{
+          position: 'fixed', bottom: 12, left: '50%', transform: 'translateX(-50%)',
+          zIndex: 9999, padding: '6px 16px', borderRadius: 8,
+          background: 'rgba(220,38,38,0.85)', border: '1.5px solid rgba(255,100,100,0.4)',
+          color: 'white', fontSize: 11, fontWeight: 900, letterSpacing: '0.08em',
+          cursor: 'pointer',
+        }}
+      >
+        ⚠ RESET ALL STATE
+      </button>
+    )}
 </>
   )
 }
