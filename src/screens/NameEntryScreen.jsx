@@ -43,6 +43,8 @@ export function NameEntryScreen({ difficulty, onDifficultyChange, lang, onLangCh
             zIndex: 1, pointerEvents: 'none',
             maskImage: 'linear-gradient(to bottom, transparent 0%, black 22%)',
             WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 22%)',
+            filter: difficulty === 'easy' ? 'brightness(1.25)' : difficulty === 'hard' ? 'brightness(0.55) saturate(0.7)' : 'brightness(1)',
+            transition: 'filter 0.5s ease',
           }}
         />
       ) : (
