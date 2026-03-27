@@ -235,6 +235,137 @@
     .btn-dead   { background:#1a0a2e; border-color:#a78bfa; color:#c4b5fd; }
     .btn-seq    { background:#0f2d1a; border-color:#4ade80; color:#86efac; }
 
+    /* ── Spritesheet tab ── */
+    .ss-layout {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 20px;
+      max-width: 960px;
+    }
+    @media (max-width: 720px) { .ss-layout { grid-template-columns: 1fr; } }
+
+    .ss-stage {
+      background: #0a0818;
+      border: 2px solid #2d2848;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 260px;
+      position: relative;
+      overflow: hidden;
+    }
+    .ss-stage-bg {
+      position: absolute; inset: 0;
+      object-fit: cover;
+      object-position: center;
+      width: 100%; height: 100%;
+      opacity: .45;
+    }
+
+    /* The actual animated sprite — driven entirely by CSS custom properties */
+    #ss-sprite {
+      position: relative; z-index: 2;
+      image-rendering: pixelated;
+      background-image: url('assets/characters/knight-sheet.webp');
+      background-repeat: no-repeat;
+      /* size/pos set by JS via CSS vars */
+      width:  var(--ss-fw);
+      height: var(--ss-fh);
+      background-size: var(--ss-sw) var(--ss-sh);
+      background-position-y: var(--ss-row-y);
+      animation: ss-walk var(--ss-duration) steps(var(--ss-steps), end) infinite;
+      transform: scaleX(var(--ss-flip)) scale(var(--ss-scale));
+    }
+    @keyframes ss-walk {
+      from { background-position-x: var(--ss-start-x); }
+      to   { background-position-x: var(--ss-end-x);   }
+    }
+    #ss-sprite.paused { animation-play-state: paused; }
+
+    .ss-controls {
+      background: #1a1430;
+      border: 1px solid #2d2848;
+      border-radius: 10px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .ss-controls h3 { font-size: .8rem; color: #fbbf24; text-transform: uppercase; letter-spacing: .06em; }
+
+    .ss-row-btns { display: flex; gap: 6px; flex-wrap: wrap; }
+    .ss-row-btn {
+      padding: 5px 14px;
+      border-radius: 20px;
+      border: 1px solid #3d3660;
+      background: #1a1430;
+      color: #94a3b8;
+      cursor: pointer;
+      font-size: .8rem;
+      transition: all .15s;
+    }
+    .ss-row-btn.active { background: #2d2848; color: #fbbf24; border-color: #fbbf24; }
+
+    .ss-range-row { display: flex; align-items: center; gap: 6px; }
+    .ss-range-row label { font-size: .78rem; color: #94a3b8; min-width: 80px; }
+    .ss-range-row input[type=number] {
+      width: 48px; padding: 3px 6px;
+      background: #0f0c1a; border: 1px solid #3d3660; border-radius: 4px;
+      color: #e2e8f0; font-size: .8rem; text-align: center;
+    }
+    .ss-range-row span { font-size: .75rem; color: #64748b; }
+
+    .ss-slider-row { display: flex; align-items: center; gap: 8px; }
+    .ss-slider-row label { font-size: .78rem; color: #94a3b8; min-width: 80px; }
+    .ss-slider-row input[type=range] { flex: 1; accent-color: #fbbf24; }
+    .ss-slider-row .val { font-size: .78rem; color: #e2e8f0; min-width: 38px; text-align: right; font-variant-numeric: tabular-nums; }
+
+    .ss-play-btn {
+      padding: 8px 0;
+      border-radius: 7px;
+      border: 2px solid #fbbf24;
+      background: #3b2a00;
+      color: #fde68a;
+      font-weight: 700;
+      font-size: .9rem;
+      cursor: pointer;
+      letter-spacing: .05em;
+      transition: background .15s;
+    }
+    .ss-play-btn:hover { background: #5a4000; }
+
+    /* Frame strip — all frames shown small, active one highlighted */
+    .ss-frame-strip {
+      display: flex;
+      gap: 3px;
+      flex-wrap: wrap;
+      margin-top: 4px;
+    }
+    .ss-frame {
+      width: var(--ss-thumb-w);
+      height: var(--ss-thumb-h);
+      background-image: url('assets/characters/knight-sheet.webp');
+      background-repeat: no-repeat;
+      background-size: var(--ss-sw) var(--ss-sh);
+      border: 1px solid #2d2848;
+      border-radius: 3px;
+      cursor: pointer;
+      image-rendering: pixelated;
+      transition: border-color .1s;
+      flex-shrink: 0;
+    }
+    .ss-frame:hover { border-color: #94a3b8; }
+    .ss-frame.active { border-color: #fbbf24; box-shadow: 0 0 0 1px #fbbf24; }
+
+    .ss-sheet-preview {
+      margin-top: 4px;
+      max-width: 100%;
+      border-radius: 6px;
+      border: 1px solid #2d2848;
+      image-rendering: pixelated;
+    }
+
     /* ── Battle tab ── */
     .battle-scene {
       max-width: 680px;
@@ -418,6 +549,7 @@
 <nav class="tab-bar">
   <button class="tab active" onclick="showTab('characters')">Characters</button>
   <button class="tab" onclick="showTab('battle')">Battle Scene</button>
+  <button class="tab" onclick="showTab('spritesheet')">Spritesheet ✨</button>
   <button class="tab" onclick="showTab('settings')">Settings</button>
   <button class="tab" onclick="showTab('workflow')">Workflow</button>
 </nav>
@@ -471,6 +603,94 @@
       <span class="seq-step" data-seq="3">Enemy Atk</span>
       <span class="seq-step" data-seq="4">Knight Atk</span>
       <span class="seq-step" data-seq="5">Enemy Dies</span>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════ SPRITESHEET TAB ══════════════════════════════ -->
+<div id="tab-spritesheet" class="panel">
+  <div class="hint" style="max-width:960px;margin-bottom:16px">
+    CSS <code>steps()</code> animation — the spritesheet is used <strong>as-is</strong>, no splitting.
+    Select a row, adjust FPS and frame range, then port the values straight into the game component.
+  </div>
+
+  <div class="ss-layout">
+
+    <!-- Stage -->
+    <div>
+      <div class="ss-stage" id="ss-stage">
+        <img class="ss-stage-bg" id="ss-bg" src="assets/backgrounds/forest.webp" alt="" />
+        <div id="ss-sprite"></div>
+      </div>
+      <div style="margin-top:10px">
+        <p style="font-size:.75rem;color:#64748b;margin-bottom:6px">Full spritesheet (knight-sheet.webp)</p>
+        <img src="assets/characters/knight-sheet.webp" class="ss-sheet-preview" id="ss-sheet-img" alt="spritesheet" />
+        <div class="ss-frame-strip" id="ss-frame-strip" style="margin-top:8px"></div>
+      </div>
+    </div>
+
+    <!-- Controls -->
+    <div class="ss-controls">
+
+      <div>
+        <h3>Row (animation)</h3>
+        <div class="ss-row-btns" id="ss-row-btns">
+          <button class="ss-row-btn active" onclick="setRow(0)">Row 0</button>
+          <button class="ss-row-btn"        onclick="setRow(1)">Row 1</button>
+          <button class="ss-row-btn"        onclick="setRow(2)">Row 2</button>
+        </div>
+        <p id="ss-row-label" style="font-size:.72rem;color:#64748b;margin-top:4px">— label this row once you know what it is</p>
+      </div>
+
+      <div>
+        <h3>Frame range</h3>
+        <div class="ss-range-row">
+          <label>Start frame</label>
+          <input type="number" id="ss-start" value="0" min="0" max="7" oninput="updateSprite()" />
+          <span>/ 0–7</span>
+        </div>
+        <div class="ss-range-row" style="margin-top:6px">
+          <label>End frame</label>
+          <input type="number" id="ss-end" value="7" min="0" max="7" oninput="updateSprite()" />
+        </div>
+      </div>
+
+      <div>
+        <h3>Timing</h3>
+        <div class="ss-slider-row">
+          <label>FPS</label>
+          <input type="range" id="ss-fps" min="1" max="24" step="1" value="8" oninput="updateSprite()" />
+          <span class="val" id="ss-fps-val">8</span>
+        </div>
+        <div class="ss-slider-row">
+          <label>Scale</label>
+          <input type="range" id="ss-scale" min="0.5" max="4" step="0.25" value="1.5" oninput="updateSprite()" />
+          <span class="val" id="ss-scale-val">1.5×</span>
+        </div>
+        <div class="ss-slider-row">
+          <label>Flip</label>
+          <input type="range" id="ss-flip" min="-1" max="1" step="2" value="1" oninput="updateSprite()" />
+          <span class="val" id="ss-flip-val">normal</span>
+        </div>
+      </div>
+
+      <div>
+        <h3>Background</h3>
+        <div class="ss-row-btns">
+          <button class="ss-row-btn active" onclick="setBg('forest')">Forest</button>
+          <button class="ss-row-btn" onclick="setBg('swamp')">Swamp</button>
+          <button class="ss-row-btn" onclick="setBg('mountains')">Mountains</button>
+          <button class="ss-row-btn" onclick="setBg('castle')">Castle</button>
+          <button class="ss-row-btn" onclick="setBg('dragon-lair')">Dragon</button>
+          <button class="ss-row-btn" onclick="setBg(null)">None</button>
+        </div>
+      </div>
+
+      <button class="ss-play-btn" id="ss-pause-btn" onclick="togglePause()">⏸ Pause</button>
+
+      <div style="background:#0f0c1a;border:1px solid #1e293b;border-radius:6px;padding:10px;font-size:.72rem;color:#64748b;line-height:1.8;font-family:monospace" id="ss-code-hint">
+        <!-- filled by JS -->
+      </div>
     </div>
   </div>
 </div>
@@ -887,9 +1107,141 @@ async function playSequence() {
 
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
+/* ══════════════════════════════════════════════════════════════════
+   Spritesheet tab
+   Sheet: knight-sheet.webp — 704×384, 8 cols × 3 rows, 88×128 px/frame
+   ══════════════════════════════════════════════════════════════════ */
+const SS = { cols: 8, rows: 3, fw: 88, fh: 128, sw: 704, sh: 384 }
+const SS_THUMB_SCALE = 0.6   // strip thumbnail scale
+const ROW_LABELS = ['Row 0 — Walk?', 'Row 1 — ?', 'Row 2 — ?']
+
+let ssRow     = 0
+let ssPaused  = false
+// thumb scale helper — recomputed when sprite scale changes
+const THUMB_W = Math.round(SS.fw * SS_THUMB_SCALE)
+const THUMB_H = Math.round(SS.fh * SS_THUMB_SCALE)
+const THUMB_SW = Math.round(SS.sw * SS_THUMB_SCALE)
+const THUMB_SH = Math.round(SS.sh * SS_THUMB_SCALE)
+
+// Seed CSS thumb vars once (they don't change)
+document.documentElement.style.setProperty('--ss-thumb-w', THUMB_W + 'px')
+document.documentElement.style.setProperty('--ss-thumb-h', THUMB_H + 'px')
+document.documentElement.style.setProperty('--ss-sw', SS.sw + 'px')
+document.documentElement.style.setProperty('--ss-sh', SS.sh + 'px')
+
+function setRow(r) {
+  ssRow = r
+  document.querySelectorAll('.ss-row-btn').forEach((b, i) => {
+    if (b.getAttribute('onclick') === `setRow(${r})`) b.classList.add('active')
+    else if (b.getAttribute('onclick')?.startsWith('setRow(')) b.classList.remove('active')
+  })
+  document.getElementById('ss-row-label').textContent = ROW_LABELS[r] || `Row ${r}`
+  buildFrameStrip()
+  updateSprite()
+}
+
+function setBg(world) {
+  const el = document.getElementById('ss-bg')
+  document.querySelectorAll('#tab-spritesheet .ss-row-btn').forEach(b => {
+    if (b.getAttribute('onclick') === `setBg('${world}')` || (world === null && b.getAttribute('onclick') === "setBg(null)"))
+      b.classList.add('active')
+    else if (b.getAttribute('onclick')?.startsWith('setBg('))
+      b.classList.remove('active')
+  })
+  el.src = world ? `assets/backgrounds/${world}.webp` : ''
+  el.style.opacity = world ? '0.45' : '0'
+}
+
+function togglePause() {
+  ssPaused = !ssPaused
+  const sprite = document.getElementById('ss-sprite')
+  sprite.classList.toggle('paused', ssPaused)
+  document.getElementById('ss-pause-btn').textContent = ssPaused ? '▶ Play' : '⏸ Pause'
+}
+
+function updateSprite() {
+  const fps     = parseInt(document.getElementById('ss-fps').value)
+  const scale   = parseFloat(document.getElementById('ss-scale').value)
+  const flip    = parseFloat(document.getElementById('ss-flip').value)
+  const startF  = Math.max(0, Math.min(7, parseInt(document.getElementById('ss-start').value) || 0))
+  const endF    = Math.max(startF, Math.min(7, parseInt(document.getElementById('ss-end').value) || 7))
+  const steps   = endF - startF + 1
+  const dur     = (steps / fps).toFixed(3)
+
+  // Update labels
+  document.getElementById('ss-fps-val').textContent   = fps
+  document.getElementById('ss-scale-val').textContent = scale + '×'
+  document.getElementById('ss-flip-val').textContent  = flip === -1 ? 'flipped' : 'normal'
+
+  // CSS custom property values
+  const startX = -(startF * SS.fw)          // initial background-position-x
+  const endX   = -(endF   * SS.fw) - SS.fw  // one frame past end
+
+  const el = document.getElementById('ss-sprite')
+  const root = document.documentElement
+
+  root.style.setProperty('--ss-fw',       SS.fw + 'px')
+  root.style.setProperty('--ss-fh',       SS.fh + 'px')
+  root.style.setProperty('--ss-row-y',    -(ssRow * SS.fh) + 'px')
+  root.style.setProperty('--ss-start-x',  startX + 'px')
+  root.style.setProperty('--ss-end-x',    endX   + 'px')
+  root.style.setProperty('--ss-steps',    steps)
+  root.style.setProperty('--ss-duration', dur + 's')
+  root.style.setProperty('--ss-flip',     flip)
+  root.style.setProperty('--ss-scale',    scale)
+
+  // Force animation restart so new steps() takes effect
+  el.style.animation = 'none'
+  void el.offsetWidth
+  el.style.animation = ''
+
+  // Update frame strip highlight
+  updateFrameStripHighlight(startF, endF)
+
+  // Code hint
+  document.getElementById('ss-code-hint').innerHTML =
+    `<span style="color:#7dd3fc">// CSS usage</span><br>` +
+    `width: ${SS.fw}px; height: ${SS.fh}px;<br>` +
+    `background-size: ${SS.sw}px ${SS.sh}px;<br>` +
+    `background-position-y: ${-(ssRow * SS.fh)}px;<br>` +
+    `animation: ss-walk ${dur}s steps(${steps}) infinite;<br><br>` +
+    `<span style="color:#7dd3fc">// @keyframes ss-walk</span><br>` +
+    `from { background-position-x: ${startX}px }<br>` +
+    `to   { background-position-x: ${endX}px }`
+}
+
+function buildFrameStrip() {
+  const strip = document.getElementById('ss-frame-strip')
+  strip.innerHTML = ''
+  for (let f = 0; f < SS.cols; f++) {
+    const div = document.createElement('div')
+    div.className = 'ss-frame'
+    div.id = `ss-thumb-${f}`
+    div.title = `Frame ${f}`
+    div.style.backgroundPositionX = -(f * SS.fw * SS_THUMB_SCALE) + 'px'
+    div.style.backgroundPositionY = -(ssRow * SS.fh * SS_THUMB_SCALE) + 'px'
+    div.style.backgroundSize = THUMB_SW + 'px ' + THUMB_SH + 'px'
+    div.onclick = () => {
+      document.getElementById('ss-start').value = f
+      document.getElementById('ss-end').value   = f
+      updateSprite()
+    }
+    strip.appendChild(div)
+  }
+}
+
+function updateFrameStripHighlight(start, end) {
+  for (let f = 0; f < SS.cols; f++) {
+    const el = document.getElementById(`ss-thumb-${f}`)
+    if (el) el.classList.toggle('active', f >= start && f <= end)
+  }
+}
+
 /* ── Init ── */
 buildGrid();
 buildEnemyPicker();
+buildFrameStrip();
+updateSprite();
 
 // Set initial background
 document.getElementById('arena-bg').src = ENEMY_BG['goblin'] || '';
