@@ -1,6 +1,6 @@
 import { useState, useRef, useMemo, useEffect } from 'react'
 import { motion, useAnimation } from 'framer-motion'
-import { KingdomBackground, KingdomForeground, StrollingKnight } from '../components/KingdomScenery'
+import { KingdomBackground, KingdomForeground, KingdomCreatures } from '../components/KingdomScenery'
 import { FlyingCreatures } from '../components/FlyingCreatures'
 import { loadPlayerStats, computeNumberRating } from '../game/statsState'
 
@@ -79,7 +79,7 @@ export function PracticePickerScreen({ onStart, onBack, difficulty, playerName, 
           <KingdomForeground difficulty={difficulty} />
         </>
       )}
-      <StrollingKnight useRaster={useRaster} />
+      <KingdomCreatures useRaster={useRaster} difficulty={difficulty} />
 
       {/* Back button */}
       <button

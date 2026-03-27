@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { KingdomBackground, KingdomForeground, StrollingKnight } from '../components/KingdomScenery'
+import { KingdomBackground, KingdomForeground, KingdomCreatures } from '../components/KingdomScenery'
 import { FlyingCreatures } from '../components/FlyingCreatures'
 
 const TOTAL_QUESTIONS = 20
@@ -36,7 +36,7 @@ export function PracticeEndScreen({ score, selectedNumbers, onPracticeAgain, onC
           <KingdomForeground difficulty={difficulty} />
         </>
       )}
-      <StrollingKnight useRaster={useRaster} />
+      <KingdomCreatures useRaster={useRaster} difficulty={difficulty} />
 
       <motion.div
         initial={{ opacity: 0, y: 20 }}

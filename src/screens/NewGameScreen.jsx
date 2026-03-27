@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { motion, useAnimation } from 'framer-motion'
-import { KingdomBackground, KingdomForeground, StrollingKnight } from '../components/KingdomScenery'
+import { KingdomBackground, KingdomForeground, KingdomCreatures } from '../components/KingdomScenery'
 import { FlyingCreatures } from '../components/FlyingCreatures'
 import { CAMPAIGN } from '../game/campaign.config'
 
@@ -158,7 +158,7 @@ export function NewGameScreen({ onStart, onBack, lang, t }) {
       {/* Scenery — only the castle changes with difficulty */}
       <FlyingCreatures difficulty={difficulty} />
       <KingdomBackground />
-      <StrollingKnight />
+      <KingdomCreatures difficulty={difficulty} />
       <KingdomForeground difficulty={difficulty} />
     </div>
   )

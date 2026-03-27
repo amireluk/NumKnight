@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { isMuted, toggleMute } from '../game/sounds'
 
-import { KingdomBackground, KingdomForeground, StrollingKnight } from '../components/KingdomScenery'
+import { KingdomBackground, KingdomForeground, KingdomCreatures } from '../components/KingdomScenery'
 import { FlyingCreatures } from '../components/FlyingCreatures'
 
 const NAME_KEY = 'numknight_player_name'
@@ -115,7 +115,7 @@ export function OptionsScreen({ difficulty, onDifficultyChange, useRaster, onRas
           <KingdomForeground difficulty={difficulty} />
         </>
       )}
-      <StrollingKnight useRaster={useRaster} />
+      <KingdomCreatures useRaster={useRaster} difficulty={difficulty} />
 
       {/* Header */}
       <div style={{

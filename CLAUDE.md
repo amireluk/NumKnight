@@ -48,11 +48,16 @@ There are two deployments. All code lives on `main` — no separate source branc
 
 ### Deploy + push sequence (ALWAYS follow this order)
 
-**Deploy to dev:**
+**Deploy to dev** (iterate freely — no commit needed):
 ```
-npm run deploy:dev                        # bumps version, builds, deploys
-git add package.json
-git commit -m "chore: bump version to X.X.X"
+npm run deploy:dev                        # bumps version, builds, deploys to /dev/
+```
+No git commit required here. Repeat as many times as needed during iteration.
+
+**Commit when a feature is done** (one clean commit per feature, not per session):
+```
+git add <specific files>
+git commit -m "feat: describe the completed feature"
 git tag deploy-dev-vX.X.X
 git push origin main --tags
 ```
@@ -70,9 +75,15 @@ Deploy FIRST (the deploy script bumps the version), THEN commit + tag + push so 
 
 ---
 
-## ⚠️ After every session that changes code — ALWAYS ask the user:
-1. **"Deploy to dev?"** — if yes, follow the deploy-to-dev sequence above
-2. **"Push to GitHub?"** — if yes, commit any unstaged changes, then push
+## ⚠️ Git commit policy — read carefully
+
+- **Deploy to dev freely** during a feature — no commit needed per session or per deploy.
+- **Commit only when the user says the feature is done** or explicitly asks to commit.
+- **One meaningful commit per feature**, not one per fix or iteration. Keep git history clean.
+- **Never commit automatically** at the end of a session.
+- After every session that changes code, ask: **"Deploy to dev?"** — but do NOT run it automatically, wait for confirmation.
+- Only ask about committing/pushing when the user signals the feature is complete.
+- When testing changes locally, use `npm run dev` — not `npm run deploy:dev`.
 
 Do NOT deploy to prod unless the user explicitly asks.
 

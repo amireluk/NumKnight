@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { KingdomBackground, KingdomForeground, StrollingKnight } from '../components/KingdomScenery'
+import { KingdomBackground, KingdomForeground, KingdomCreatures } from '../components/KingdomScenery'
 import { FlyingCreatures } from '../components/FlyingCreatures'
 import { loadRun, isRunInProgress } from '../game/runState'
 import { LogoBanner } from '../components/LogoBanner'
@@ -60,7 +60,7 @@ export function StartScreen({ onNewGame, onContinue, onOptions, onViewLeaderboar
           <KingdomForeground difficulty={difficulty} />
         </>
       )}
-      <StrollingKnight useRaster={useRaster} />
+      <KingdomCreatures useRaster={useRaster} difficulty={difficulty} />
 
       {/* ── UI panel ── */}
       <motion.div

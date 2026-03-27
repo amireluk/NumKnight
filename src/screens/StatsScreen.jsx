@@ -1,6 +1,6 @@
 import { useMemo, useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { KingdomBackground, KingdomForeground, StrollingKnight } from '../components/KingdomScenery'
+import { KingdomBackground, KingdomForeground, KingdomCreatures } from '../components/KingdomScenery'
 import { FlyingCreatures } from '../components/FlyingCreatures'
 import { loadPlayerStats, computeNumberRating, clearPlayerStats } from '../game/statsState'
 import { getLog } from '../game/runLog'
@@ -230,7 +230,7 @@ export function StatsScreen({ onBack, playerName, difficulty, useRaster, lang, t
           <KingdomForeground difficulty={difficulty} />
         </>
       )}
-      <StrollingKnight useRaster={useRaster} />
+      <KingdomCreatures useRaster={useRaster} difficulty={difficulty} />
 
       {/* Back button */}
       <button

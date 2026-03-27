@@ -2,6 +2,68 @@ import { useState, useEffect, useRef } from 'react'
 import { motion, useMotionValue, useTransform, animate } from 'framer-motion'
 import { KnightCharacter } from './KnightCharacter'
 
+/* eslint-disable no-undef */
+const _VER  = typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : 'dev'
+const _BASE = import.meta.env.BASE_URL
+const _img  = (f) => `${_BASE}${f}?v=${_VER}`
+const RASTER_KEY = 'numknight_raster_bg'
+
+const MONSTER_BY_DIFFICULTY = { easy: 'goblin', medium: 'skeleton', hard: 'orc' }
+
+const MONSTER_SPRITES = {
+  goblin:   { idle: _img('assets/characters/goblin/goblin-idle.webp'),     hit: _img('assets/characters/goblin/goblin-hit.webp') },
+  skeleton: { idle: _img('assets/characters/skeleton/skeleton-idle.webp'), hit: _img('assets/characters/skeleton/skeleton-hit.webp') },
+  orc:      { idle: _img('assets/characters/orc/orc-idle.webp'),           hit: _img('assets/characters/orc/orc-hit.webp') },
+}
+
+
+const KNIGHT_SPRITES = {
+  idle: _img('assets/characters/knight/knight-idle.webp'),
+  hit:  _img('assets/characters/knight/knight-hit.webp'),
+}
+
+// Knight sprite — idle while strolling, hit while fleeing
+function SceneryKnight({ sprite, facingRight, useRaster }) {
+  const useRasterMode = useRaster || localStorage.getItem(RASTER_KEY) !== 'false'
+  return (
+    <div style={{
+      transform: `scale(${useRasterMode ? 0.38 : 0.3}) scaleX(${facingRight ? 1 : -1})`,
+      transformOrigin: 'center bottom',
+      display: 'inline-block',
+      filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.5))',
+    }}>
+      {useRasterMode ? (
+        <img src={KNIGHT_SPRITES[sprite] ?? KNIGHT_SPRITES.idle}
+          style={{ height: 'min(150px, 33vw)', width: 'auto', display: 'block' }} alt="" />
+      ) : (
+        <KnightCharacter phase="idle" hitKey={0} />
+      )}
+    </div>
+  )
+}
+
+// Monster sprite rendered in scenery
+function SceneryMonster({ monsterId, phase, facingRight }) {
+  const useRasterMode = localStorage.getItem(RASTER_KEY) !== 'false'
+  const sprites = MONSTER_SPRITES[monsterId]
+
+  return (
+    <div style={{
+      transform: `scale(0.32) scaleX(${facingRight ? -1 : 1})`,
+      transformOrigin: 'center bottom',
+      display: 'inline-block',
+      filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.5))',
+    }}>
+      {useRasterMode && sprites ? (
+        <img src={sprites[phase] ?? sprites.idle}
+          style={{ height: '150px', width: 'auto', display: 'block' }} alt="" />
+      ) : (
+        <div style={{ width: 84, height: 112, background: monsterId === 'goblin' ? '#8bc34a' : monsterId === 'skeleton' ? '#a78bfa' : '#fb923c', borderRadius: 8, opacity: 0.85 }} />
+      )}
+    </div>
+  )
+}
+
 // Ground sampling points — matches the near-hills bezier in KingdomBackground
 const GROUND_PTS = [
   [0, 180], [25, 174], [50, 171.5], [75, 171.5], [100, 174],
@@ -25,61 +87,178 @@ function groundBottom(screenX, containerW) {
   return (230 - vy) * scale
 }
 
-export function StrollingKnight({ useRaster = false }) {
-  const wrapRef   = useRef(null)
-  const motionX   = useMotionValue(20)
-  const cancelled = useRef(false)
-  const [facingRight, setFacingRight] = useState(true)
-  const [visible, setVisible]         = useState(false)
+export function KingdomCreatures({ difficulty = 'easy', useRaster = false }) {
+  const wrapRef = useRef(null)
 
-  const motionBottom = useTransform(motionX, (x) => {
-    const w = wrapRef.current?.offsetWidth ?? 390
-    return groundBottom(x, w)
-  })
+  // Knight
+  const knightX = useMotionValue(-120)
+  const [facingRight, setFacingRight]   = useState(true)
+  const [knightSprite, setKnightSprite] = useState('idle')   // 'idle' | 'hit'
+
+  // Monster
+  const monsterX = useMotionValue(-300)
+  const [monsterVisible, setMonsterVisible]         = useState(false)
+  const [monsterFacingRight, setMonsterFacingRight] = useState(false)
+  const [monsterPhase, setMonsterPhase]             = useState('idle')
+
+  // Terrain curves
+  const knightBottom  = useTransform(knightX,  (x) => groundBottom(x, wrapRef.current?.offsetWidth ?? 390))
+  const monsterBottom = useTransform(monsterX, (x) => groundBottom(x, wrapRef.current?.offsetWidth ?? 390))
+
+  // Refs shared across async loop and timers
+  const cancelledRef        = useRef(false)
+  const pauseInProgress     = useRef(false)
+  const pauseCountRef       = useRef(0)
+  const attackPauseTimerRef = useRef(null)
+  const monsterAnimRef      = useRef(null)
+  const chaseActiveRef      = useRef(false)
+  const monsterTargetRef    = useRef(0)
+
+  const monsterId = MONSTER_BY_DIFFICULTY[difficulty] ?? 'goblin'
+
+  // Resume monster from current position after a pause
+  function resumeMonsterChase() {
+    if (!chaseActiveRef.current) return
+    const dist = Math.abs(monsterTargetRef.current - monsterX.get())
+    if (dist < 1) return
+    monsterAnimRef.current = animate(monsterX, monsterTargetRef.current, { duration: dist / 82, ease: 'linear' })
+  }
+
+  // Schedule up to maxPauses mid-chase pauses: stop → 'hit' sprite → resume
+  function scheduleNextPause(maxPauses) {
+    const delay = 1000 + Math.random() * 1000
+    attackPauseTimerRef.current = setTimeout(() => {
+      if (!chaseActiveRef.current || pauseInProgress.current) return
+      pauseInProgress.current = true
+      if (monsterAnimRef.current) monsterAnimRef.current.stop()
+      setMonsterPhase('hit')
+      setTimeout(() => {
+        if (!chaseActiveRef.current) return
+        setMonsterPhase('idle')
+        pauseInProgress.current = false
+        resumeMonsterChase()
+        pauseCountRef.current += 1
+        if (pauseCountRef.current < maxPauses) scheduleNextPause(maxPauses)
+      }, 500)
+    }, delay)
+  }
+
+  function clearAttackPause() {
+    clearTimeout(attackPauseTimerRef.current)
+    attackPauseTimerRef.current = null
+  }
 
   useEffect(() => {
-    cancelled.current = false
-    async function stroll() {
+    cancelledRef.current = false
+
+    async function loop() {
       await new Promise(r => requestAnimationFrame(r))
-      motionX.set(20)
-      setVisible(true)
-      await new Promise(r => setTimeout(r, 700))
-      let goRight = true
-      while (!cancelled.current) {
-        const w       = wrapRef.current?.offsetWidth ?? 390
-        const targetX = goRight ? w - 84 : 20
-        const dist    = Math.abs(targetX - motionX.get())
+      await new Promise(r => setTimeout(r, 400 + Math.random() * 800))
+
+      let goRight = Math.random() < 0.5
+
+      while (!cancelledRef.current) {
+        const w = wrapRef.current?.offsetWidth ?? 390
+
+        const entryX    = goRight ? -120 : w + 40
+        const decisionX = goRight ? w - 60 : 20
+        const exitX     = goRight ? w + 40 : -120
+
+        knightX.set(entryX)
         setFacingRight(goRight)
+
+        // ── Stroll to decision point ──────────────────────────────
+        const distToDecision = Math.abs(decisionX - entryX)
         await new Promise(resolve =>
-          animate(motionX, targetX, { duration: dist / 36, ease: 'linear', onComplete: resolve })
+          animate(knightX, decisionX, { duration: distToDecision / 36, ease: 'linear', onComplete: resolve })
         )
-        goRight = !goRight
-        if (cancelled.current) break
-        await new Promise(r => setTimeout(r, 700 + Math.random() * 1000))
+        if (cancelledRef.current) break
+
+        if (Math.random() < 0.33) {
+          // ── CHASE ────────────────────────────────────────────────
+          const fleeRight     = !goRight
+          const fleeTarget    = fleeRight ? w + 40 : -120
+          const monsterStart  = fleeRight ? knightX.get() - 80 : knightX.get() + 80
+          const monsterTarget = fleeRight ? w + 180 : -180
+
+          monsterTargetRef.current = monsterTarget
+          chaseActiveRef.current   = true
+          pauseInProgress.current  = false
+          pauseCountRef.current    = 0
+
+          monsterX.set(monsterStart)
+          setMonsterPhase('idle')
+          setMonsterFacingRight(fleeRight)
+          setMonsterVisible(true)
+          setFacingRight(fleeRight)
+          // setKnightSprite('hit')  // kept idle — hit sprite looks weird in scenery
+
+          const maxPauses = Math.random() < 0.5 ? 1 : 2
+          scheduleNextPause(maxPauses)
+
+          const monsterDist = Math.abs(monsterTarget - monsterStart)
+          monsterAnimRef.current = animate(monsterX, monsterTarget, { duration: monsterDist / 82, ease: 'linear' })
+
+          const fleeDist = Math.abs(fleeTarget - knightX.get())
+          await new Promise(resolve =>
+            animate(knightX, fleeTarget, { duration: fleeDist / 72, ease: 'linear', onComplete: resolve })
+          )
+
+          chaseActiveRef.current = false
+          clearAttackPause()
+          if (monsterAnimRef.current) monsterAnimRef.current.stop()
+          setMonsterVisible(false)
+          setMonsterPhase('idle')
+          setKnightSprite('idle')
+
+        } else {
+          // ── NO CHASE: continue off-screen ────────────────────────
+          const distToExit = Math.abs(exitX - knightX.get())
+          await new Promise(resolve =>
+            animate(knightX, exitX, { duration: distToExit / 36, ease: 'linear', onComplete: resolve })
+          )
+          goRight = !goRight
+        }
+
+        if (cancelledRef.current) break
+        await new Promise(r => setTimeout(r, 800 + Math.random() * 1500))
       }
     }
-    stroll()
-    return () => { cancelled.current = true }
-  }, [motionX])
+
+    loop()
+    return () => {
+      cancelledRef.current = true
+      chaseActiveRef.current = false
+      clearAttackPause()
+    }
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div ref={wrapRef} dir="ltr" style={{ position: 'absolute', inset: 0, zIndex: 2, pointerEvents: 'none' }}>
-      <motion.div style={{
-        x: motionX, bottom: motionBottom,
-        position: 'absolute', left: 0, display: 'inline-block',
-        opacity: visible ? 1 : 0,
-      }}>
-        <div style={{
-          transform: `scale(${useRaster ? 0.38 : 0.3}) scaleX(${facingRight ? 1 : -1})`,
-          transformOrigin: 'center bottom',
-          display: 'inline-block',
-          filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.5))',
-        }}>
-          <KnightCharacter phase="idle" hitKey={0} />
+      {/* Knight */}
+      <motion.div style={{ x: knightX, bottom: knightBottom, position: 'absolute', left: 0, display: 'inline-block' }}>
+        <div style={{ position: 'relative', display: 'inline-block' }}>
+          <div style={{ position: 'absolute', bottom: 1, left: '50%', transform: 'translateX(-50%)', width: 30, height: 8, borderRadius: '50%', background: 'rgba(0,0,0,0.28)', filter: 'blur(4px)' }} />
+          <SceneryKnight sprite={knightSprite} facingRight={facingRight} useRaster={useRaster} />
         </div>
       </motion.div>
+
+      {/* Monster */}
+      {monsterVisible && (
+        <motion.div style={{ x: monsterX, bottom: monsterBottom, position: 'absolute', left: 0, display: 'inline-block' }}>
+          <div style={{ position: 'relative', display: 'inline-block' }}>
+            <div style={{ position: 'absolute', bottom: 1, left: '50%', transform: 'translateX(-50%)', width: 30, height: 8, borderRadius: '50%', background: 'rgba(0,0,0,0.28)', filter: 'blur(4px)' }} />
+            <SceneryMonster monsterId={monsterId} phase={monsterPhase} facingRight={monsterFacingRight} />
+          </div>
+        </motion.div>
+      )}
     </div>
   )
+}
+
+// Keep StrollingKnight as an alias so any import not yet updated still works
+export function StrollingKnight({ useRaster = false, difficulty = 'easy' }) {
+  return <KingdomCreatures useRaster={useRaster} difficulty={difficulty} />
 }
 
 // Sky + ground background — always the same (difficulty only affects the castle)
