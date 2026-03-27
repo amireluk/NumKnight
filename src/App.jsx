@@ -9,7 +9,6 @@ import { VictoryScreen } from './screens/VictoryScreen'
 import { StartScreen } from './screens/StartScreen'
 import { OptionsScreen } from './screens/OptionsScreen'
 import { CampfireScreen } from './screens/CampfireScreen'
-import { DesignScreen } from './screens/DesignScreen'
 import { PracticePickerScreen } from './screens/PracticePickerScreen'
 import { PracticeBattleScreen } from './screens/PracticeBattleScreen'
 import { PracticeEndScreen } from './screens/PracticeEndScreen'
@@ -44,9 +43,7 @@ export default function App() {
   const totalBattles = worlds.reduce((sum, w) => sum + w.battles, 0)
 
   const [run, setRun] = useState(() => loadRun() ?? createNewRun())
-  const [screen, setScreen] = useState(
-    () => window.location.search.includes('design') ? 'design' : 'start'
-  )
+  const [screen, setScreen] = useState('start')
   const [clearedData, setClearedData] = useState(null)
   const [battleKey, setBattleKey] = useState(0)
   const [mapIsTransition, setMapIsTransition] = useState(false)
@@ -272,16 +269,7 @@ export default function App() {
   return (
     <>
     <AnimatePresence mode="wait">
-      {screen === 'design' && (
-        <motion.div key="design"
-          initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-          transition={{ duration: 0.2 }} className="w-full"
-        >
-          <DesignScreen onExit={() => setScreen('start')} />
-        </motion.div>
-      )}
-
-      {screen === 'start' && (
+{screen === 'start' && (
         <motion.div key="start"
           initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
           transition={{ duration: 0.25 }} className="w-full"
