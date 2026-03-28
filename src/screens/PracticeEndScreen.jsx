@@ -4,7 +4,7 @@ import { FlyingCreatures } from '../components/FlyingCreatures'
 
 const TOTAL_QUESTIONS = 20
 
-export function PracticeEndScreen({ score, selectedNumbers, onPracticeAgain, onChangeNumbers, difficulty, useRaster, lang, t }) {
+export function PracticeEndScreen({ score, avgTimeMs, selectedNumbers, onPracticeAgain, onChangeNumbers, onHome, difficulty, useRaster, lang, t }) {
   const isRtl = lang === 'he'
   const perfect = score === TOTAL_QUESTIONS
 
@@ -68,6 +68,7 @@ export function PracticeEndScreen({ score, selectedNumbers, onPracticeAgain, onC
           style={{
             background: 'rgba(0,0,0,0.35)', border: '1.5px solid rgba(255,255,255,0.18)',
             borderRadius: 20, padding: '16px 32px', textAlign: 'center',
+            display: 'flex', flexDirection: 'column', gap: 6,
           }}
         >
           <p style={{ fontSize: 20, fontWeight: 900, color: 'white', letterSpacing: '0.04em', margin: 0 }}>
@@ -75,6 +76,13 @@ export function PracticeEndScreen({ score, selectedNumbers, onPracticeAgain, onC
               ? t.practiceResultText(score)
               : `You got ${score} right!`}
           </p>
+          {avgTimeMs != null && (
+            <p style={{ fontSize: 13, fontWeight: 700, color: 'rgba(255,255,255,0.55)', margin: 0 }}>
+              {t?.practiceAvgTime
+                ? t.practiceAvgTime(+(avgTimeMs / 1000).toFixed(1))
+                : `avg. time: ${+(avgTimeMs / 1000).toFixed(1)}s`}
+            </p>
+          )}
         </motion.div>
 
         {/* Buttons */}
@@ -99,6 +107,16 @@ export function PracticeEndScreen({ score, selectedNumbers, onPracticeAgain, onC
           >
             {t?.practiceNewNumbers ?? 'NEW NUMBERS'}
           </motion.button>
+
+          {onHome && (
+            <motion.button
+              whileTap={{ scale: 0.95 }} whileHover={{ scale: 1.03 }}
+              onClick={onHome}
+              className="w-full bg-yellow-400 border-b-4 border-yellow-600 text-black font-black text-lg rounded-2xl h-12 shadow-xl cursor-pointer tracking-widest"
+            >
+              {t?.back ?? 'BACK'}
+            </motion.button>
+          )}
         </motion.div>
       </motion.div>
     </div>

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useLayoutEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
 import { isMuted, toggleMute } from '../game/sounds'
 
@@ -57,12 +57,19 @@ export function OptionsScreen({ difficulty, onDifficultyChange, useRaster, onRas
   const nameUnsaved = name.trim() !== savedName
 
   // Android hardware back → close options
-  useEffect(() => {
-    window.history.pushState(null, '', window.location.href)
-    const onPop = () => onBack()
+  // Use a ref so this only pushes state once on mount, not on every parent re-render
+  const onBackRef = useRef(onBack)
+  useEffect(() => { onBackRef.current = onBack }, [onBack])
+
+  useLayoutEffect(() => {
+    // Skip push when returning from Stats — we're already at our own entry
+    if (window.history.state?._screen !== 'options') {
+      window.history.pushState({ _screen: 'options' }, '', window.location.href)
+    }
+    const onPop = () => onBackRef.current()
     window.addEventListener('popstate', onPop)
     return () => window.removeEventListener('popstate', onPop)
-  }, [onBack])
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleNameChange = (v) => {
     setName(v.slice(0, 16))
@@ -128,7 +135,7 @@ export function OptionsScreen({ difficulty, onDifficultyChange, useRaster, onRas
           {t?.optionsTitle ?? 'OPTIONS'}
         </p>
         <button
-          onClick={onBack}
+          onClick={() => window.history.back()}
           style={{
             background: 'rgba(0,0,0,0.35)', border: '1.5px solid rgba(255,255,255,0.18)',
             borderRadius: 8, padding: '5px 12px',

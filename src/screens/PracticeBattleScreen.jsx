@@ -101,6 +101,8 @@ export function PracticeBattleScreen({ selectedNumbers, onPracticeEnd, onQuit, u
 
   // Hidden response timer — records ms from question display to first tap
   const questionStartTime = useRef(Date.now())
+  // Accumulates response times for correct first-attempt answers (for trimmed mean)
+  const successTimesRef = useRef([])
 
   const { problem, options } = round
   const isRtl = lang === 'he'
@@ -129,6 +131,7 @@ export function PracticeBattleScreen({ selectedNumbers, onPracticeEnd, onQuit, u
       // Record stat on first attempt only (success or failure was already recorded on wrong)
       if (firstAttempt) {
         recordResult(playerName, problem.a, problem.b, true, elapsed)
+        successTimesRef.current = [...successTimesRef.current, elapsed]
       }
       playCorrect()
       setPhase('attacking')
@@ -147,8 +150,8 @@ export function PracticeBattleScreen({ selectedNumbers, onPracticeEnd, onQuit, u
 
         if (nextNum >= TOTAL_QUESTIONS) {
           setScore(newScore)
-          setPhase('idle')
-          setTimeout(() => onPracticeEnd(newScore), 600)
+          // Keep phase as 'attacking' so buttons stay disabled during transition
+          setTimeout(() => onPracticeEnd(newScore, successTimesRef.current), 600)
         } else {
           setScore(newScore)
           setQuestionNum(nextNum)

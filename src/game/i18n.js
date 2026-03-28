@@ -109,6 +109,7 @@ export const T = {
     practiceAgain: (nums) => `PRACTICE AGAIN  ${nums.join(', ')}`,
     practiceNewNumbers: 'NEW NUMBERS',
     practiceQuestionLabel: (n, total) => `${n} / ${total}`,
+    practiceAvgTime: (s) => `avg. time: ${s}s`,
 
     // StatsScreen
     statsTitle: 'YOUR NUMBERS',
@@ -249,6 +250,7 @@ export const T = {
     practiceAgain: (nums) => `תרגל שוב  ${nums.join(', ')}`,
     practiceNewNumbers: 'מספרים חדשים',
     practiceQuestionLabel: (n, total) => `${n} / ${total}`,
+    practiceAvgTime: (s) => `זמן ממוצע: ${s}שנ`,
 
     // StatsScreen
     statsTitle: 'המספרים שלך',

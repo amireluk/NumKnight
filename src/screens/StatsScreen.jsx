@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect } from 'react'
+import { useMemo, useState, useEffect, useLayoutEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { KingdomBackground, KingdomForeground, KingdomCreatures } from '../components/KingdomScenery'
 import { FlyingCreatures } from '../components/FlyingCreatures'
@@ -24,7 +24,7 @@ const ALL_NUMBERS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 function NumberCell({ n, stats, t, isSelected, onClick }) {
   const rating = stats ? computeNumberRating(stats.results) : null
 
-  const pctText  = rating ? `${Math.round(rating.pct * 100)}%` : null
+  const pctText  = rating ? `${Math.round(rating.rating * 100)}` : null
   const timeText = rating
     ? t?.statsMedianTime?.(+(rating.medianMs / 1000).toFixed(1)) ?? `${+(rating.medianMs / 1000).toFixed(1)}s`
     : null
@@ -172,16 +172,26 @@ export function StatsScreen({ onBack, playerName, difficulty, useRaster, lang, t
   const [showLog, setShowLog] = useState(false)
   const hasLog = getLog().length > 0
 
+  // Keep a ref so the popstate handler can read current selectedNumber
+  // without re-registering (which would push extra history entries)
+  const selectedNumberRef = useRef(null)
+  useEffect(() => { selectedNumberRef.current = selectedNumber }, [selectedNumber])
+
   // Android back button — close overlay first, then navigate back
-  useEffect(() => {
-    window.history.pushState(null, '', window.location.href)
+  useLayoutEffect(() => {
+    if (window.history.state?._screen !== 'stats') {
+      window.history.pushState({ _screen: 'stats' }, '', window.location.href)
+    }
     const onPop = () => {
-      if (selectedNumber !== null) { setSelectedNumber(null) }
+      if (selectedNumberRef.current !== null) {
+        setSelectedNumber(null)
+        window.history.pushState({ _screen: 'stats' }, '', window.location.href)
+      }
       else onBack?.()
     }
     window.addEventListener('popstate', onPop)
     return () => window.removeEventListener('popstate', onPop)
-  }, [selectedNumber]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const numbersMap = useMemo(() => loadPlayerStats(playerName), [playerName, statsVersion])
 
@@ -234,7 +244,11 @@ export function StatsScreen({ onBack, playerName, difficulty, useRaster, lang, t
 
       {/* Back button */}
       <button
-        onClick={onBack}
+        onClick={() => {
+          selectedNumberRef.current = null
+          setSelectedNumber(null)
+          window.history.back()
+        }}
         style={{
           position: 'absolute', top: 16, left: 16, zIndex: 5,
           background: 'rgba(0,0,0,0.35)', border: '1.5px solid rgba(255,255,255,0.18)',

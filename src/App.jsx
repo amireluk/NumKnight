@@ -60,6 +60,7 @@ export default function App() {
   // Practice mode state
   const [practiceNumbers, setPracticeNumbers] = useState([])
   const [practiceScore, setPracticeScore] = useState(0)
+  const [practiceAvgTime, setPracticeAvgTime] = useState(null)
   const [practiceBattleKey, setPracticeBattleKey] = useState(0)
   const handleRasterChange = (val) => { setUseRaster(val); localStorage.setItem(RASTER_KEY, String(val)) }
 
@@ -246,8 +247,17 @@ export default function App() {
     setScreen('practice-battle')
   }
 
-  const handlePracticeEnd = (score) => {
+  const handlePracticeEnd = (score, times) => {
     setPracticeScore(score)
+    // Trimmed mean: remove min and max before averaging; fall back to plain mean if < 3
+    if (times && times.length > 0) {
+      const sorted = [...times].sort((a, b) => a - b)
+      const trimmed = sorted.length >= 3 ? sorted.slice(1, -1) : sorted
+      const avg = Math.round(trimmed.reduce((a, b) => a + b, 0) / trimmed.length)
+      setPracticeAvgTime(avg)
+    } else {
+      setPracticeAvgTime(null)
+    }
     setScreen('practice-end')
   }
 
@@ -464,9 +474,11 @@ export default function App() {
         >
           <PracticeEndScreen
             score={practiceScore}
+            avgTimeMs={practiceAvgTime}
             selectedNumbers={practiceNumbers}
             onPracticeAgain={handlePracticeAgain}
             onChangeNumbers={handlePracticeChangeNumbers}
+            onHome={() => setScreen('start')}
             difficulty={difficulty}
             useRaster={useRaster}
             lang={lang} t={t}
