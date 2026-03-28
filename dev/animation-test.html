@@ -5,536 +5,166 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>NumKnight — Animation Lab</title>
   <style>
-    /* ── Timing knobs — edit these to tune animations ── */
-    :root {
-      --idle-duration:    3.0s;
-      --idle-amplitude:   4px;
-      --attack-duration:  0.45s;
-      --attack-lunge:     54px;
-      --enemy-lunge:     -20px;
-      --hit-duration:     0.35s;
-      --hit-recoil:       12px;
-      --enemy-recoil:     15px;
-      --flash-ms:         80ms;
-      --death-duration:   0.65s;
-      --death-slide:      160px;
-    }
-
-    /* ── Base ── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       background: #0f0c1a;
       color: #e2e8f0;
       font-family: 'Segoe UI', system-ui, sans-serif;
       min-height: 100vh;
+      padding: 16px;
     }
 
-    /* ── Layout ── */
     header {
       background: #1a1430;
-      border-bottom: 2px solid #fbbf24;
-      padding: 12px 20px;
+      border: 1px solid #fbbf24;
+      border-radius: 8px;
+      padding: 10px 16px;
+      margin-bottom: 16px;
       display: flex;
-      align-items: center;
-      gap: 16px;
-    }
-    header h1 { font-size: 1.1rem; color: #fbbf24; letter-spacing: .05em; }
-    header p  { font-size: .8rem; color: #94a3b8; }
-
-    .tab-bar {
-      display: flex;
-      gap: 4px;
-      padding: 12px 20px 0;
-      border-bottom: 1px solid #2d2848;
-    }
-    .tab {
-      padding: 6px 18px;
-      border: 1px solid #3d3660;
-      border-bottom: none;
-      border-radius: 6px 6px 0 0;
-      background: #1a1430;
-      color: #94a3b8;
-      cursor: pointer;
-      font-size: .85rem;
-      transition: background .15s, color .15s;
-    }
-    .tab.active { background: #2d2848; color: #fbbf24; border-color: #fbbf24; }
-    .tab:hover:not(.active) { background: #252040; color: #cbd5e1; }
-
-    .panel { display: none; padding: 20px; }
-    .panel.active { display: block; }
-
-    /* ── Sprite grid (Characters tab) ── */
-    .sprite-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-      gap: 16px;
-    }
-
-    .char-card {
-      background: #1a1430;
-      border: 1px solid #2d2848;
-      border-radius: 10px;
-      padding: 16px 12px 12px;
-      display: flex;
-      flex-direction: column;
       align-items: center;
       gap: 12px;
     }
-    .char-card h3 { font-size: .8rem; color: #94a3b8; text-transform: uppercase; letter-spacing: .08em; }
+    header h1 { font-size: 1rem; color: #fbbf24; }
+    header p  { font-size: .78rem; color: #64748b; }
 
-    /* ── Stage (arena box) ── */
-    .stage {
-      width: 140px;
-      height: 130px;
-      background: #0a0818;
-      border-radius: 8px;
-      position: relative;
-      overflow: hidden;
-      display: flex;
-      align-items: flex-end;
-      justify-content: center;
-    }
-    .stage-ground {
-      position: absolute;
-      bottom: 0; left: 0; right: 0;
-      height: 28px;
-      background: linear-gradient(to bottom, #2d4a1e, #1a2e10);
-      border-top: 1px solid #4a7a32;
-    }
-
-    /* ── Sprite image wrapper ── */
-    .sprite-wrap {
-      position: relative;
-      z-index: 2;
-      margin-bottom: 20px;
-      display: flex;
-      align-items: flex-end;
-      justify-content: center;
-      transform-origin: center bottom;
-    }
-    .sprite-wrap img {
-      display: block;
-      image-rendering: pixelated;
-    }
-    /* Enemy sprites face left in-game via scaleX(-1) */
-    .sprite-wrap.enemy { transform: scaleX(-1); }
-    /* Knight is not mirrored */
-    .sprite-wrap.knight { }
-
-    /* ── Idle bob ── */
-    @keyframes idle-bob {
-      0%, 100% { transform: translateY(0); }
-      50%       { transform: translateY(calc(-1 * var(--idle-amplitude))); }
-    }
-    .anim-idle .sprite-wrap.enemy {
-      animation: idle-bob-enemy var(--idle-duration) ease-in-out infinite;
-    }
-    .anim-idle .sprite-wrap.knight {
-      animation: idle-bob var(--idle-duration) ease-in-out infinite;
-    }
-    @keyframes idle-bob-enemy {
-      0%, 100% { transform: scaleX(-1) translateY(0); }
-      50%       { transform: scaleX(-1) translateY(calc(-1 * var(--idle-amplitude))); }
-    }
-
-    /* ── Knight attack (lunge right) ── */
-    @keyframes knight-attack {
-      0%   { transform: translateX(0); }
-      40%  { transform: translateX(var(--attack-lunge)); }
-      100% { transform: translateX(0); }
-    }
-    .anim-attack .sprite-wrap.knight {
-      animation: knight-attack var(--attack-duration) ease-in-out forwards;
-    }
-
-    /* ── Enemy attack (lunge left = positive x since mirrored) ── */
-    @keyframes enemy-attack {
-      0%   { transform: scaleX(-1) translateX(0); }
-      40%  { transform: scaleX(-1) translateX(var(--enemy-lunge)); }
-      100% { transform: scaleX(-1) translateX(0); }
-    }
-    .anim-attack .sprite-wrap.enemy {
-      animation: enemy-attack var(--attack-duration) ease-in-out forwards;
-    }
-
-    /* ── Knight hit (recoil left) ── */
-    @keyframes knight-hit {
-      0%   { transform: translateX(0); }
-      30%  { transform: translateX(calc(-1 * var(--hit-recoil))); }
-      70%  { transform: translateX(calc(var(--hit-recoil) * 0.4)); }
-      100% { transform: translateX(0); }
-    }
-    .anim-hit .sprite-wrap.knight {
-      animation: knight-hit var(--hit-duration) ease-out forwards;
-    }
-
-    /* ── Enemy hit (recoil right = scaleX(-1) so translate positive) ── */
-    @keyframes enemy-hit {
-      0%   { transform: scaleX(-1) translateX(0); }
-      30%  { transform: scaleX(-1) translateX(var(--enemy-recoil)); }
-      70%  { transform: scaleX(-1) translateX(calc(var(--enemy-recoil) * -0.4)); }
-      100% { transform: scaleX(-1) translateX(0); }
-    }
-    .anim-hit .sprite-wrap.enemy {
-      animation: enemy-hit var(--hit-duration) ease-out forwards;
-    }
-
-    /* ── Hit flash (red tint) ── */
-    @keyframes hit-flash {
-      0%, 100% { filter: none; }
-      10%, 60% { filter: brightness(1.6) sepia(1) saturate(8) hue-rotate(-10deg); }
-    }
-    .anim-hit .sprite-wrap {
-      animation-name: hit-flash, enemy-hit;  /* overridden per class above */
-    }
-    .anim-hit .sprite-wrap.enemy {
-      animation: enemy-hit var(--hit-duration) ease-out forwards,
-                 hit-flash var(--hit-duration) ease-out forwards;
-    }
-    .anim-hit .sprite-wrap.knight {
-      animation: knight-hit var(--hit-duration) ease-out forwards,
-                 hit-flash var(--hit-duration) ease-out forwards;
-    }
-
-    /* ── Death (fall off screen) ── */
-    @keyframes enemy-death {
-      0%   { transform: scaleX(-1) translateX(0)            rotate(0deg);   opacity: 1; }
-      30%  { transform: scaleX(-1) translateX(-18px)         rotate(12deg);  opacity: 1; }
-      100% { transform: scaleX(-1) translateX(calc(-1 * var(--death-slide))) rotate(80deg); opacity: 0; }
-    }
-    @keyframes knight-death {
-      0%   { transform: translateX(0)             rotate(0deg);   opacity: 1; }
-      30%  { transform: translateX(18px)           rotate(-10deg); opacity: 1; }
-      100% { transform: translateX(var(--death-slide)) rotate(-80deg); opacity: 0; }
-    }
-    .anim-dead .sprite-wrap.enemy  { animation: enemy-death  var(--death-duration) ease-in forwards; }
-    .anim-dead .sprite-wrap.knight { animation: knight-death var(--death-duration) ease-in forwards; }
-
-    /* ── Buttons ── */
-    .btn-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      justify-content: center;
-    }
-    .btn {
-      padding: 4px 10px;
-      border-radius: 5px;
-      border: 1px solid;
-      font-size: .75rem;
-      font-weight: 600;
-      cursor: pointer;
-      letter-spacing: .04em;
-      transition: opacity .1s;
-    }
-    .btn:hover { opacity: .85; }
-    .btn-idle   { background:#1e3a5f; border-color:#3b82f6; color:#93c5fd; }
-    .btn-attack { background:#3b2a00; border-color:#fbbf24; color:#fde68a; }
-    .btn-hit    { background:#3b0a0a; border-color:#f87171; color:#fca5a5; }
-    .btn-dead   { background:#1a0a2e; border-color:#a78bfa; color:#c4b5fd; }
-    .btn-seq    { background:#0f2d1a; border-color:#4ade80; color:#86efac; }
-
-    /* ── Spritesheet tab ── */
-    .ss-layout {
+    /* ── Main layout ── */
+    .main {
       display: grid;
-      grid-template-columns: 1fr 340px;
-      gap: 20px;
-      max-width: 960px;
+      grid-template-columns: 1fr 1fr 280px;
+      gap: 14px;
+      align-items: start;
     }
-    @media (max-width: 720px) { .ss-layout { grid-template-columns: 1fr; } }
+    @media (max-width: 900px) {
+      .main { grid-template-columns: 1fr 1fr; }
+      .controls { grid-column: 1 / -1; }
+    }
 
-    .ss-stage {
+    /* ── Stage ── */
+    .stage-wrap { display: flex; flex-direction: column; gap: 8px; }
+    .stage-label {
+      font-size: .75rem;
+      font-weight: 700;
+      color: #fbbf24;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      text-align: center;
+    }
+    .stage {
       background: #0a0818;
       border: 2px solid #2d2848;
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 260px;
+      border-radius: 10px;
       position: relative;
       overflow: hidden;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      height: 260px;
     }
-    .ss-stage-bg {
+    .stage-bg {
       position: absolute; inset: 0;
       object-fit: cover;
       object-position: center;
       width: 100%; height: 100%;
-      opacity: .45;
+      opacity: .5;
+      pointer-events: none;
     }
-
-    /* The actual animated sprite — driven entirely by CSS custom properties */
-    #ss-sprite {
-      position: relative; z-index: 2;
+    .sprite {
+      position: relative;
+      z-index: 2;
+      margin-bottom: 24px;
       image-rendering: pixelated;
-      background-image: url('assets/characters/knight-sheet.webp');
       background-repeat: no-repeat;
-      /* size/pos set by JS via CSS vars */
-      width:  var(--ss-fw);
-      height: var(--ss-fh);
-      background-size: var(--ss-sw) var(--ss-sh);
-      background-position-y: var(--ss-row-y);
-      animation: ss-walk var(--ss-duration) steps(var(--ss-steps), end) infinite;
-      transform: scaleX(var(--ss-flip)) scale(var(--ss-scale));
+      transform-origin: center bottom;
     }
-    @keyframes ss-walk {
-      from { background-position-x: var(--ss-start-x); }
-      to   { background-position-x: var(--ss-end-x);   }
-    }
-    #ss-sprite.paused { animation-play-state: paused; }
 
-    .ss-controls {
+    /* ── Frame strip ── */
+    .strip {
+      display: flex;
+      gap: 3px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .thumb {
+      image-rendering: pixelated;
+      background-repeat: no-repeat;
+      border: 1px solid #2d2848;
+      border-radius: 3px;
+      cursor: pointer;
+      transition: border-color .1s;
+      flex-shrink: 0;
+    }
+    .thumb:hover  { border-color: #94a3b8; }
+    .thumb.active { border-color: #fbbf24; box-shadow: 0 0 0 1px #fbbf24; }
+
+    /* ── Controls panel ── */
+    .controls {
       background: #1a1430;
       border: 1px solid #2d2848;
       border-radius: 10px;
-      padding: 16px;
+      padding: 14px;
       display: flex;
       flex-direction: column;
       gap: 14px;
     }
-    .ss-controls h3 { font-size: .8rem; color: #fbbf24; text-transform: uppercase; letter-spacing: .06em; }
-
-    .ss-row-btns { display: flex; gap: 6px; flex-wrap: wrap; }
-    .ss-row-btn {
-      padding: 5px 14px;
+    .ctrl-section h3 {
+      font-size: .7rem;
+      color: #fbbf24;
+      text-transform: uppercase;
+      letter-spacing: .07em;
+      margin-bottom: 7px;
+    }
+    .pill-row { display: flex; gap: 5px; flex-wrap: wrap; }
+    .pill {
+      padding: 4px 12px;
       border-radius: 20px;
       border: 1px solid #3d3660;
-      background: #1a1430;
+      background: #12102a;
       color: #94a3b8;
       cursor: pointer;
-      font-size: .8rem;
-      transition: all .15s;
+      font-size: .75rem;
+      transition: all .12s;
     }
-    .ss-row-btn.active { background: #2d2848; color: #fbbf24; border-color: #fbbf24; }
+    .pill.active { background: #2d2848; color: #fbbf24; border-color: #fbbf24; }
 
-    .ss-range-row { display: flex; align-items: center; gap: 6px; }
-    .ss-range-row label { font-size: .78rem; color: #94a3b8; min-width: 80px; }
-    .ss-range-row input[type=number] {
-      width: 48px; padding: 3px 6px;
+    .slider-row { display: flex; align-items: center; gap: 8px; margin-bottom: 7px; }
+    .slider-row label { font-size: .75rem; color: #94a3b8; min-width: 70px; }
+    .slider-row input[type=range] { flex: 1; accent-color: #fbbf24; }
+    .slider-row .val { font-size: .74rem; color: #e2e8f0; min-width: 34px; text-align: right; font-variant-numeric: tabular-nums; }
+
+    .range-row { display: flex; align-items: center; gap: 6px; margin-bottom: 7px; }
+    .range-row label { font-size: .75rem; color: #94a3b8; min-width: 70px; }
+    .range-row input[type=number] {
+      width: 44px; padding: 3px 5px;
       background: #0f0c1a; border: 1px solid #3d3660; border-radius: 4px;
-      color: #e2e8f0; font-size: .8rem; text-align: center;
+      color: #e2e8f0; font-size: .75rem; text-align: center;
     }
-    .ss-range-row span { font-size: .75rem; color: #64748b; }
+    .range-row span { font-size: .7rem; color: #475569; }
 
-    .ss-slider-row { display: flex; align-items: center; gap: 8px; }
-    .ss-slider-row label { font-size: .78rem; color: #94a3b8; min-width: 80px; }
-    .ss-slider-row input[type=range] { flex: 1; accent-color: #fbbf24; }
-    .ss-slider-row .val { font-size: .78rem; color: #e2e8f0; min-width: 38px; text-align: right; font-variant-numeric: tabular-nums; }
-
-    .ss-play-btn {
-      padding: 8px 0;
+    .play-btn {
+      width: 100%;
+      padding: 7px 0;
       border-radius: 7px;
       border: 2px solid #fbbf24;
       background: #3b2a00;
       color: #fde68a;
       font-weight: 700;
-      font-size: .9rem;
+      font-size: .85rem;
       cursor: pointer;
       letter-spacing: .05em;
-      transition: background .15s;
     }
-    .ss-play-btn:hover { background: #5a4000; }
+    .play-btn:hover { background: #5a4000; }
 
-    /* Frame strip — all frames shown small, active one highlighted */
-    .ss-frame-strip {
-      display: flex;
-      gap: 3px;
-      flex-wrap: wrap;
-      margin-top: 4px;
-    }
-    .ss-frame {
-      width: var(--ss-thumb-w);
-      height: var(--ss-thumb-h);
-      background-image: url('assets/characters/knight-sheet.webp');
-      background-repeat: no-repeat;
-      background-size: var(--ss-sw) var(--ss-sh);
-      border: 1px solid #2d2848;
-      border-radius: 3px;
-      cursor: pointer;
-      image-rendering: pixelated;
-      transition: border-color .1s;
-      flex-shrink: 0;
-    }
-    .ss-frame:hover { border-color: #94a3b8; }
-    .ss-frame.active { border-color: #fbbf24; box-shadow: 0 0 0 1px #fbbf24; }
-
-    .ss-sheet-preview {
-      margin-top: 4px;
-      max-width: 100%;
-      border-radius: 6px;
-      border: 1px solid #2d2848;
-      image-rendering: pixelated;
-    }
-
-    /* ── Battle tab ── */
-    .battle-scene {
-      max-width: 680px;
-      margin: 0 auto;
-    }
-    .battle-arena {
+    .code-hint {
       background: #0a0818;
-      border: 2px solid #2d2848;
-      border-radius: 12px;
-      height: 220px;
-      position: relative;
-      overflow: hidden;
-      display: flex;
-      align-items: flex-end;
-      justify-content: space-between;
-      padding: 0 40px 40px;
-    }
-    .arena-ground {
-      position: absolute;
-      bottom: 0; left: 0; right: 0;
-      height: 40px;
-      background: linear-gradient(to bottom, #2d4a1e, #1a2e10);
-      border-top: 2px solid #4a7a32;
-    }
-    .arena-bg-img {
-      position: absolute;
-      inset: 0;
-      object-fit: cover;
-      object-position: center;
-      width: 100%;
-      height: 100%;
-      opacity: .5;
-    }
-    .battle-controls {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      justify-content: center;
-      margin: 16px 0;
-    }
-    .battle-btn {
-      padding: 8px 16px;
-      border-radius: 7px;
-      border: 2px solid;
-      font-size: .85rem;
-      font-weight: 700;
-      cursor: pointer;
-      letter-spacing: .05em;
-      transition: transform .1s, opacity .1s;
-    }
-    .battle-btn:hover { transform: translateY(-1px); opacity: .9; }
-
-    .enemy-picker {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      justify-content: center;
-      margin-bottom: 16px;
-    }
-    .enemy-tab {
-      padding: 5px 12px;
-      border-radius: 20px;
-      border: 1px solid #3d3660;
-      background: #1a1430;
-      color: #94a3b8;
-      cursor: pointer;
-      font-size: .8rem;
-      transition: all .15s;
-    }
-    .enemy-tab.active { background: #2d2848; color: #fbbf24; border-color: #fbbf24; }
-
-    /* ── Settings tab ── */
-    .settings-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-      gap: 12px;
-      max-width: 900px;
-    }
-    .setting-card {
-      background: #1a1430;
-      border: 1px solid #2d2848;
-      border-radius: 8px;
-      padding: 14px;
-    }
-    .setting-card h4 { font-size: .75rem; color: #fbbf24; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 10px; }
-    .setting-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-      margin-bottom: 8px;
-    }
-    .setting-row label { font-size: .82rem; color: #94a3b8; flex: 1; }
-    .setting-row input[type=range] { width: 110px; accent-color: #fbbf24; }
-    .setting-row .val { font-size: .8rem; color: #e2e8f0; min-width: 44px; text-align: right; font-variant-numeric: tabular-nums; }
-
-    /* ── Sprite label overlay ── */
-    .pose-label {
-      position: absolute;
-      bottom: 2px; left: 0; right: 0;
-      font-size: .6rem;
-      text-align: center;
-      color: #64748b;
-      text-transform: uppercase;
-      letter-spacing: .05em;
-      z-index: 5;
-    }
-
-    /* ── Sequence progress ── */
-    .seq-steps {
-      display: flex;
-      gap: 6px;
-      flex-wrap: wrap;
-      justify-content: center;
-      margin-top: 8px;
-    }
-    .seq-step {
-      padding: 3px 8px;
-      border-radius: 4px;
-      font-size: .7rem;
-      background: #1e2a3a;
-      color: #475569;
-      border: 1px solid #2d3748;
-      transition: all .2s;
-    }
-    .seq-step.active { background: #fbbf24; color: #000; border-color: #fbbf24; }
-    .seq-step.done   { background: #166534; color: #86efac; border-color: #166534; }
-
-    /* ── Floating hint ── */
-    .hint {
-      background: #1e2535;
-      border: 1px solid #334155;
-      border-radius: 8px;
-      padding: 10px 14px;
-      font-size: .78rem;
-      color: #94a3b8;
-      line-height: 1.6;
-      margin-bottom: 16px;
-    }
-    .hint code { background: #0f172a; color: #7dd3fc; padding: 1px 5px; border-radius: 3px; font-size: .8em; }
-
-    /* ── Workflow tab ── */
-    .workflow { max-width: 640px; }
-    .step { display: flex; gap: 14px; margin-bottom: 20px; }
-    .step-num {
-      width: 28px; height: 28px;
-      border-radius: 50%;
-      background: #fbbf24;
-      color: #000;
-      font-weight: 700;
-      font-size: .85rem;
-      display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0;
-      margin-top: 2px;
-    }
-    .step-body h3 { font-size: .95rem; color: #e2e8f0; margin-bottom: 4px; }
-    .step-body p  { font-size: .82rem; color: #94a3b8; line-height: 1.6; }
-    .step-body code { background: #0f172a; color: #7dd3fc; padding: 2px 6px; border-radius: 3px; font-size: .85em; }
-    .step-body pre {
-      background: #0f172a;
       border: 1px solid #1e293b;
       border-radius: 6px;
-      padding: 10px 14px;
-      margin-top: 8px;
-      font-size: .8rem;
-      color: #7dd3fc;
-      overflow-x: auto;
+      padding: 9px 11px;
+      font-size: .68rem;
+      color: #64748b;
+      line-height: 1.8;
+      font-family: monospace;
     }
-    .divider { border: none; border-top: 1px solid #2d2848; margin: 24px 0; }
+    .code-hint .k { color: #7dd3fc; }
   </style>
 </head>
 <body>
@@ -542,709 +172,216 @@
 <header>
   <div>
     <h1>⚔️ NumKnight — Animation Lab</h1>
-    <p>Standalone sprite animation testbed — no build step needed</p>
+    <p>Spritesheet tester · CSS steps() · no build step · F5 to refresh</p>
   </div>
 </header>
 
-<nav class="tab-bar">
-  <button class="tab active" onclick="showTab('characters')">Characters</button>
-  <button class="tab" onclick="showTab('battle')">Battle Scene</button>
-  <button class="tab" onclick="showTab('spritesheet')">Spritesheet ✨</button>
-  <button class="tab" onclick="showTab('settings')">Settings</button>
-  <button class="tab" onclick="showTab('workflow')">Workflow</button>
-</nav>
+<div class="main">
 
-<!-- ═══════════════════════════════ CHARACTERS TAB ═══════════════════════════════ -->
-<div id="tab-characters" class="panel active">
-  <div class="hint" style="max-width:900px;margin-bottom:16px">
-    Click the buttons under each character to preview animations. Tweak timing in the <strong>Settings</strong> tab.
-  </div>
-  <div class="sprite-grid" id="sprite-grid"></div>
-</div>
-
-<!-- ════════════════════════════════ BATTLE TAB ═════════════════════════════════ -->
-<div id="tab-battle" class="panel">
-  <div class="battle-scene">
-    <div class="hint">
-      A synchronized battle view. <strong>Knight Attack</strong> → knight lunges + enemy recoils.
-      <strong>Enemy Attack</strong> → enemy lunges + knight recoils. Sequences play automatically.
+  <!-- Stage A: ss_n2 -->
+  <div class="stage-wrap" id="wrap-a">
+    <div class="stage-label">ss_n2</div>
+    <div class="stage">
+      <img class="stage-bg" id="bg-a" src="assets/backgrounds/forest.webp" alt="" />
+      <div class="sprite" id="sprite-a"></div>
     </div>
-
-    <div class="enemy-picker" id="enemy-picker"></div>
-
-    <div class="battle-arena" id="battle-arena">
-      <img id="arena-bg" class="arena-bg-img" src="" alt="" />
-      <div class="arena-ground"></div>
-
-      <!-- Knight (left side) -->
-      <div id="battle-knight-wrap" class="sprite-wrap knight anim-idle" style="position:relative;z-index:2;margin-bottom:30px">
-        <img id="battle-knight-img" src="assets/characters/knight/knight-idle.webp" width="80" height="107" alt="knight" />
-      </div>
-
-      <!-- Enemy (right side) -->
-      <div id="battle-enemy-wrap" class="sprite-wrap enemy anim-idle" style="position:relative;z-index:2;margin-bottom:30px">
-        <img id="battle-enemy-img" src="assets/characters/goblin/goblin-idle.webp" width="80" height="107" alt="enemy" />
-      </div>
-    </div>
-
-    <div class="battle-controls">
-      <button class="battle-btn btn-attack" onclick="battleAction('knightAttack')" style="background:#3b2a00;border-color:#fbbf24;color:#fde68a">⚔️ Knight Attack</button>
-      <button class="battle-btn btn-hit"    onclick="battleAction('enemyAttack')"  style="background:#1a0030;border-color:#a78bfa;color:#c4b5fd">🗡️ Enemy Attack</button>
-      <button class="battle-btn btn-dead"   onclick="battleAction('enemyDead')"    style="background:#2a0000;border-color:#f87171;color:#fca5a5">💀 Enemy Dies</button>
-      <button class="battle-btn btn-dead"   onclick="battleAction('knightDead')"   style="background:#0a1a00;border-color:#4ade80;color:#86efac">💀 Knight Dies</button>
-      <button class="battle-btn btn-seq"    onclick="playSequence()"               style="background:#0f2d1a;border-color:#4ade80;color:#86efac">▶ Play Full Sequence</button>
-      <button class="battle-btn btn-idle"   onclick="battleReset()"                style="background:#1e3a5f;border-color:#3b82f6;color:#93c5fd">↺ Reset</button>
-    </div>
-
-    <div class="seq-steps" id="seq-steps">
-      <span class="seq-step" data-seq="0">Knight Atk</span>
-      <span class="seq-step" data-seq="1">Enemy Atk</span>
-      <span class="seq-step" data-seq="2">Knight Atk</span>
-      <span class="seq-step" data-seq="3">Enemy Atk</span>
-      <span class="seq-step" data-seq="4">Knight Atk</span>
-      <span class="seq-step" data-seq="5">Enemy Dies</span>
-    </div>
-  </div>
-</div>
-
-<!-- ══════════════════════════════ SPRITESHEET TAB ══════════════════════════════ -->
-<div id="tab-spritesheet" class="panel">
-  <div class="hint" style="max-width:960px;margin-bottom:16px">
-    CSS <code>steps()</code> animation — the spritesheet is used <strong>as-is</strong>, no splitting.
-    Select a row, adjust FPS and frame range, then port the values straight into the game component.
+    <div class="strip" id="strip-a"></div>
   </div>
 
-  <div class="ss-layout">
-
-    <!-- Stage -->
-    <div>
-      <div class="ss-stage" id="ss-stage">
-        <img class="ss-stage-bg" id="ss-bg" src="assets/backgrounds/forest.webp" alt="" />
-        <div id="ss-sprite"></div>
-      </div>
-      <div style="margin-top:10px">
-        <p style="font-size:.75rem;color:#64748b;margin-bottom:6px">Full spritesheet (knight-sheet.webp)</p>
-        <img src="assets/characters/knight-sheet.webp" class="ss-sheet-preview" id="ss-sheet-img" alt="spritesheet" />
-        <div class="ss-frame-strip" id="ss-frame-strip" style="margin-top:8px"></div>
-      </div>
+  <!-- Stage B: ss_npro -->
+  <div class="stage-wrap" id="wrap-b">
+    <div class="stage-label">ss_npro</div>
+    <div class="stage">
+      <img class="stage-bg" id="bg-b" src="assets/backgrounds/forest.webp" alt="" />
+      <div class="sprite" id="sprite-b"></div>
     </div>
-
-    <!-- Controls -->
-    <div class="ss-controls">
-
-      <div>
-        <h3>Row (animation)</h3>
-        <div class="ss-row-btns" id="ss-row-btns">
-          <button class="ss-row-btn active" onclick="setRow(0)">Row 0</button>
-          <button class="ss-row-btn"        onclick="setRow(1)">Row 1</button>
-          <button class="ss-row-btn"        onclick="setRow(2)">Row 2</button>
-        </div>
-        <p id="ss-row-label" style="font-size:.72rem;color:#64748b;margin-top:4px">— label this row once you know what it is</p>
-      </div>
-
-      <div>
-        <h3>Frame range</h3>
-        <div class="ss-range-row">
-          <label>Start frame</label>
-          <input type="number" id="ss-start" value="0" min="0" max="7" oninput="updateSprite()" />
-          <span>/ 0–7</span>
-        </div>
-        <div class="ss-range-row" style="margin-top:6px">
-          <label>End frame</label>
-          <input type="number" id="ss-end" value="7" min="0" max="7" oninput="updateSprite()" />
-        </div>
-      </div>
-
-      <div>
-        <h3>Timing</h3>
-        <div class="ss-slider-row">
-          <label>FPS</label>
-          <input type="range" id="ss-fps" min="1" max="24" step="1" value="8" oninput="updateSprite()" />
-          <span class="val" id="ss-fps-val">8</span>
-        </div>
-        <div class="ss-slider-row">
-          <label>Scale</label>
-          <input type="range" id="ss-scale" min="0.5" max="4" step="0.25" value="1.5" oninput="updateSprite()" />
-          <span class="val" id="ss-scale-val">1.5×</span>
-        </div>
-        <div class="ss-slider-row">
-          <label>Flip</label>
-          <input type="range" id="ss-flip" min="-1" max="1" step="2" value="1" oninput="updateSprite()" />
-          <span class="val" id="ss-flip-val">normal</span>
-        </div>
-      </div>
-
-      <div>
-        <h3>Background</h3>
-        <div class="ss-row-btns">
-          <button class="ss-row-btn active" onclick="setBg('forest')">Forest</button>
-          <button class="ss-row-btn" onclick="setBg('swamp')">Swamp</button>
-          <button class="ss-row-btn" onclick="setBg('mountains')">Mountains</button>
-          <button class="ss-row-btn" onclick="setBg('castle')">Castle</button>
-          <button class="ss-row-btn" onclick="setBg('dragon-lair')">Dragon</button>
-          <button class="ss-row-btn" onclick="setBg(null)">None</button>
-        </div>
-      </div>
-
-      <button class="ss-play-btn" id="ss-pause-btn" onclick="togglePause()">⏸ Pause</button>
-
-      <div style="background:#0f0c1a;border:1px solid #1e293b;border-radius:6px;padding:10px;font-size:.72rem;color:#64748b;line-height:1.8;font-family:monospace" id="ss-code-hint">
-        <!-- filled by JS -->
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ════════════════════════════════ SETTINGS TAB ═══════════════════════════════ -->
-<div id="tab-settings" class="panel">
-  <div class="hint" style="max-width:900px;margin-bottom:16px">
-    These sliders control CSS custom properties used by all animations. Changes apply live.
-    When you find values you like, copy the <code>:root { … }</code> block into the game's component.
-  </div>
-  <div class="settings-grid">
-    <div class="setting-card">
-      <h4>Idle</h4>
-      <div class="setting-row">
-        <label>Duration</label>
-        <input type="range" min="1" max="6" step="0.1" value="3.0" oninput="setCSSVar('--idle-duration', this.value+'s')" />
-        <span class="val" data-var="--idle-duration">3.0s</span>
-      </div>
-      <div class="setting-row">
-        <label>Amplitude (px)</label>
-        <input type="range" min="1" max="12" step="0.5" value="4" oninput="setCSSVar('--idle-amplitude', this.value+'px')" />
-        <span class="val" data-var="--idle-amplitude">4px</span>
-      </div>
-    </div>
-    <div class="setting-card">
-      <h4>Knight Attack</h4>
-      <div class="setting-row">
-        <label>Duration</label>
-        <input type="range" min="0.1" max="1.0" step="0.01" value="0.45" oninput="setCSSVar('--attack-duration', this.value+'s')" />
-        <span class="val" data-var="--attack-duration">0.45s</span>
-      </div>
-      <div class="setting-row">
-        <label>Lunge (px)</label>
-        <input type="range" min="10" max="120" step="2" value="54" oninput="setCSSVar('--attack-lunge', this.value+'px')" />
-        <span class="val" data-var="--attack-lunge">54px</span>
-      </div>
-    </div>
-    <div class="setting-card">
-      <h4>Enemy Attack</h4>
-      <div class="setting-row">
-        <label>Lunge (px)</label>
-        <input type="range" min="-80" max="-5" step="2" value="-20" oninput="setCSSVar('--enemy-lunge', this.value+'px')" />
-        <span class="val" data-var="--enemy-lunge">-20px</span>
-      </div>
-    </div>
-    <div class="setting-card">
-      <h4>Hit Recoil</h4>
-      <div class="setting-row">
-        <label>Duration</label>
-        <input type="range" min="0.1" max="0.8" step="0.01" value="0.35" oninput="setCSSVar('--hit-duration', this.value+'s')" />
-        <span class="val" data-var="--hit-duration">0.35s</span>
-      </div>
-      <div class="setting-row">
-        <label>Knight recoil (px)</label>
-        <input type="range" min="2" max="40" step="1" value="12" oninput="setCSSVar('--hit-recoil', this.value+'px')" />
-        <span class="val" data-var="--hit-recoil">12px</span>
-      </div>
-      <div class="setting-row">
-        <label>Enemy recoil (px)</label>
-        <input type="range" min="2" max="40" step="1" value="15" oninput="setCSSVar('--enemy-recoil', this.value+'px')" />
-        <span class="val" data-var="--enemy-recoil">15px</span>
-      </div>
-    </div>
-    <div class="setting-card">
-      <h4>Death</h4>
-      <div class="setting-row">
-        <label>Duration</label>
-        <input type="range" min="0.2" max="1.5" step="0.05" value="0.65" oninput="setCSSVar('--death-duration', this.value+'s')" />
-        <span class="val" data-var="--death-duration">0.65s</span>
-      </div>
-      <div class="setting-row">
-        <label>Slide distance (px)</label>
-        <input type="range" min="60" max="300" step="5" value="160" oninput="setCSSVar('--death-slide', this.value+'px')" />
-        <span class="val" data-var="--death-slide">160px</span>
-      </div>
-    </div>
+    <div class="strip" id="strip-b"></div>
   </div>
 
-  <hr class="divider" />
-  <div style="font-size:.8rem;color:#64748b;margin-top:4px">
-    Copy into <code style="background:#0f172a;color:#7dd3fc;padding:2px 6px;border-radius:3px">EnemyCharacter.jsx</code> or
-    <code style="background:#0f172a;color:#7dd3fc;padding:2px 6px;border-radius:3px">KnightCharacter.jsx</code> when satisfied.
-    Framer Motion uses the same durations — just swap the JS number in the <code>transition: { duration: … }</code> object.
-  </div>
-</div>
+  <!-- Shared controls -->
+  <div class="controls">
 
-<!-- ════════════════════════════════ WORKFLOW TAB ═══════════════════════════════ -->
-<div id="tab-workflow" class="panel">
-  <div class="workflow">
-    <div class="step">
-      <div class="step-num">1</div>
-      <div class="step-body">
-        <h3>Start the dev server</h3>
-        <p>Run once per session from the project root:</p>
-        <pre>npm run dev</pre>
-        <p>Then open <code>http://localhost:5173/NumKnight/animation-test.html</code> in your browser.</p>
-      </div>
-    </div>
-    <div class="step">
-      <div class="step-num">2</div>
-      <div class="step-body">
-        <h3>Edit this file, refresh to see changes</h3>
-        <p>This file is a standalone HTML in <code>public/</code> — Vite serves it directly.
-        Edit <code>public/animation-test.html</code> and hit <kbd>F5</kbd> to refresh.
-        No build step, no hot-reload lag.</p>
-      </div>
-    </div>
-    <div class="step">
-      <div class="step-num">3</div>
-      <div class="step-body">
-        <h3>Tune timing with the Settings tab</h3>
-        <p>Sliders update live. When you find values you like, note them down — then copy
-        the numbers into the Framer Motion <code>transition</code> objects in the game components.</p>
-      </div>
-    </div>
-    <div class="step">
-      <div class="step-num">4</div>
-      <div class="step-body">
-        <h3>Port animations into React components</h3>
-        <p>The game uses <strong>Framer Motion</strong> for all character animations.
-        The CSS animations here map 1:1 to Framer Motion's API:</p>
-        <pre>// CSS: translateX(0 → 54px → 0) over 0.45s
-// Framer Motion equivalent:
-animate={{ x: [0, 54, 0] }}
-transition={{ duration: 0.45, times: [0, 0.4, 1], ease: 'easeInOut' }}</pre>
-        <p>Key files to edit: <code>src/components/KnightCharacter.jsx</code>,
-        <code>src/components/EnemyCharacter.jsx</code></p>
-      </div>
-    </div>
-    <div class="step">
-      <div class="step-num">5</div>
-      <div class="step-body">
-        <h3>Test in the real game</h3>
-        <p>Dev server is already running — switch to
-        <code>http://localhost:5173/NumKnight/</code> and play through a battle.
-        Use Easy mode (1 battle/world) for the fastest loop.</p>
-      </div>
-    </div>
-    <div class="step">
-      <div class="step-num">6</div>
-      <div class="step-body">
-        <h3>Deploy to dev when ready</h3>
-        <pre>npm run deploy:dev</pre>
-        <p>Then commit and push following the sequence in CLAUDE.md.
-        This file (<code>animation-test.html</code>) deploys with the rest of
-        <code>public/</code> — that's fine for now.</p>
+    <div class="ctrl-section">
+      <h3>Row</h3>
+      <div class="pill-row" id="row-btns">
+        <button class="pill active" onclick="setRow(0)">Row 0</button>
+        <button class="pill"        onclick="setRow(1)">Row 1</button>
+        <button class="pill"        onclick="setRow(2)">Row 2</button>
       </div>
     </div>
 
-    <hr class="divider" />
-    <div style="font-size:.8rem;color:#64748b;line-height:1.7">
-      <strong style="color:#94a3b8">Sprite naming convention:</strong><br />
-      <code style="background:#0f172a;color:#7dd3fc;padding:2px 6px;border-radius:3px">assets/characters/{enemy-id}/{enemy-id}-{pose}.webp</code><br />
-      Poses: <code style="background:#0f172a;color:#7dd3fc;padding:2px 6px;border-radius:3px">idle · attack · hit · dead</code> — Knight also has <code style="background:#0f172a;color:#7dd3fc;padding:2px 6px;border-radius:3px">camp · victory</code>
+    <div class="ctrl-section">
+      <h3>Frame range</h3>
+      <div class="range-row">
+        <label>Start</label>
+        <input type="number" id="inp-start" value="0" min="0" max="7" oninput="update()" />
+        <span>0 – 7</span>
+      </div>
+      <div class="range-row">
+        <label>End</label>
+        <input type="number" id="inp-end" value="7" min="0" max="7" oninput="update()" />
+      </div>
     </div>
+
+    <div class="ctrl-section">
+      <h3>Timing &amp; size</h3>
+      <div class="slider-row">
+        <label>FPS</label>
+        <input type="range" id="inp-fps" min="1" max="24" step="1" value="8" oninput="update()" />
+        <span class="val" id="val-fps">8</span>
+      </div>
+      <div class="slider-row">
+        <label>Scale</label>
+        <input type="range" id="inp-scale" min="0.5" max="4" step="0.25" value="1.5" oninput="update()" />
+        <span class="val" id="val-scale">1.5×</span>
+      </div>
+      <div class="slider-row">
+        <label>Flip</label>
+        <input type="range" id="inp-flip" min="-1" max="1" step="2" value="1" oninput="update()" />
+        <span class="val" id="val-flip">→</span>
+      </div>
+    </div>
+
+    <div class="ctrl-section">
+      <h3>Background</h3>
+      <div class="pill-row" id="bg-btns">
+        <button class="pill active" onclick="setBg('forest')">Forest</button>
+        <button class="pill" onclick="setBg('swamp')">Swamp</button>
+        <button class="pill" onclick="setBg('mountains')">Mountains</button>
+        <button class="pill" onclick="setBg('castle')">Castle</button>
+        <button class="pill" onclick="setBg('dragon-lair')">Dragon</button>
+        <button class="pill" onclick="setBg(null)">None</button>
+      </div>
+    </div>
+
+    <button class="play-btn" id="pause-btn" onclick="togglePause()">⏸ Pause</button>
+
+    <div class="code-hint" id="code-hint"></div>
   </div>
+
 </div>
 
 <script>
-/* ── Character config ── */
-const CHARS = [
-  { id: 'knight',     label: 'Knight',      folder: 'knight',     poses: ['idle','attack','hit','dead','camp','victory'], scale: 1.0,  isEnemy: false },
-  { id: 'goblin',     label: 'Goblin',      folder: 'goblin',     poses: ['idle','attack','hit','dead'],                  scale: 0.8,  isEnemy: true  },
-  { id: 'skeleton',   label: 'Skeleton',    folder: 'skeleton',   poses: ['idle','attack','hit','dead'],                  scale: 1.0,  isEnemy: true  },
-  { id: 'orc',        label: 'Orc',         folder: 'orc',        poses: ['idle','attack','hit','dead'],                  scale: 1.2,  isEnemy: true  },
-  { id: 'dark-knight',label: 'Dark Knight', folder: 'dark-knight',poses: ['idle','attack','hit','dead'],                  scale: 1.2,  isEnemy: true  },
-  { id: 'dragon',     label: 'Dragon',      folder: 'dragon',     poses: ['idle','attack','hit','dead'],                  scale: 1.7,  isEnemy: true  },
-];
+const SHEETS = {
+  a: { file: 'assets/characters/ss_n2.webp',   cols: 8, rows: 3, fw: 106, fh: 104, sw: 848, sh: 312 },
+  b: { file: 'assets/characters/ss_npro.webp',  cols: 8, rows: 3, fw: 88,  fh: 128, sw: 704, sh: 384 },
+}
+const THUMB_SCALE = 0.55
+let row     = 0
+let paused  = false
 
-const ENEMY_BG = {
-  goblin:       'assets/backgrounds/forest.webp',
-  skeleton:     'assets/backgrounds/swamp.webp',
-  orc:          'assets/backgrounds/mountains.webp',
-  'dark-knight':'assets/backgrounds/castle.webp',
-  dragon:       'assets/backgrounds/dragon-lair.webp',
-};
-
-/* ── Base sprite dimensions ── */
-const BASE_W = 84, BASE_H = 112;
-
-/* ── Tab switching ── */
-function showTab(id) {
-  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  document.getElementById('tab-' + id).classList.add('active');
-  event.target.classList.add('active');
+function getInputs() {
+  const fps   = parseInt(document.getElementById('inp-fps').value)
+  const scale = parseFloat(document.getElementById('inp-scale').value)
+  const flip  = parseFloat(document.getElementById('inp-flip').value)
+  const start = Math.max(0, Math.min(7, parseInt(document.getElementById('inp-start').value) || 0))
+  const end   = Math.max(start, Math.min(7, parseInt(document.getElementById('inp-end').value) || 7))
+  return { fps, scale, flip, start, end }
 }
 
-/* ── CSS variable slider ── */
-function setCSSVar(name, value) {
-  document.documentElement.style.setProperty(name, value);
-  document.querySelectorAll(`[data-var="${name}"]`).forEach(el => el.textContent = value);
+function applySprite(id, sheet, { fps, scale, flip, start, end }) {
+  const el     = document.getElementById('sprite-' + id)
+  const steps  = end - start + 1
+  const dur    = (steps / fps).toFixed(3)
+  const startX = -(start * sheet.fw)
+  const endX   = startX - steps * sheet.fw
+
+  el.style.width           = sheet.fw + 'px'
+  el.style.height          = sheet.fh + 'px'
+  el.style.backgroundImage = `url('${sheet.file}')`
+  el.style.backgroundSize  = `${sheet.sw}px ${sheet.sh}px`
+  el.style.backgroundPositionY = -(row * sheet.fh) + 'px'
+  el.style.transform       = `scaleX(${flip}) scale(${scale})`
+
+  // Inject a per-sprite keyframe so each can have its own pixel offsets
+  const kfName = `ss-walk-${id}`
+  let styleEl = document.getElementById('kf-' + id)
+  if (!styleEl) {
+    styleEl = document.createElement('style')
+    styleEl.id = 'kf-' + id
+    document.head.appendChild(styleEl)
+  }
+  styleEl.textContent = `@keyframes ${kfName} { from { background-position-x: ${startX}px } to { background-position-x: ${endX}px } }`
+
+  el.style.animation = 'none'
+  void el.offsetWidth
+  el.style.animation = `${kfName} ${dur}s steps(${steps}, end) infinite`
+  if (paused) el.style.animationPlayState = 'paused'
 }
 
-/* ── Individual card animation ── */
-function playCardAnim(id, animClass) {
-  const wrap = document.getElementById('wrap-' + id);
-  const img  = document.getElementById('img-'  + id);
-  const char = CHARS.find(c => c.id === id);
-  if (!wrap) return;
-
-  // Remove all anim classes
-  wrap.classList.remove('anim-idle','anim-attack','anim-hit','anim-dead');
-
-  const poseMap = { anim_idle: 'idle', anim_attack: 'attack', anim_hit: 'hit', anim_dead: 'dead' };
-  const pose = poseMap[animClass.replace('-','_')] || 'idle';
-  const safePose = char.poses.includes(pose) ? pose : 'idle';
-  img.src = `assets/characters/${char.folder}/${char.id === 'dark-knight' ? 'dark-knight' : char.folder}-${safePose}.webp`;
-
-  const label = document.getElementById('pose-label-' + id);
-  if (label) label.textContent = safePose;
-
-  // Force reflow so animation restarts
-  void wrap.offsetWidth;
-  wrap.classList.add(animClass);
-
-  // Return to idle after animation ends (except dead)
-  if (animClass !== 'anim-dead') {
-    const duration = parseFloat(getComputedStyle(document.documentElement)
-      .getPropertyValue(animClass === 'anim-attack' ? '--attack-duration'
-                      : animClass === 'anim-hit'    ? '--hit-duration'
-                      : '--idle-duration').trim()) * 1000;
-    setTimeout(() => {
-      img.src = `assets/characters/${char.folder}/${char.id === 'dark-knight' ? 'dark-knight' : char.folder}-idle.webp`;
-      if (label) label.textContent = 'idle';
-      wrap.classList.remove(animClass);
-      void wrap.offsetWidth;
-      wrap.classList.add('anim-idle');
-    }, animClass === 'anim-idle' ? 200 : duration + 50);
+function buildStrip(id, sheet, { start, end }) {
+  const strip = document.getElementById('strip-' + id)
+  strip.innerHTML = ''
+  const tw = Math.round(sheet.fw * THUMB_SCALE)
+  const th = Math.round(sheet.fh * THUMB_SCALE)
+  const tsw = Math.round(sheet.sw * THUMB_SCALE)
+  const tsh = Math.round(sheet.sh * THUMB_SCALE)
+  for (let f = 0; f < sheet.cols; f++) {
+    const d = document.createElement('div')
+    d.className = 'thumb' + (f >= start && f <= end ? ' active' : '')
+    d.title = 'Frame ' + f
+    d.style.cssText = `width:${tw}px;height:${th}px;background-image:url('${sheet.file}');background-size:${tsw}px ${tsh}px;background-position:${-(f*sheet.fw*THUMB_SCALE)}px ${-(row*sheet.fh*THUMB_SCALE)}px`
+    d.onclick = () => {
+      document.getElementById('inp-start').value = f
+      document.getElementById('inp-end').value   = f
+      update()
+    }
+    strip.appendChild(d)
   }
 }
 
-/* ── Build character grid ── */
-function buildGrid() {
-  const grid = document.getElementById('sprite-grid');
-  CHARS.forEach(char => {
-    const w = Math.round(BASE_W * char.scale);
-    const h = Math.round(BASE_H * char.scale);
-    const cls = char.isEnemy ? 'enemy' : 'knight';
-    const card = document.createElement('div');
-    card.className = 'char-card';
-    card.innerHTML = `
-      <h3>${char.label}</h3>
-      <div class="stage">
-        <div class="stage-ground"></div>
-        <div id="wrap-${char.id}" class="sprite-wrap ${cls} anim-idle" style="margin-bottom:${18 + (BASE_H - h) / 2}px">
-          <img id="img-${char.id}" src="assets/characters/${char.folder}/${char.folder === 'dark-knight' ? 'dark-knight' : char.folder}-idle.webp"
-               width="${w}" height="${h}" alt="${char.label}" />
-        </div>
-        <span id="pose-label-${char.id}" class="pose-label">idle</span>
-      </div>
-      <div class="btn-row">
-        <button class="btn btn-idle"   onclick="playCardAnim('${char.id}','anim-idle'  )">Idle</button>
-        <button class="btn btn-attack" onclick="playCardAnim('${char.id}','anim-attack')">Attack</button>
-        <button class="btn btn-hit"    onclick="playCardAnim('${char.id}','anim-hit'   )">Hit</button>
-        <button class="btn btn-dead"   onclick="playCardAnim('${char.id}','anim-dead'  )">Dead</button>
-      </div>`;
-    grid.appendChild(card);
-  });
+function updateCodeHint({ fps, start, end }) {
+  const sa = SHEETS.a, steps = end - start + 1, dur = (steps / fps).toFixed(3)
+  document.getElementById('code-hint').innerHTML =
+    `<span class="k">// ss_n2</span><br>` +
+    `width:${sa.fw}px; height:${sa.fh}px;<br>` +
+    `background-size:${sa.sw}px ${sa.sh}px;<br>` +
+    `animation: walk ${dur}s steps(${steps}) infinite;<br><br>` +
+    `<span class="k">// Framer Motion equivalent</span><br>` +
+    `animate={{ x: [0, ${Math.round(sa.fw*1.5)}, 0] }}<br>` +
+    `transition={{ duration: ${dur}, times:[0,.4,1] }}`
 }
 
-/* ── Battle tab ── */
-let currentEnemy = 'goblin';
-
-function buildEnemyPicker() {
-  const picker = document.getElementById('enemy-picker');
-  CHARS.filter(c => c.isEnemy).forEach(char => {
-    const btn = document.createElement('button');
-    btn.className = 'enemy-tab' + (char.id === 'goblin' ? ' active' : '');
-    btn.textContent = char.label;
-    btn.onclick = () => selectBattleEnemy(char.id);
-    picker.appendChild(btn);
-  });
+function update() {
+  const inp = getInputs()
+  document.getElementById('val-fps').textContent   = inp.fps
+  document.getElementById('val-scale').textContent = inp.scale + '×'
+  document.getElementById('val-flip').textContent  = inp.flip === -1 ? '←' : '→'
+  applySprite('a', SHEETS.a, inp)
+  applySprite('b', SHEETS.b, inp)
+  buildStrip('a', SHEETS.a, inp)
+  buildStrip('b', SHEETS.b, inp)
+  updateCodeHint(inp)
 }
-
-function selectBattleEnemy(id) {
-  currentEnemy = id;
-  document.querySelectorAll('.enemy-tab').forEach(b => b.classList.remove('active'));
-  event.target.classList.add('active');
-  const char = CHARS.find(c => c.id === id);
-  const img  = document.getElementById('battle-enemy-img');
-  const w = Math.round(BASE_W * char.scale), h = Math.round(BASE_H * char.scale);
-  img.src = `assets/characters/${char.folder}/${char.id === 'dark-knight' ? 'dark-knight' : char.folder}-idle.webp`;
-  img.width = w; img.height = h;
-  // Update background
-  const bgEl = document.getElementById('arena-bg');
-  bgEl.src = ENEMY_BG[id] || '';
-  battleReset();
-}
-
-function getSpriteUrl(charId, pose) {
-  const char = CHARS.find(c => c.id === charId);
-  const folder = char.folder;
-  const prefix = charId === 'dark-knight' ? 'dark-knight' : folder;
-  const safePose = char.poses.includes(pose) ? pose : 'idle';
-  return `assets/characters/${folder}/${prefix}-${safePose}.webp`;
-}
-
-function setSprite(el, charId, pose) {
-  el.src = getSpriteUrl(charId, pose);
-}
-
-function getMs(varName) {
-  return parseFloat(getComputedStyle(document.documentElement).getPropertyValue(varName).trim()) * 1000;
-}
-
-function battleReset() {
-  const kWrap = document.getElementById('battle-knight-wrap');
-  const eWrap = document.getElementById('battle-enemy-wrap');
-  const kImg  = document.getElementById('battle-knight-img');
-  const eImg  = document.getElementById('battle-enemy-img');
-  const char  = CHARS.find(c => c.id === currentEnemy);
-
-  kWrap.classList.remove('anim-idle','anim-attack','anim-hit','anim-dead');
-  eWrap.classList.remove('anim-idle','anim-attack','anim-hit','anim-dead');
-  void kWrap.offsetWidth;
-  setSprite(kImg, 'knight', 'idle');
-  setSprite(eImg, currentEnemy, 'idle');
-  kWrap.style.opacity = '1';
-  eWrap.style.opacity = '1';
-  const w = Math.round(BASE_W * char.scale), h = Math.round(BASE_H * char.scale);
-  eImg.width = w; eImg.height = h;
-  kWrap.classList.add('anim-idle');
-  eWrap.classList.add('anim-idle');
-  document.querySelectorAll('.seq-step').forEach(s => s.classList.remove('active','done'));
-}
-
-function battleAction(action) {
-  const kWrap = document.getElementById('battle-knight-wrap');
-  const eWrap = document.getElementById('battle-enemy-wrap');
-  const kImg  = document.getElementById('battle-knight-img');
-  const eImg  = document.getElementById('battle-enemy-img');
-
-  const attackMs = getMs('--attack-duration');
-  const hitMs    = getMs('--hit-duration');
-  const deathMs  = getMs('--death-duration');
-
-  if (action === 'knightAttack') {
-    // Knight lunges → enemy recoils + hit sprite
-    kWrap.classList.remove('anim-idle','anim-attack','anim-hit','anim-dead');
-    eWrap.classList.remove('anim-idle','anim-attack','anim-hit','anim-dead');
-    void kWrap.offsetWidth;
-    setSprite(kImg, 'knight', 'attack');
-    setSprite(eImg, currentEnemy, 'hit');
-    kWrap.classList.add('anim-attack');
-    eWrap.classList.add('anim-hit');
-    setTimeout(() => {
-      setSprite(kImg, 'knight', 'idle');
-      setSprite(eImg, currentEnemy, 'idle');
-      kWrap.classList.remove('anim-attack'); eWrap.classList.remove('anim-hit');
-      void kWrap.offsetWidth;
-      kWrap.classList.add('anim-idle'); eWrap.classList.add('anim-idle');
-    }, Math.max(attackMs, hitMs) + 80);
-  }
-
-  if (action === 'enemyAttack') {
-    // Enemy lunges → knight recoils + hit sprite
-    kWrap.classList.remove('anim-idle','anim-attack','anim-hit','anim-dead');
-    eWrap.classList.remove('anim-idle','anim-attack','anim-hit','anim-dead');
-    void kWrap.offsetWidth;
-    setSprite(kImg, 'knight', 'hit');
-    setSprite(eImg, currentEnemy, 'attack');
-    eWrap.classList.add('anim-attack');
-    kWrap.classList.add('anim-hit');
-    setTimeout(() => {
-      setSprite(kImg, 'knight', 'idle');
-      setSprite(eImg, currentEnemy, 'idle');
-      kWrap.classList.remove('anim-hit'); eWrap.classList.remove('anim-attack');
-      void kWrap.offsetWidth;
-      kWrap.classList.add('anim-idle'); eWrap.classList.add('anim-idle');
-    }, Math.max(attackMs, hitMs) + 80);
-  }
-
-  if (action === 'enemyDead') {
-    eWrap.classList.remove('anim-idle','anim-attack','anim-hit','anim-dead');
-    setSprite(eImg, currentEnemy, 'dead');
-    void eWrap.offsetWidth;
-    eWrap.classList.add('anim-dead');
-  }
-
-  if (action === 'knightDead') {
-    kWrap.classList.remove('anim-idle','anim-attack','anim-hit','anim-dead');
-    setSprite(kImg, 'knight', 'dead');
-    void kWrap.offsetWidth;
-    kWrap.classList.add('anim-dead');
-  }
-}
-
-/* ── Full sequence ── */
-async function playSequence() {
-  battleReset();
-  await sleep(300);
-  const steps = [
-    { action: 'knightAttack', idx: 0 },
-    { action: 'enemyAttack',  idx: 1 },
-    { action: 'knightAttack', idx: 2 },
-    { action: 'enemyAttack',  idx: 3 },
-    { action: 'knightAttack', idx: 4 },
-    { action: 'enemyDead',    idx: 5 },
-  ];
-  const attackMs = getMs('--attack-duration');
-  const hitMs    = getMs('--hit-duration');
-  const deathMs  = getMs('--death-duration');
-  const stepDur  = Math.max(attackMs, hitMs) + 500;
-
-  for (const step of steps) {
-    document.querySelector(`[data-seq="${step.idx}"]`).classList.add('active');
-    battleAction(step.action);
-    await sleep(step.action === 'enemyDead' ? deathMs + 200 : stepDur);
-    document.querySelector(`[data-seq="${step.idx}"]`).classList.remove('active');
-    document.querySelector(`[data-seq="${step.idx}"]`).classList.add('done');
-  }
-}
-
-function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
-
-/* ══════════════════════════════════════════════════════════════════
-   Spritesheet tab
-   Sheet: knight-sheet.webp — 704×384, 8 cols × 3 rows, 88×128 px/frame
-   ══════════════════════════════════════════════════════════════════ */
-const SS = { cols: 8, rows: 3, fw: 88, fh: 128, sw: 704, sh: 384 }
-const SS_THUMB_SCALE = 0.6   // strip thumbnail scale
-const ROW_LABELS = ['Row 0 — Walk?', 'Row 1 — ?', 'Row 2 — ?']
-
-let ssRow     = 0
-let ssPaused  = false
-// thumb scale helper — recomputed when sprite scale changes
-const THUMB_W = Math.round(SS.fw * SS_THUMB_SCALE)
-const THUMB_H = Math.round(SS.fh * SS_THUMB_SCALE)
-const THUMB_SW = Math.round(SS.sw * SS_THUMB_SCALE)
-const THUMB_SH = Math.round(SS.sh * SS_THUMB_SCALE)
-
-// Seed CSS thumb vars once (they don't change)
-document.documentElement.style.setProperty('--ss-thumb-w', THUMB_W + 'px')
-document.documentElement.style.setProperty('--ss-thumb-h', THUMB_H + 'px')
-document.documentElement.style.setProperty('--ss-sw', SS.sw + 'px')
-document.documentElement.style.setProperty('--ss-sh', SS.sh + 'px')
 
 function setRow(r) {
-  ssRow = r
-  document.querySelectorAll('.ss-row-btn').forEach((b, i) => {
-    if (b.getAttribute('onclick') === `setRow(${r})`) b.classList.add('active')
-    else if (b.getAttribute('onclick')?.startsWith('setRow(')) b.classList.remove('active')
-  })
-  document.getElementById('ss-row-label').textContent = ROW_LABELS[r] || `Row ${r}`
-  buildFrameStrip()
-  updateSprite()
+  row = r
+  document.querySelectorAll('#row-btns .pill').forEach((b, i) => b.classList.toggle('active', i === r))
+  update()
 }
 
 function setBg(world) {
-  const el = document.getElementById('ss-bg')
-  document.querySelectorAll('#tab-spritesheet .ss-row-btn').forEach(b => {
-    if (b.getAttribute('onclick') === `setBg('${world}')` || (world === null && b.getAttribute('onclick') === "setBg(null)"))
-      b.classList.add('active')
-    else if (b.getAttribute('onclick')?.startsWith('setBg('))
-      b.classList.remove('active')
+  const src = world ? `assets/backgrounds/${world}.webp` : ''
+  document.getElementById('bg-a').src = src
+  document.getElementById('bg-b').src = src
+  document.getElementById('bg-a').style.opacity = world ? '0.5' : '0'
+  document.getElementById('bg-b').style.opacity = world ? '0.5' : '0'
+  document.querySelectorAll('#bg-btns .pill').forEach(b => {
+    const match = world ? b.getAttribute('onclick') === `setBg('${world}')` : b.getAttribute('onclick') === 'setBg(null)'
+    b.classList.toggle('active', match)
   })
-  el.src = world ? `assets/backgrounds/${world}.webp` : ''
-  el.style.opacity = world ? '0.45' : '0'
 }
 
 function togglePause() {
-  ssPaused = !ssPaused
-  const sprite = document.getElementById('ss-sprite')
-  sprite.classList.toggle('paused', ssPaused)
-  document.getElementById('ss-pause-btn').textContent = ssPaused ? '▶ Play' : '⏸ Pause'
+  paused = !paused
+  const state = paused ? 'paused' : 'running'
+  document.getElementById('sprite-a').style.animationPlayState = state
+  document.getElementById('sprite-b').style.animationPlayState = state
+  document.getElementById('pause-btn').textContent = paused ? '▶ Play' : '⏸ Pause'
 }
 
-function updateSprite() {
-  const fps     = parseInt(document.getElementById('ss-fps').value)
-  const scale   = parseFloat(document.getElementById('ss-scale').value)
-  const flip    = parseFloat(document.getElementById('ss-flip').value)
-  const startF  = Math.max(0, Math.min(7, parseInt(document.getElementById('ss-start').value) || 0))
-  const endF    = Math.max(startF, Math.min(7, parseInt(document.getElementById('ss-end').value) || 7))
-  const steps   = endF - startF + 1
-  const dur     = (steps / fps).toFixed(3)
-
-  // Update labels
-  document.getElementById('ss-fps-val').textContent   = fps
-  document.getElementById('ss-scale-val').textContent = scale + '×'
-  document.getElementById('ss-flip-val').textContent  = flip === -1 ? 'flipped' : 'normal'
-
-  // CSS custom property values
-  const startX = -(startF * SS.fw)          // initial background-position-x
-  const endX   = -(endF   * SS.fw) - SS.fw  // one frame past end
-
-  const el = document.getElementById('ss-sprite')
-  const root = document.documentElement
-
-  root.style.setProperty('--ss-fw',       SS.fw + 'px')
-  root.style.setProperty('--ss-fh',       SS.fh + 'px')
-  root.style.setProperty('--ss-row-y',    -(ssRow * SS.fh) + 'px')
-  root.style.setProperty('--ss-start-x',  startX + 'px')
-  root.style.setProperty('--ss-end-x',    endX   + 'px')
-  root.style.setProperty('--ss-steps',    steps)
-  root.style.setProperty('--ss-duration', dur + 's')
-  root.style.setProperty('--ss-flip',     flip)
-  root.style.setProperty('--ss-scale',    scale)
-
-  // Force animation restart so new steps() takes effect
-  el.style.animation = 'none'
-  void el.offsetWidth
-  el.style.animation = ''
-
-  // Update frame strip highlight
-  updateFrameStripHighlight(startF, endF)
-
-  // Code hint
-  document.getElementById('ss-code-hint').innerHTML =
-    `<span style="color:#7dd3fc">// CSS usage</span><br>` +
-    `width: ${SS.fw}px; height: ${SS.fh}px;<br>` +
-    `background-size: ${SS.sw}px ${SS.sh}px;<br>` +
-    `background-position-y: ${-(ssRow * SS.fh)}px;<br>` +
-    `animation: ss-walk ${dur}s steps(${steps}) infinite;<br><br>` +
-    `<span style="color:#7dd3fc">// @keyframes ss-walk</span><br>` +
-    `from { background-position-x: ${startX}px }<br>` +
-    `to   { background-position-x: ${endX}px }`
-}
-
-function buildFrameStrip() {
-  const strip = document.getElementById('ss-frame-strip')
-  strip.innerHTML = ''
-  for (let f = 0; f < SS.cols; f++) {
-    const div = document.createElement('div')
-    div.className = 'ss-frame'
-    div.id = `ss-thumb-${f}`
-    div.title = `Frame ${f}`
-    div.style.backgroundPositionX = -(f * SS.fw * SS_THUMB_SCALE) + 'px'
-    div.style.backgroundPositionY = -(ssRow * SS.fh * SS_THUMB_SCALE) + 'px'
-    div.style.backgroundSize = THUMB_SW + 'px ' + THUMB_SH + 'px'
-    div.onclick = () => {
-      document.getElementById('ss-start').value = f
-      document.getElementById('ss-end').value   = f
-      updateSprite()
-    }
-    strip.appendChild(div)
-  }
-}
-
-function updateFrameStripHighlight(start, end) {
-  for (let f = 0; f < SS.cols; f++) {
-    const el = document.getElementById(`ss-thumb-${f}`)
-    if (el) el.classList.toggle('active', f >= start && f <= end)
-  }
-}
-
-/* ── Init ── */
-buildGrid();
-buildEnemyPicker();
-buildFrameStrip();
-updateSprite();
-
-// Set initial background
-document.getElementById('arena-bg').src = ENEMY_BG['goblin'] || '';
+// Init
+update()
 </script>
 </body>
 </html>
